@@ -76,7 +76,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setDefault('emailperiodcount','1');
         $mform->setDefault('emailperiod','604800');
 
-        $mform->addElement('textarea', 'usertext', get_string('usertext', 'reengagement'),array('rows=5','cols=60'));
+        $mform->addElement('editor', 'usertext', get_string('usertext', 'reengagement'),array('rows=5','cols=60'));
         $mform->setDefault('usertext', get_string('usertextdefaultvalue','reengagement'));
         $mform->setType('usertext', PARAM_RAW);
         $mform->addHelpButton('usertext', 'usertext', 'reengagement');
