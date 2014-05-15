@@ -319,7 +319,7 @@ function reengagement_email_user($reengagement, $inprogress) {
     $emailsenduser->lastname = '';
     $emailsenduser->email = $CFG->noreplyaddress;
     $emailsenduser->maildisplay = false;
-    $result = email_to_user($user, $emailsenduser, $emailsubject, $reengagement->usertext);
+    $result = email_to_user($user, $emailsenduser, $emailsubject, html_to_text($reengagement->usertext), $reengagement->usertext);
     return $result;
 }
 
