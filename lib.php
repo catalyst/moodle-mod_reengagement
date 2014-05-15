@@ -22,6 +22,7 @@ require_once($CFG->libdir."/completionlib.php");
 define('REENGAGEMENT_EMAILUSER_NEVER', 0);
 define('REENGAGEMENT_EMAILUSER_COMPLETION', 1);
 define('REENGAGEMENT_EMAILUSER_TIME', 2);
+define('REENGAGEMENT_EMAILUSER_RESERVED1', 3);
 
 
 /**
