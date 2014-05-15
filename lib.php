@@ -67,8 +67,8 @@ function reengagement_update_instance($reengagement) {
         $reengagement->supresstarget = 0;//no target to be set
     }
     unset($reengagement->supressemail);
-
-    return $DB->update_record('reengagement', $reengagement);
+    $result = $DB->update_record('reengagement', $reengagement);
+    return $result;
 }
 
 
@@ -179,9 +179,9 @@ function reengagement_cron() {
     $timenow = time();
     $reengagementmod = $DB->get_record('modules', array('name' => 'reengagement'));
 
-    $reengagementssql = "SELECT cm.id as id, cm.id as cmid, s.id as sid, s.duration
-                      FROM {reengagement} s
-                      INNER JOIN {course_modules} cm on cm.instance = s.id
+    $reengagementssql = "SELECT cm.id as id, cm.id as cmid, r.id as rid, r.duration, r.emaildelay
+                      FROM {reengagement} r
+                      INNER JOIN {course_modules} cm on cm.instance = r.id
                       WHERE cm.module = :moduleid";
 
     $reengagements = $DB->get_records_sql($reengagementssql, array("moduleid" => $reengagementmod->id));
@@ -199,7 +199,7 @@ function reengagement_cron() {
 
         // Prepare some objects for later db insertion
         $reengagement_inprogress = new stdClass();
-        $reengagement_inprogress->reengagement = $reengagementcm->sid;
+        $reengagement_inprogress->reengagement = $reengagementcm->rid;
         $reengagement_inprogress->completiontime = $timenow + $reengagementcm->duration;
         $reengagement_inprogress->emailtime = $timenow + $reengagementcm->emaildelay;
         $activity_completion = new stdClass();
@@ -207,7 +207,7 @@ function reengagement_cron() {
         $activity_completion->completionstate = COMPLETION_INCOMPLETE;
         $activity_completion->timemodified = $timenow;
         $userlist = array_keys($startusers);
-        mtrace("Adding " . count($userlist) . " reengagements-in-progress to reengagementid " . $reengagementcm->sid);
+        mtrace("Adding " . count($userlist) . " reengagements-in-progress to reengagementid " . $reengagementcm->rid);
 
         foreach ($userlist as $userid) {
             $reengagement_inprogress->userid = $userid;
@@ -222,9 +222,9 @@ function reengagement_cron() {
     // Get more info about the stand down, & prepare to update db
     // and email users.
 
-    $reengagementssql = "SELECT s.id as id, cm.id as cmid, s.admintext, s.usertext, s.emailuser, s.name, s.supresstarget
-                      FROM {reengagement} s
-                      INNER JOIN {course_modules} cm ON cm.instance = s.id
+    $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.usertext, r.emailuser, r.name, r.supresstarget
+                      FROM {reengagement} r
+                      INNER JOIN {course_modules} cm ON cm.instance = r.id
                       WHERE cm.module = :moduleid";
 
     $reengagements = $DB->get_records_sql($reengagementssql, array('moduleid' => $reengagementmod->id));
@@ -281,6 +281,7 @@ function reengagement_cron() {
 
     $inprogresses = $DB->get_records_sql($inprogresssql, $params);
     foreach ($inprogresses as $inprogress) {
+        $reengagement = $reengagements[$inprogress->reengagement];
         if ($inprogress->completed == COMPLETION_COMPLETE) {
             $result = $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
         } else {
@@ -298,7 +299,7 @@ function reengagement_cron() {
 }
 
 function reengagement_email_user($reengagement, $inprogress) {
-    global $DB;
+    global $DB, $SITE, $CFG;
     $user = $DB->get_record('user', array('id' =>  $inprogress->userid));
     $sendemail = true;
     if (!empty($reengagement->supresstarget)) {
@@ -486,11 +487,12 @@ function reengagement_reset_userdata($data) {
 
 /* Get array of users who can start supplied reengagement module */
 function reengagement_get_startusers($reengagement) {
-    $context = get_context_instance(CONTEXT_MODULE, $reengagementcm->cmid);
+    global $DB;
+    $context = get_context_instance(CONTEXT_MODULE, $reengagement->cmid);
     $startusers = get_users_by_capability($context, 'mod/reengagement:startreengagement',
             'u.id, email, firstname, lastname, emailstop', '', '', '', '', '', false);
 
-    $conditions = $DB->get_records('course_modules_availability', array('coursemoduleid' => $reengagementcm->cmid));
+    $conditions = $DB->get_records('course_modules_availability', array('coursemoduleid' => $reengagement->cmid));
     while (!empty($conditions)) {
         $condition = array_shift($conditions);
         //Get a list of users who are compliant with this condition.
@@ -508,7 +510,7 @@ function reengagement_get_startusers($reengagement) {
     $alreadysql = "SELECT userid, userid as junk
                    FROM  {course_modules_completion}
                    WHERE coursemoduleid = :moduleid";
-    $alreadyusers = $DB->get_records_sql($alreadysql, array('moduleid' => $reengagementcm->id));
+    $alreadyusers = $DB->get_records_sql($alreadysql, array('moduleid' => $reengagement->id));
 
     // Remove users who have already started the module from the starting list.
     foreach ($alreadyusers as $a_user) {
