@@ -53,17 +53,33 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->addElement('header', 'reengagementfieldset', get_string('reengagementfieldset', 'reengagement'));
 
         /// Adding email detail fields:
-        $mform->addElement('checkbox', 'emailuser', get_string('emailuser', 'reengagement'));
+        $emailuseroptions = array(); // The sorts of emailing this module might do.
+        $emailuseroptions[REENGAGEMENT_EMAILUSER_NEVER] = get_string('never', 'reengagement');
+        $emailuseroptions[REENGAGEMENT_EMAILUSER_COMPLETION] = get_string('oncompletion', 'reengagement');
+        $emailuseroptions[REENGAGEMENT_EMAILUSER_TIME] = get_string('afterdelay', 'reengagement');
+        
+        $mform->addElement('select', 'emailuser', get_string('emailuser', 'reengagement'), $emailuseroptions);
         $mform->addHelpButton('emailuser', 'emailuser','reengagement');
+
+        // Add a group of controls to specify after how long an email should be sent.
+        $emaildelay;
+        $periods = array();
+        $periods[60] = get_string('minutes','reengagement');
+        $periods[3600] = get_string('hours','reengagement');
+        $periods[86400] = get_string('days','reengagement');
+        $periods[604800] = get_string('weeks','reengagement');
+        $emaildelay[] = $mform->createElement('text', 'emailperiodcount', '', array('class="emailperiodcount"'));
+        $emaildelay[] = $mform->createElement('select', 'emailperiod', '', $periods);
+        $mform->addGroup($emaildelay, 'emaildelay', get_string('emaildelay','reengagement'), array(' '), false);
+        $mform->addHelpButton('emaildelay', 'emaildelay', 'reengagement');
+        $mform->setType('emailperiodcount', PARAM_INT);
+        $mform->setDefault('emailperiodcount','1');
+        $mform->setDefault('emailperiod','604800');
+
         $mform->addElement('textarea', 'usertext', get_string('usertext', 'reengagement'),array('rows=5','cols=60'));
-        $mform->disabledIf('usertext', 'emailuser');
         $mform->setDefault('usertext', get_string('usertextdefaultvalue','reengagement'));
         $mform->setType('usertext', PARAM_RAW);
         $mform->addHelpButton('usertext', 'usertext', 'reengagement');
-        $mform->addElement('textarea', 'admintext', get_string('admintext', 'reengagement'),array('rows=5','cols=60'));
-        $mform->setType('admintext', PARAM_RAW);
-        $mform->setDefault('admintext', get_string('admintextdefaultvalue','reengagement'));
-        $mform->addHelpButton('admintext', 'admintext', 'reengagement');
 
         $mform->addElement('advcheckbox', 'supressemail', get_string('supressemail', 'reengagement'));
         $mform->addHelpbutton('supressemail', 'supressemail', 'reengagement');
@@ -85,34 +101,25 @@ class mod_reengagement_mod_form extends moodleform_mod {
 
     }
     function set_data ($toform) {
-        # Take a duration in seconds, and list it as a number of weeks if possible
-        # Otherwise list it as days, otherwise hours, otherwise minutes (5 minute minimum)
+        // Form expects durations as a number of periods eg 5 minutes.
+        // Process dbtime (seconds) into form-appropraite times.
         if (!empty($toform->duration)) {
-            if ($toform->duration < 300) {
-                $toform->period = 60;
-                $toform->periodcount = 5;
-            } else {
-                $periods = array(604800, 86400, 3600, 60);
-                foreach ($periods as $period) {
-                    if ((($toform->duration % $period) == 0) || ($period == 60)) {
-                        $toform->period = $period;
-                        $toform->periodcount = floor((int)$toform->duration / (int)$period);
-                        break;
-                    }
-                }
-                if ($toform->period == 60) {
-                    if ($toform->periodcount < 5) {
-                        $toform->periodcount = 5;
-                    }
-                }
-            }
+            list ($periodcount, $period) = reengagement_get_readable_duration($toform->duration);
+            $toform->period = $period;
+            $toform->periodcount = $periodcount;
             unset($toform->duration);
         }
-        // if supress target !== 0, supressemail checkbox is true
-        if(!empty($toform->supresstarget)) {
-            $toform->supressemail = true;
-        } else {
-            $toform->supressemail = false;
+        if (!empty($toform->emaildelay)) {
+            list ($periodcount, $period) = reengagement_get_readable_duration($toform->emaildelay);
+            $toform->emailperiod = $period;
+            $toform->emailperiodcount = $periodcount;
+            unset($toform->emaildelay);
+        }
+
+        if (empty($toform->suppressemail)) {
+            // Settings indicate that email shouldn't be suppressed based on another activites' completion.
+            // Don't allow 'suppress target' ddb to specify any particular activity.
+            $toform->suppresstarget = 0;
         }
         return parent::set_data($toform);
     }
@@ -120,12 +127,24 @@ class mod_reengagement_mod_form extends moodleform_mod {
     function get_data() {
         $fromform = parent::get_data();
         if (!empty($fromform)) {
+            // Format, regulate module duration:
             if (isset($fromform->period) && isset($fromform->periodcount)) {
                 $fromform->duration = $fromform->period * $fromform->periodcount;
             }
             if (empty($fromform->duration) || $fromform->duration < 300) {
                 $fromform->duration = 300;
             }
+            unset($fromform->period);
+            unset($fromform->periodcount);
+            // Format, regulate email notification delay:
+            if (isset($fromform->emailperiod) && isset($fromform->emailperiodcount)) {
+                $fromform->emaildelay = $fromform->emailperiod * $fromform->emailperiodcount;
+            }
+            if (empty($fromform->emaildelay) || $fromform->emaildelay < 300) {
+                $fromform->emaildelay = 300;
+            }
+            unset($fromform->emailperiod);
+            unset($fromform->emailperiodcount);
         }
         return $fromform;
     }
