@@ -121,7 +121,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
             // Don't allow 'suppress target' ddb to specify any particular activity.
             $toform->suppresstarget = 0;
         }
-        return parent::set_data($toform);
+        $result = parent::set_data($toform);
+        return $result;
     }
 
     function get_data() {
