@@ -76,10 +76,14 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setDefault('emailperiodcount','1');
         $mform->setDefault('emailperiod','604800');
 
-        $mform->addElement('editor', 'usertext', get_string('usertext', 'reengagement'),array('rows=5','cols=60'));
-        $mform->setDefault('usertext', get_string('usertextdefaultvalue','reengagement'));
-        $mform->setType('usertext', PARAM_RAW);
-        $mform->addHelpButton('usertext', 'usertext', 'reengagement');
+        $mform->addElement('text', 'emailsubject', get_string('emailsubject', 'reengagement'), array('size'=>'64'));
+        $mform->setType('emailsubject', PARAM_TEXT);
+        $mform->addRule('emailsubject', null, 'required', null, 'client');
+        $mform->addRule('emailsubject', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addElement('editor', 'emailcontent', get_string('emailcontent', 'reengagement'), null, null);
+        $mform->setDefault('emailcontent', get_string('emailcontentdefaultvalue','reengagement'));
+        $mform->setType('emailcontent', PARAM_CLEANHTML);
+        $mform->addHelpButton('emailcontent', 'emailcontent', 'reengagement');
 
         $mform->addElement('advcheckbox', 'supressemail', get_string('supressemail', 'reengagement'));
         $mform->addHelpbutton('supressemail', 'supressemail', 'reengagement');
@@ -115,6 +119,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $toform->emailperiodcount = $periodcount;
             unset($toform->emaildelay);
         }
+        $toform->emailcontent = array('text'=>$toform->emailcontent, 'format'=>$toform->emailcontentformat);
 
         if (empty($toform->suppressemail)) {
             // Settings indicate that email shouldn't be suppressed based on another activites' completion.
@@ -146,6 +151,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
             }
             unset($fromform->emailperiod);
             unset($fromform->emailperiodcount);
+            $fromform->emailcontentformat = $fromform->emailcontent['format'];
+            $fromform->emailcontent = $fromform->emailcontent['text'];
         }
         return $fromform;
     }

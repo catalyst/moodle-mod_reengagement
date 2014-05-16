@@ -315,13 +315,18 @@ function reengagement_email_user($reengagement, $inprogress) {
         }
     }
     mtrace('Reengagement modules: User:'.$user->id.' Sending email.');
-    $emailsubject = $SITE->shortname . ": " . $reengagement->name . " is complete";
+    if (!empty($reengagement->emailsubject)) {
+        $emailsubject = $reengagement->emailsubject;
+    } else {
+        $emailsubject = $SITE->shortname . ": " . $reengagement->name . " is complete";
+    }
     $emailsenduser = new stdClass();
     $emailsenduser->firstname = $SITE->shortname;
     $emailsenduser->lastname = '';
     $emailsenduser->email = $CFG->noreplyaddress;
     $emailsenduser->maildisplay = false;
-    $result = email_to_user($user, $emailsenduser, $emailsubject, html_to_text($reengagement->usertext), $reengagement->usertext);
+    $plaintext = html_to_text($reengagement->emailcontent);
+    $result = email_to_user($user, $emailsenduser, $emailsubject, $plaintext, $reengagement->usertext);
     return $result;
 }
 

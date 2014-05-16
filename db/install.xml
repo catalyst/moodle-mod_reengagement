@@ -13,8 +13,10 @@
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="emailuser" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Should the user be emailed when their reengagement is complete"/>
-        <FIELD NAME="usertext" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The text that should be sent to the user on completion of the reengagement."/>
+        <FIELD NAME="emailuser" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="When should user be emailed"/>
+        <FIELD NAME="emailcontent" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The html-formatted text that should be sent to the user"/>
+        <FIELD NAME="emailcontentformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the emailcontent field"/>
+        <FIELD NAME="emailsubject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line"/>
         <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="how long the reengagement is"/>
         <FIELD NAME="supresstarget" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of module that, if completed, should prevent an email being sent out."/>
         <FIELD NAME="emaildelay" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="Time setting related to email"/>
@@ -30,9 +32,9 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="reengagement" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id of the reengagement which is in progress"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id of user who is currently in a reengagement."/>
-        <FIELD NAME="completiontime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time when the reengagement will be complete - unix timestamp. Seconds since Midnight Jan 1, 1970 (UTC)"/>
-        <FIELD NAME="emailtime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time that the user started/unlocked the activity - unix timestamp. Seconds since Midnight Jan 1, 1970 (UTC)"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id of user this record relates to."/>
+        <FIELD NAME="completiontime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix time when this module will be complete for this user."/>
+        <FIELD NAME="emailtime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix time when user should be emailed (if set to emailaftertime)"/>
         <FIELD NAME="emailsent" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether the user has been sent the email"/>
         <FIELD NAME="completed" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether the user has been marked as completed"/>
       </FIELDS>
