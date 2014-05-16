@@ -232,6 +232,7 @@ function reengagement_cron() {
     $inprogresses = $DB->get_records_select('reengagement_inprogress', 'completiontime < ' . $timenow);
     mtrace("Found " . count($inprogresses) . " complete reengagements, emailing as appropriate");
     foreach ($inprogresses as $inprogress) {
+        $inprogress->timedue = $inprogress->completiontime;
         // A user has completed an instance of the reengagement module.
         $reengagement = $reengagements[$inprogress->reengagement];
         $cmid = $reengagement->cmid; // The cm id of the module which was completed.
@@ -272,7 +273,7 @@ function reengagement_cron() {
     }
 
     // Get inprogress records where the user has reached their email time, and module is email 'after delay'.
-    $inprogresssql = "SELECT ip.*
+    $inprogresssql = "SELECT ip.*, ip.emailtime as timedue
                       FROM {reengagement_inprogress} ip
                           INNER JOIN {reengagement} r on r.id = ip.reengagement
                       WHERE ip.emailtime < :emailtime
@@ -303,10 +304,12 @@ function reengagement_email_user($reengagement, $inprogress) {
     $user = $DB->get_record('user', array('id' =>  $inprogress->userid));
     $sendemail = true;
     if (!empty($reengagement->supresstarget)) {
+        // This reengagement is focused on getting people to do a particular (ie targeted) activity.
+        // If that target activity is already complete, suppress the would-be email.
         $conditions = array('userid'=>$user->id, 'coursemoduleid'=>$reengagement->supresstarget);
         $activitycompletion = $DB->get_record('course_modules_completion', $conditions);
         if ($activitycompletion) {
-            // If the user has completed this activity, don't email, return success.
+            // There is a target activity, and completion is enabled in that activity.
             $userstate = $activitycompletion->completionstate;
             if (in_array($userstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL))) {
                 mtrace('Reengagement modules: User:'.$user->id.' has completed target activity:'.$reengagement->supresstarget.' supressing email.');
@@ -314,6 +317,20 @@ function reengagement_email_user($reengagement, $inprogress) {
             }
         }
     }
+    // Where cron isn't run regularly, we could get a glut requests to send email that are either ancient, or too late to be useful.
+    if (!empty($inprogress->timedue) && (($inprogress->timedue + 2 * DAY_SECS) < time())) {
+        // We should have sent this email more than two days ago.
+        // Don't send.
+        mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.' Email not sent - was due more than 2 days ago.');
+        return true;
+    }
+    if (!empty($inprogress->timeoverdue) && ($inprogress->timeoverdue < time())) {
+        // We should have sent this email more than two days ago.
+        // Don't send.
+        mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.' Email not sent - past usefulness deadline.');
+        return true;
+    }
+
     mtrace('Reengagement modules: User:'.$user->id.' Sending email.');
     if (!empty($reengagement->emailsubject)) {
         $emailsubject = $reengagement->emailsubject;
