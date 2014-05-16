@@ -118,6 +118,12 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $toform->emailperiodcount = $periodcount;
             unset($toform->emaildelay);
         }
+        if (empty($toform->emailcontent)) {
+            $toform->emailcontent = '';
+        }
+        if (empty($toform->emailcontentformat)) {
+            $toform->emailcontentformat = 1;
+        }
         $toform->emailcontent = array('text'=>$toform->emailcontent, 'format'=>$toform->emailcontentformat);
 
         if (empty($toform->suppressemail)) {

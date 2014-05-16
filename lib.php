@@ -222,7 +222,8 @@ function reengagement_cron() {
     // Get more info about the stand down, & prepare to update db
     // and email users.
 
-    $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.usertext, r.emailuser, r.name, r.supresstarget
+    $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
+                          r.emailuser, r.name, r.supresstarget
                       FROM {reengagement} r
                       INNER JOIN {course_modules} cm ON cm.instance = r.id
                       WHERE cm.module = :moduleid";
@@ -318,14 +319,14 @@ function reengagement_email_user($reengagement, $inprogress) {
         }
     }
     // Where cron isn't run regularly, we could get a glut requests to send email that are either ancient, or too late to be useful.
-    if (!empty($inprogress->timedue) && (($inprogress->timedue + 2 * DAY_SECS) < time())) {
+    if (!empty($inprogress->timedue) && (($inprogress->timedue + 2 * DAYSECS) < time())) {
         // We should have sent this email more than two days ago.
         // Don't send.
         mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.' Email not sent - was due more than 2 days ago.');
         return true;
     }
     if (!empty($inprogress->timeoverdue) && ($inprogress->timeoverdue < time())) {
-        // We should have sent this email more than two days ago.
+        // There's a deadline hint provided, and we're past it.
         // Don't send.
         mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.' Email not sent - past usefulness deadline.');
         return true;
@@ -343,7 +344,7 @@ function reengagement_email_user($reengagement, $inprogress) {
     $emailsenduser->email = $CFG->noreplyaddress;
     $emailsenduser->maildisplay = false;
     $plaintext = html_to_text($reengagement->emailcontent);
-    $result = email_to_user($user, $emailsenduser, $emailsubject, $plaintext, $reengagement->usertext);
+    $result = email_to_user($user, $emailsenduser, $emailsubject, $plaintext, $reengagement->emailcontent);
     return $result;
 }
 
