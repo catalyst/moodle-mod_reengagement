@@ -78,7 +78,6 @@ class mod_reengagement_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'emailsubject', get_string('emailsubject', 'reengagement'), array('size'=>'64'));
         $mform->setType('emailsubject', PARAM_TEXT);
-        $mform->addRule('emailsubject', null, 'required', null, 'client');
         $mform->addRule('emailsubject', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addElement('editor', 'emailcontent', get_string('emailcontent', 'reengagement'), null, null);
         $mform->setDefault('emailcontent', get_string('emailcontentdefaultvalue','reengagement'));
