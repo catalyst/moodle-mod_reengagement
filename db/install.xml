@@ -9,8 +9,6 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course reengagement activity belongs to"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
-        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the reengagement activity"/>
-        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="emailuser" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="When should user be emailed"/>
@@ -18,7 +16,7 @@
         <FIELD NAME="emailcontentformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the emailcontent field"/>
         <FIELD NAME="emailsubject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line"/>
         <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="how long the reengagement is"/>
-        <FIELD NAME="supresstarget" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of module that, if completed, should prevent an email being sent out."/>
+        <FIELD NAME="suppresstarget" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of module that, if completed, should prevent an email being sent out."/>
         <FIELD NAME="emaildelay" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="Time setting related to email"/>
       </FIELDS>
       <KEYS>

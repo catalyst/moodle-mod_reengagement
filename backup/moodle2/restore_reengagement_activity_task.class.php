@@ -54,8 +54,6 @@ class restore_reengagement_activity_task extends restore_activity_task {
     static public function define_decode_contents() {
         $contents = array();
 
-        $contents[] = new restore_decode_content('reengagement', array('intro'), 'reengagement');
-
         return $contents;
     }
 
@@ -107,33 +105,40 @@ class restore_reengagement_activity_task extends restore_activity_task {
     }
 
     /**
-     * The reengagement module has a supresstarget which is a cmid, we need to update that accordingly, however, in certain cases, that course may be restored to our target course
+     * The reengagement module has a suppresstarget which is a cmid, we need to update that accordingly, however, in certain cases, that course may be restored to our target course
      * After the reengagement itself is restored, so we do the cmid mapping fix after the restore has finished
      */
     public function after_restore() {
         global $DB;
         $id = $this->get_activityid();
         $course = $this->get_courseid();
-        if($reengagement = $DB->get_record('reengagement', array('id'=>$id))) {
-            //Find the mapping between old course_module id and new course_module id
-            if($map = restore_dbops::get_backup_ids_record($this->get_restoreid(), 'course_module', $reengagement->supresstarget)) {
-                $newid = $map->newitemid;
-                //update cmid if the mapping exists
-                $reengagement->supresstarget = $newid;
-                $DB->update_record('reengagement', $reengagement);
-            }
-            else {
-                //If there is no new cm, then the course we are targeting is not included in the backup
-                //put out a log warning and set a target of 0. not much else we can do here
-                //nb: according to wiki doc these logs go nowhere!
-                $this->get_logger()->process("Failed to restore the supressed email target in reengagement: '$id'. " .
-                    "Backup and restore of this item will not work correctly unless you include the required activity in the restore to course:$course.",
-                            backup::LOG_ERROR);
-                //so lets do the error log as well
-                error_log('Failed to restore supressed email target in reengagement: '.$id.' while restoring it to course:'.$course.', you likely didn\'t include the target activity');
-                $reengagement->supresstarget = 0;
-                $DB->update_record('reengagement', $reengagement);
-            }
+        $reengagement = $DB->get_record('reengagement', array('id'=>$id));
+        if (empty($reengagement)) {
+            // Unexpected, but nothing needs doing.
+            return;
+        }
+        if (empty($reengagement->suppresstarget)) {
+            // Restored activity didn't have a targeted activity. Nothing needs mapping.
+            return;
+        }
+        //Find the mapping between old course_module id and new course_module id
+        $map = restore_dbops::get_backup_ids_record($this->get_restoreid(), 'course_module', $reengagement->suppresstarget);
+        if ($map) {
+            $newid = $map->newitemid;
+            //update cmid if the mapping exists
+            $reengagement->suppresstarget = $newid;
+            $DB->update_record('reengagement', $reengagement);
+        } else {
+            //If there is no new cm, then the course we are targeting is not included in the backup
+            //put out a log warning and set a target of 0. not much else we can do here
+            //nb: according to wiki doc these logs go nowhere!
+            $this->get_logger()->process("Failed to restore the suppressed email target in reengagement: '$id'. " .
+                "Backup and restore of this item will not work correctly unless you include the required activity in the restore to course:$course.",
+                        backup::LOG_ERROR);
+            //so lets do the error log as well
+            error_log('Failed to restore suppressed email target in reengagement: '.$id.' while restoring it to course:'.$course.', you likely didn\'t include the target activity');
+            $reengagement->suppresstarget = 0;
+            $DB->update_record('reengagement', $reengagement);
         }
     }
 }

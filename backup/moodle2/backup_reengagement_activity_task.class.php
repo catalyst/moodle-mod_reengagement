@@ -22,14 +22,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/mod/reengagementn/backup/moodle2/backup_reengagementn_stepslib.php'); // Because it exists (must)
-require_once($CFG->dirroot . '/mod/reengagementn/backup/moodle2/backup_reengagementn_settingslib.php'); // Because it exists (optional)
+require_once($CFG->dirroot . '/mod/reengagement/backup/moodle2/backup_reengagement_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/reengagement/backup/moodle2/backup_reengagement_settingslib.php'); // Because it exists (optional)
 
 /**
- * reengagementn backup task that provides all the settings and steps to perform one
+ * reengagement backup task that provides all the settings and steps to perform one
  * complete backup of the activity
  */
-class backup_reengagementn_activity_task extends backup_activity_task {
+class backup_reengagement_activity_task extends backup_activity_task {
 
     /**
      * Define (add) particular settings this activity can have
@@ -42,8 +42,8 @@ class backup_reengagementn_activity_task extends backup_activity_task {
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // reengagementn only has one structure step
-        $this->add_step(new backup_reengagementn_activity_structure_step('reengagementn_structure', 'reengagementn.xml'));
+        // reengagement only has one structure step
+        $this->add_step(new backup_reengagement_activity_structure_step('reengagement_structure', 'reengagement.xml'));
     }
 
     /**
@@ -55,13 +55,13 @@ class backup_reengagementn_activity_task extends backup_activity_task {
 
         $base = preg_quote($CFG->wwwroot,"/");
 
-        // Link to the list of reengagementns
-        $search="/(".$base."\/mod\/reengagementn\/index.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@reengagementnINDEX*$2@$', $content);
+        // Link to the list of reengagements
+        $search="/(".$base."\/mod\/reengagement\/index.php\?id\=)([0-9]+)/";
+        $content= preg_replace($search, '$@reengagementINDEX*$2@$', $content);
 
-        // Link to reengagementn view by moduleid
-        $search="/(".$base."\/mod\/reengagementn\/view.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@reengagementnVIEWBYID*$2@$', $content);
+        // Link to reengagement view by moduleid
+        $search="/(".$base."\/mod\/reengagement\/view.php\?id\=)([0-9]+)/";
+        $content= preg_replace($search, '$@reengagementVIEWBYID*$2@$', $content);
 
         return $content;
     }

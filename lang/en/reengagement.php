@@ -27,7 +27,7 @@ $string['hours'] = 'Hours';
 $string['introdefaultvalue'] = 'This is a reengagement activity.  Its purpose is to enforce a time lapse between the activities which preceed it, and the activities which follow it.';
 $string['minutes'] = 'Minutes';
 $string['never'] = 'Never';
-$string['nosupresstarget'] = 'No target activity selected';
+$string['nosuppresstarget'] = 'No target activity selected';
 $string['oncompletion'] = 'On Completion';
 $string['reengagement:startreengagement'] =  'Start Renengagement';
 $string['reengagement:getnotifications'] =  'Receive notification of reengagement completions';
@@ -37,10 +37,10 @@ $string['reengagementfieldset'] = 'Renengagement details';
 $string['reengagementintro'] = 'Renengagement Intro';
 $string['reengagementname'] = 'Renengagement Name';
 $string['reengagementsinprogress'] = 'Renengagements in progress';
-$string['supressemail'] = 'Supress email if target activity complete';
-$string['supressemail_help'] = 'With this option you can configure the reengagement so that it will first check if the target activity is complete before deciding to send an email. If the target activity is complete then it will not send the email. This can be useful for sending reminder emails to a user to complete a survey if they have not already done so';
-$string['supresstarget'] = 'Target activity';
-$string['supresstarget_help'] = 'Use this dropdown to choose which activity should be checked for completion before sending the reminder email';
+$string['suppressemail'] = 'Supress email if target activity complete';
+$string['suppressemail_help'] = 'With this option you can configure the reengagement so that it will first check if the target activity is complete before deciding to send an email. If the target activity is complete then it will not send the email. This can be useful for sending reminder emails to a user to complete a survey if they have not already done so';
+$string['suppresstarget'] = 'Target activity';
+$string['suppresstarget_help'] = 'Use this dropdown to choose which activity should be checked for completion before sending the reminder email';
 $string['weeks'] = 'Weeks';
 
 ?>
