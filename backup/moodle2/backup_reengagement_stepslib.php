@@ -38,13 +38,13 @@ class backup_reengagement_activity_structure_step extends backup_activity_struct
 
         // Define each element separated
         $reengagement = new backup_nested_element('reengagement', array('id'), array(
-            'name', 'intro', 'introformat','timecreated', 'timemodified',
-            'emailuser', 'usertext', 'admintext', 'duration', 'supresstarget'));
+            'name', 'timecreated', 'timemodified',
+            'emailuser', 'emailsubject', 'emailcontent', 'emailcontentformat', 'duration', 'suppresstarget', 'emaildelay'));
 
         $inprogresses = new backup_nested_element('inprogresses');
 
         $inprogress = new backup_nested_element('inprogress', array('id'), array(
-            'reengagement', 'userid', 'completiontime'));
+            'reengagement', 'userid', 'completiontime', 'emailtime', 'emailsent', 'completed'));
 
         // Build the tree
         $reengagement->add_child($inprogresses);
@@ -61,9 +61,6 @@ class backup_reengagement_activity_structure_step extends backup_activity_struct
 
         // Define id annotations
         $inprogress->annotate_ids('user', 'userid');
-
-        // Define file annotations
-        $reengagement->annotate_files('mod_reengagement', 'intro', null); // This file area hasn't itemid
 
         // Return the root element (reengagement), wrapped into standard activity structure
         return $this->prepare_activity_structure($reengagement);

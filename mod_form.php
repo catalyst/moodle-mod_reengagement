@@ -84,20 +84,26 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setType('emailcontent', PARAM_CLEANHTML);
         $mform->addHelpButton('emailcontent', 'emailcontent', 'reengagement');
 
-        $mform->addElement('advcheckbox', 'supressemail', get_string('supressemail', 'reengagement'));
-        $mform->addHelpbutton('supressemail', 'supressemail', 'reengagement');
+        $mform->addElement('advcheckbox', 'suppressemail', get_string('suppressemail', 'reengagement'));
+        $mform->addHelpbutton('suppressemail', 'suppressemail', 'reengagement');
         $truemods = get_fast_modinfo($COURSE->id);
         $mods = array();
-        $mods[0] = get_string('nosupresstarget', 'reengagement');
+        $mods[0] = get_string('nosuppresstarget', 'reengagement');
         foreach ($truemods->cms as $mod) {
             $mods[$mod->id] = $mod->name;
         }
-        $mform->addElement('select', 'supresstarget', get_string('supresstarget', 'reengagement'), $mods);
-        $mform->addHelpbutton('supresstarget', 'supresstarget', 'reengagement');
+        $mform->addElement('select', 'suppresstarget', get_string('suppresstarget', 'reengagement'), $mods);
+        $mform->addHelpbutton('suppresstarget', 'suppresstarget', 'reengagement');
 
 //-------------------------------------------------------------------------------
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();
+        if ($mform->elementExists('completion')) {
+            $mform->removeElement('completion');
+        }
+        if ($mform->elementExists('visible')) {
+            $mform->removeElement('visible');
+        }
 //-------------------------------------------------------------------------------
         // add standard buttons, common to all modules
         $this->add_action_buttons();
@@ -126,11 +132,19 @@ class mod_reengagement_mod_form extends moodleform_mod {
         }
         $toform->emailcontent = array('text'=>$toform->emailcontent, 'format'=>$toform->emailcontentformat);
 
-        if (empty($toform->suppressemail)) {
-            // Settings indicate that email shouldn't be suppressed based on another activites' completion.
-            // Don't allow 'suppress target' ddb to specify any particular activity.
-            $toform->suppresstarget = 0;
+        if (empty($toform->suppresstarget)) {
+            // There is no target activity specified.
+            // Configure the box to have this dropdown disabled by default.
+            $toform->suppressemail = 0;
+        } else {
+            // There is a target activity specified, enable the target selector so that the user can change it if desired.
+            $toform->suppressemail = 1;
         }
+        // Force completion tracking to automatic.
+        $toform->completion = COMPLETION_TRACKING_AUTOMATIC;
+        // Force activity to hidden.
+        $toform->visible = 0;
+
         $result = parent::set_data($toform);
         return $result;
     }
@@ -138,6 +152,10 @@ class mod_reengagement_mod_form extends moodleform_mod {
     function get_data() {
         $fromform = parent::get_data();
         if (!empty($fromform)) {
+            // Force completion tracking to automatic.
+            $fromform->completion = COMPLETION_TRACKING_AUTOMATIC;
+            // Force activity to hidden.
+            $fromform->visible = 0;
             // Format, regulate module duration:
             if (isset($fromform->period) && isset($fromform->periodcount)) {
                 $fromform->duration = $fromform->period * $fromform->periodcount;
@@ -156,6 +174,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
             }
             unset($fromform->emailperiod);
             unset($fromform->emailperiodcount);
+            // Some special handling for the wysiwyg editor field.
             $fromform->emailcontentformat = $fromform->emailcontent['format'];
             $fromform->emailcontent = $fromform->emailcontent['text'];
         }

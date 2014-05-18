@@ -67,7 +67,6 @@ class restore_reengagement_activity_structure_step extends restore_activity_stru
 
         $data->reengagement = $this->get_new_parentid('reengagement');
         $data->userid = $this->get_mappingid('user', $data->userid);
-        $data->completiontime = $this->apply_date_offset($data->completiontime);
 
         $newitemid = $DB->insert_record('reengagement_inprogress', $data);
         // No need to save this mapping as far as nothing depend on it
@@ -76,6 +75,5 @@ class restore_reengagement_activity_structure_step extends restore_activity_stru
 
     protected function after_execute() {
         // Add reengagement related files, no need to match by itemname (just internally handled context)
-        $this->add_related_files('mod_reengagement', 'intro', null);
     }
 }
