@@ -232,7 +232,10 @@ function reengagement_cron() {
     $reengagements = $DB->get_records_sql($reengagementssql, array('moduleid' => $reengagementmod->id));
 
     $inprogresses = $DB->get_records_select('reengagement_inprogress', 'completiontime < ' . $timenow . ' AND completed = 0');
-    mtrace("Found " . count($inprogresses) . " complete reengagements, emailing as appropriate");
+    $count = count($inprogresses);
+    if ($count) {
+        mtrace("Found " . count($inprogresses) . " complete reengagements.");
+    }
     foreach ($inprogresses as $inprogress) {
         // A user has completed an instance of the reengagement module.
         $inprogress->timedue = $inprogress->completiontime;
@@ -257,11 +260,11 @@ function reengagement_cron() {
                 ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_TIME && !empty($inprogress->emailsent))) {
             // No need to keep 'inprogress' record for later emailing
             // Delete inprogress record.
-            mtrace("mode $reengagement->emailuser reengagement $reengagement->id deleting inprogress record for user $userid");
+            mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. User marked complete, deleting inprogress record for user $userid");
             $result = $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
         } else {
             // Update inprogress record to indicate completion done.
-            mtrace("mode $reengagement->emailuser reengagement $reengagement->id updating inprogress record for user $userid to indicate completion");
+            mtrace("mode $reengagement->emailuser reengagementid $reengagement->id updating inprogress record for user $userid to indicate completion");
             $updaterecord = new stdClass();
             $updaterecord->id = $inprogress->id;
             $updaterecord->completed = COMPLETION_COMPLETE;
@@ -286,11 +289,17 @@ function reengagement_cron() {
     $params = array('emailtime' => $timenow);
 
     $inprogresses = $DB->get_records_sql($inprogresssql, $params);
+    $count = count($inprogresses);
+    if ($count) {
+        mtrace("Found " . count($inprogresses) . " reengagements due to be emailed.");
+    }
     foreach ($inprogresses as $inprogress) {
         $reengagement = $reengagements[$inprogress->reengagement];
         if ($inprogress->completed == COMPLETION_COMPLETE) {
+            mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. User already marked complete. Deleting inprogress record for user $userid");
             $result = $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
         } else {
+            mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. Updating inprogress record to indicate email sent for user $userid");
             $updaterecord = new stdClass();
             $updaterecord->id = $inprogress->id;
             $updaterecord->emailsent = 1;
