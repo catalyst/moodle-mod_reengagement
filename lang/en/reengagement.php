@@ -15,13 +15,20 @@ The reengagement duration is specified as a period length (eg Weeks) and number 
 
 <p>This example would mean that a user starting a reengagement period now would be marked as compete in 7 weeks time.</p>
 ';
-$string['emailcontent'] = 'Email Content';
+$string['emailcontent'] = 'Email Content (User)';
 $string['emailcontent_help'] = 'When the module sends a user an email, it takes the email content from this field.';
-$string['emailcontentdefaultvalue'] = 'The re-engagement activity is now complete.  You can now log back into your course to view any new activities that are available to you.';
+$string['emailcontentmanager'] = 'Email Content (Manager)';
+$string['emailcontentmanager_help'] = 'When the module sends a user\'s manager an email, it takes the email content from this field.';
+$string['emailcontentdefaultvalue'] = 'This is a reminder email from course %coursename%.';
+$string['emailcontentmanagerdefaultvalue'] = 'This is a reminder email from course %coursename%, regarding user %userfirstname% %userlastname%.';
 $string['emaildelay'] = 'Email Delay';
 $string['emaildelay_help'] = 'When module is set to email users "after delay", this setting controls how long the delay is.';
-$string['emailsubject'] = 'Email Subject';
+$string['emailrecipient'] = 'Email Recipient(s)';
+$string['emailrecipient_help'] = 'When an email needs to be sent out to prompt a user\'s re-engagement with the course, this setting controls if an email is sent to the user, their manager, or both.';
+$string['emailsubject'] = 'Email Subject (User)';
 $string['emailsubject_help'] = 'When the module sends a user an email, it takes the email subject from this field.';
+$string['emailsubjectmanager'] = 'Email Subject (Manager)';
+$string['emailsubjectmanager_help'] = 'When the module sends a user\'s manager an email, it takes the email subject from this field.';
 $string['emailuser'] = 'Email User';
 $string['emailuser_help'] = 'When the activity should email users: <ul>
 <li>Never: Don\'t email users.</li>
@@ -46,6 +53,7 @@ $string['suppressemail'] = 'Supress email if target activity complete';
 $string['suppressemail_help'] = 'This option instructs the activity to suppress emails to users where a named activity is complete.';
 $string['suppresstarget'] = 'Target activity.';
 $string['suppresstarget_help'] = 'Use this dropdown to choose which activity should be checked for completion before sending the reminder email.';
+$string['userandmanager'] = 'User and Manager';
 $string['weeks'] = 'Weeks';
 
 ?>
