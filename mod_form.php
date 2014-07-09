@@ -63,9 +63,18 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $emailuseroptions[REENGAGEMENT_EMAILUSER_NEVER] = get_string('never', 'reengagement');
         $emailuseroptions[REENGAGEMENT_EMAILUSER_COMPLETION] = get_string('oncompletion', 'reengagement');
         $emailuseroptions[REENGAGEMENT_EMAILUSER_TIME] = get_string('afterdelay', 'reengagement');
-        
+
         $mform->addElement('select', 'emailuser', get_string('emailuser', 'reengagement'), $emailuseroptions);
         $mform->addHelpButton('emailuser', 'emailuser','reengagement');
+
+        // Add options to control who any notifications should go to.
+        $emailrecipientoptions = array(); // The message recipient options.
+        $emailrecipientoptions[REENGAGEMENT_RECIPIENT_USER] = get_string('user');
+        $emailrecipientoptions[REENGAGEMENT_RECIPIENT_MANAGER] = get_string('manager', 'role');
+        $emailrecipientoptions[REENGAGEMENT_RECIPIENT_BOTH] = get_string('userandmanager', 'reengagement');
+
+        $mform->addElement('select', 'emailrecipient', get_string('emailrecipients', 'reengagement'), $emailrecipientoptions);
+        $mform->addHelpButton('emailrecipient', 'emailrecipient','reengagement');
 
         // Add a group of controls to specify after how long an email should be sent.
         $emaildelay;
@@ -90,6 +99,15 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setDefault('emailcontent', get_string('emailcontentdefaultvalue','reengagement'));
         $mform->setType('emailcontent', PARAM_CLEANHTML);
         $mform->addHelpButton('emailcontent', 'emailcontent', 'reengagement');
+
+        $mform->addElement('text', 'emailsubjectmanager', get_string('emailsubjectmanager', 'reengagement'), array('size'=>'64'));
+        $mform->setType('emailsubjectmanager', PARAM_TEXT);
+        $mform->addRule('emailsubjectmanager', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addHelpButton('emailsubjectmanager', 'emailsubjectmanager', 'reengagement');
+        $mform->addElement('editor', 'emailcontentmanager', get_string('emailcontentmanager', 'reengagement'), null, null);
+        $mform->setDefault('emailcontentmanager', get_string('emailcontentmanagerdefaultvalue','reengagement'));
+        $mform->setType('emailcontentmanager', PARAM_CLEANHTML);
+        $mform->addHelpButton('emailcontentmanager', 'emailcontentmanager', 'reengagement');
 
         $mform->addElement('advcheckbox', 'suppressemail', get_string('suppressemail', 'reengagement'));
         $mform->addHelpbutton('suppressemail', 'suppressemail', 'reengagement');

@@ -11,10 +11,14 @@
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="emailuser" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="When should user be emailed"/>
+        <FIELD NAME="emailuser" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Under what conditions should an email be sent"/>
         <FIELD NAME="emailcontent" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The html-formatted text that should be sent to the user"/>
         <FIELD NAME="emailcontentformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the emailcontent field"/>
-        <FIELD NAME="emailsubject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line"/>
+        <FIELD NAME="emailsubject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line for emails going to user"/>
+        <FIELD NAME="emailcontentmanager" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The html-formatted text that should be sent to the user's manager"/>
+        <FIELD NAME="emailcontentmanagerformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the emailcontentmanager field"/>
+        <FIELD NAME="emailsubjectmanager" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line for emails going to user's manager"/>
+        <FIELD NAME="emailrecipient" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Who should receive any email - user|manager|both"/>
         <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="how long the reengagement is"/>
         <FIELD NAME="suppresstarget" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of module that, if completed, should prevent an email being sent out."/>
         <FIELD NAME="emaildelay" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="Time setting related to email"/>
