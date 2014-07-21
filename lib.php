@@ -324,7 +324,11 @@ function reengagement_cron() {
  */
 function reengagement_email_user($reengagement, $inprogress) {
     global $DB, $SITE, $CFG;
-    $user = $DB->get_record('user', array('id' =>  $inprogress->userid));
+    $usersql = "SELECT u.*
+                  FROM {user} u
+                 WHERE u.id = :userid";
+    $params = array('userid' => $inprogress->userid);
+    $user = $DB->get_record_sql($usersql, $params);
     if (!empty($reengagement->suppresstarget)) {
         // This reengagement is focused on getting people to do a particular (ie targeted) activity.
         // If that target activity is already complete, suppress the would-be email.
