@@ -39,7 +39,9 @@ class backup_reengagement_activity_structure_step extends backup_activity_struct
         // Define each element separated
         $reengagement = new backup_nested_element('reengagement', array('id'), array(
             'name', 'timecreated', 'timemodified',
-            'emailuser', 'emailsubject', 'emailcontent', 'emailcontentformat', 'duration', 'suppresstarget', 'emaildelay'));
+            'emailuser', 'emailsubject', 'emailcontent', 'emailcontentformat',
+            'duration', 'suppresstarget', 'emaildelay', 'emailrecipient',
+            'emailsubjectmanager', 'emailcontentmanager', 'emailcontentmanagerformat'));
 
         $inprogresses = new backup_nested_element('inprogresses');
 
