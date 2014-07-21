@@ -327,8 +327,12 @@ function reengagement_cron() {
  */
 function reengagement_email_user($reengagement, $inprogress) {
     global $DB, $SITE, $CFG;
-    $usersql = "SELECT u.*
+    $usersql = "SELECT u.*, manager.id as mid, manager.firstname as mfirstname,
+                        manager.lastname as mlastname, manager.email as memail,
+                        manager.mailformat as mmailformat
                   FROM {user} u
+             LEFT JOIN {pos_assignment} pa ON u.id = pa.userid and pa.type = " . POSITION_TYPE_PRIMARY . "
+             LEFT JOIN {user} manager ON pa.managerid manager.id
                  WHERE u.id = :userid";
     $params = array('userid' => $inprogress->userid);
     $user = $DB->get_record_sql($usersql, $params);
@@ -366,18 +370,43 @@ function reengagement_email_user($reengagement, $inprogress) {
     } else {
         $emailsubject = $SITE->shortname . ": " . $reengagement->name . " is complete";
     }
+    // Create an object which discribes the 'user' who is sending the email.
     $emailsenduser = new stdClass();
     $emailsenduser->firstname = $SITE->shortname;
     $emailsenduser->lastname = '';
     $emailsenduser->email = $CFG->noreplyaddress;
     $emailsenduser->maildisplay = false;
+
     $templateddetails = reengagement_template_variables($reengagement, $inprogress, $user);
     $plaintext = html_to_text($templateddetails['emailcontent']);
-    $result = email_to_user($user,
-            $emailsenduser,
-            $templateddetails['emailsubject'],
-            $plaintext,
-            $templateddetails['emailcontent']);
+
+    $emailresult = true;
+    if (!empty($user->mid) &&
+            (($reengagement->recipient == REENGAGEMENT_RECIPIENT_MANAGER) ||
+            ($reengagement->recipient == REENGAGEMENT_RECIPIENT_BOTH))) {
+        // This user has a manager, and we're supposed to email them.
+
+        // Create a shell user which contains what we know about the manager.
+        $manager = new stdClass();
+        foreach(array('id', 'firstname', 'lastname', 'email', 'mailformat') as $fieldname) {
+            $mfieldname = 'm' . $fieldname;
+            $manager->fieldname = $user->$mfieldname;
+        }
+        // Actually send the email.
+        $emailresult = $emailresult && email_to_user($manager,
+                $emailsenduser,
+                $templateddetails['emailsubjectmanager'],
+                $plaintext,
+                $templateddetails['emailcontentmanager']);
+    }
+    if (($reengagement->recipient == REENGAGEMENT_RECIPIENT_USER) || ($reengagement->recipient == REENGAGEMENT_RECIPIENT_BOTH)) {
+        // We are supposed to send email to the user.
+        $emailresult = $emailresult && email_to_user($user,
+                $emailsenduser,
+                $templateddetails['emailsubject'],
+                $plaintext,
+                $templateddetails['emailcontent']);
+    }
     return $result;
 }
 
