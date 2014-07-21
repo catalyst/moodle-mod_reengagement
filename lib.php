@@ -227,9 +227,10 @@ function reengagement_cron() {
     // and email users.
 
     $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
-                          r.emailuser, r.name, r.suppresstarget
+                          r.emailuser, r.name, r.suppresstarget, c.shortname, c.fullname, c.id as courseid
                       FROM {reengagement} r
                       INNER JOIN {course_modules} cm ON cm.instance = r.id
+                      INNER JOIN {course} c ON cm.id = c.id
                       WHERE cm.module = :moduleid";
 
     $reengagements = $DB->get_records_sql($reengagementssql, array('moduleid' => $reengagementmod->id));
@@ -316,10 +317,17 @@ function reengagement_cron() {
     return true;
 }
 
+/**
+ * Email is due to be sent to reengage user in course.
+ * Check if there is any reason to not send, then email user.
+ *
+ * @param object $reengagement db record of details for this activity
+ * @param object $inprogress record of user participation in this activity.
+ * @return boolean - success indicator
+ */
 function reengagement_email_user($reengagement, $inprogress) {
     global $DB, $SITE, $CFG;
     $user = $DB->get_record('user', array('id' =>  $inprogress->userid));
-    $sendemail = true;
     if (!empty($reengagement->suppresstarget)) {
         // This reengagement is focused on getting people to do a particular (ie targeted) activity.
         // If that target activity is already complete, suppress the would-be email.
@@ -359,11 +367,46 @@ function reengagement_email_user($reengagement, $inprogress) {
     $emailsenduser->lastname = '';
     $emailsenduser->email = $CFG->noreplyaddress;
     $emailsenduser->maildisplay = false;
-    $plaintext = html_to_text($reengagement->emailcontent);
-    $result = email_to_user($user, $emailsenduser, $emailsubject, $plaintext, $reengagement->emailcontent);
+    $templateddetails = reengagement_template_variables($reengagement, $inprogress, $user);
+    $plaintext = html_to_text($templateddetails['emailcontent']);
+    $result = email_to_user($user,
+            $emailsenduser,
+            $templateddetails['emailsubject'],
+            $plaintext,
+            $templateddetails['emailcontent']);
     return $result;
 }
 
+/**
+ * Template variables into place in supplied email content.
+ *
+ * @param object $reengagement db record of details for this activity
+ * @param object $inprogress record of user participation in this activity - semiplanned future enhancement.
+ * @param object $user record of user being reengaged.
+ * @return array - the content of the fields after templating.
+ */
+function reengagement_template_variables($reengagement, $inprogress, $user) {
+    $templatevars = array(
+        '/%courseshortname%/' => $reengagement->courseshortname,
+        '/%coursefullname%/' => $reengagement->coursefullname,
+        '/%courseid%/' => $reengagement->courseid,
+        '/%userfirstname%/' => $user->firstname,
+        '/%userlastname%/' => $user->lastname,
+        '/%userid%/' => $user->id,
+    );
+    $patterns = array_keys($templatevars); // The placeholders which are to be replaced.
+    $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
+
+    // Array to describe which fields in reengagement object should have a template replacement.
+    $replacementfields = array('emailsubject', 'emailcontent');
+
+    $results = array();
+    // Replace %variable% with relevant value everywhere it occurs in reengagement->field.
+    foreach ($replacementfields as $field) {
+        $results[$field] = preg_replace($patterns, $replacements, $reengagement->$field);
+    }
+    return $results;
+}
 
 /**
  * Must return an array of user records (all data) who are participants
