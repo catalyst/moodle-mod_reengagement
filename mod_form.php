@@ -73,7 +73,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $emailrecipientoptions[REENGAGEMENT_RECIPIENT_MANAGER] = get_string('manager', 'role');
         $emailrecipientoptions[REENGAGEMENT_RECIPIENT_BOTH] = get_string('userandmanager', 'reengagement');
 
-        $mform->addElement('select', 'emailrecipient', get_string('emailrecipients', 'reengagement'), $emailrecipientoptions);
+        $mform->addElement('select', 'emailrecipient', get_string('emailrecipient', 'reengagement'), $emailrecipientoptions);
         $mform->addHelpButton('emailrecipient', 'emailrecipient','reengagement');
 
         // Add a group of controls to specify after how long an email should be sent.
@@ -157,6 +157,14 @@ class mod_reengagement_mod_form extends moodleform_mod {
         }
         $toform->emailcontent = array('text'=>$toform->emailcontent, 'format'=>$toform->emailcontentformat);
 
+        if (empty($toform->emailcontentmanager)) {
+            $toform->emailcontentmanager = '';
+        }
+        if (empty($toform->emailcontentmanagerformat)) {
+            $toform->emailcontentmanagerformat = 1;
+        }
+        $toform->emailcontentmanager = array('text'=>$toform->emailcontentmanager, 'format'=>$toform->emailcontentmanagerformat);
+
         if (empty($toform->suppresstarget)) {
             // There is no target activity specified.
             // Configure the box to have this dropdown disabled by default.
@@ -202,6 +210,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
             // Some special handling for the wysiwyg editor field.
             $fromform->emailcontentformat = $fromform->emailcontent['format'];
             $fromform->emailcontent = $fromform->emailcontent['text'];
+            $fromform->emailcontentmanagerformat = $fromform->emailcontentmanager['format'];
+            $fromform->emailcontentmanager = $fromform->emailcontentmanager['text'];
         }
         return $fromform;
     }

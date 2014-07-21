@@ -322,6 +322,7 @@ function reengagement_cron() {
     }
     foreach ($inprogresses as $inprogress) {
         $reengagement = $reengagements[$inprogress->reengagement];
+        $userid = $inprogress->userid; // The userid which completed the module.
         if ($inprogress->completed == COMPLETION_COMPLETE) {
             debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. User already marked complete. Deleting inprogress record for user $userid");
             $result = $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
@@ -356,7 +357,7 @@ function reengagement_email_user($reengagement, $inprogress) {
                         manager.mailformat as mmailformat
                   FROM {user} u
              LEFT JOIN {pos_assignment} pa ON u.id = pa.userid and pa.type = " . POSITION_TYPE_PRIMARY . "
-             LEFT JOIN {user} manager ON pa.managerid manager.id
+             LEFT JOIN {user} manager ON pa.managerid = manager.id
                  WHERE u.id = :userid";
     $params = array('userid' => $inprogress->userid);
     $user = $DB->get_record_sql($usersql, $params);
@@ -399,8 +400,8 @@ function reengagement_email_user($reengagement, $inprogress) {
 
     $emailresult = true;
     if (!empty($user->mid) &&
-            (($reengagement->recipient == REENGAGEMENT_RECIPIENT_MANAGER) ||
-            ($reengagement->recipient == REENGAGEMENT_RECIPIENT_BOTH))) {
+            (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_MANAGER) ||
+            ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH))) {
         // This user has a manager, and we're supposed to email them.
 
         // Create a shell user which contains what we know about the manager.
@@ -416,7 +417,7 @@ function reengagement_email_user($reengagement, $inprogress) {
                 $plaintext,
                 $templateddetails['emailcontentmanager']);
     }
-    if (($reengagement->recipient == REENGAGEMENT_RECIPIENT_USER) || ($reengagement->recipient == REENGAGEMENT_RECIPIENT_BOTH)) {
+    if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_USER) || ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
         // We are supposed to send email to the user.
         $emailresult = $emailresult && email_to_user($user,
                 $emailsenduser,
