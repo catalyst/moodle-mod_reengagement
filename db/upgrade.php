@@ -4,7 +4,7 @@
 function xmldb_reengagement_upgrade($oldversion=0) {
     global $DB;
     $dbman = $DB->get_manager();
-    $upgradeversion = 2014071700;
+    $upgradeversion = 2014071701;
     if ($oldversion < $upgradeversion) {
         // Define new fields to support emailing managers.
         // Define field emailrecipient to be added to reengagement to record who should receive emails.
@@ -29,7 +29,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
         }
 
         $table = new xmldb_table('reengagement');
-        $field = new xmldb_field('emailcontentformat', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0');
+        $field = new xmldb_field('emailcontentmanagerformat', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
