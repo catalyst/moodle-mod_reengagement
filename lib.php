@@ -180,10 +180,12 @@ function reengagement_cron() {
     $timenow = time();
     $reengagementmod = $DB->get_record('modules', array('name' => 'reengagement'));
 
-    $reengagementssql = "SELECT cm.id as id, cm.id as cmid, r.id as rid, r.duration, r.emaildelay
-                      FROM {reengagement} r
-                      INNER JOIN {course_modules} cm on cm.instance = r.id
-                      WHERE cm.module = :moduleid";
+    $reengagementssql =
+            "SELECT cm.id as id, cm.id as cmid, r.id as rid, r.duration, r.emaildelay
+               FROM {reengagement} r
+         INNER JOIN {course_modules} cm on cm.instance = r.id
+              WHERE cm.module = :moduleid
+           ORDER BY r.id ASC";
 
     $reengagements = $DB->get_records_sql($reengagementssql, array("moduleid" => $reengagementmod->id));
 
@@ -223,12 +225,15 @@ function reengagement_cron() {
     // Get more info about the activity, & prepare to update db
     // and email users.
 
-    $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
-                          r.emailuser, r.name, r.suppresstarget, c.shortname, c.fullname, c.id as courseid
-                      FROM {reengagement} r
-                      INNER JOIN {course_modules} cm ON cm.instance = r.id
-                      INNER JOIN {course} c ON cm.id = c.id
-                      WHERE cm.module = :moduleid";
+    $reengagementssql =
+            "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
+              r.emailuser, r.name, r.suppresstarget, c.shortname as courseshortname,
+              c.fullname as coursefullname, c.id as courseid, r.emailrecipient
+               FROM {reengagement} r
+         INNER JOIN {course_modules} cm ON cm.instance = r.id
+         INNER JOIN {course} c ON cm.id = c.id
+              WHERE cm.module = :moduleid
+           ORDER BY r.id ASC";
 
     $reengagements = $DB->get_records_sql($reengagementssql, array('moduleid' => $reengagementmod->id));
 
@@ -281,12 +286,14 @@ function reengagement_cron() {
     }
 
     // Get inprogress records where the user has reached their email time, and module is email 'after delay'.
-    $inprogresssql = "SELECT ip.*, ip.emailtime as timedue
-                      FROM {reengagement_inprogress} ip
-                          INNER JOIN {reengagement} r on r.id = ip.reengagement
-                      WHERE ip.emailtime < :emailtime
-                          AND r.emailuser = " . REENGAGEMENT_EMAILUSER_TIME . '
-                          AND ip.emailsent = 0';
+    $inprogresssql =
+            "SELECT ip.*, ip.emailtime as timedue
+               FROM {reengagement_inprogress} ip
+         INNER JOIN {reengagement} r on r.id = ip.reengagement
+              WHERE ip.emailtime < :emailtime
+                AND r.emailuser = " . REENGAGEMENT_EMAILUSER_TIME . '
+                AND ip.emailsent = 0
+           ORDER BY r.id ASC';
     $params = array('emailtime' => $timenow);
 
     $inprogresses = $DB->get_records_sql($inprogresssql, $params);
@@ -370,12 +377,12 @@ function reengagement_email_user($reengagement, $inprogress) {
     $emailsenduser->maildisplay = false;
     $templateddetails = reengagement_template_variables($reengagement, $inprogress, $user);
     $plaintext = html_to_text($templateddetails['emailcontent']);
-    $result = email_to_user($user,
+    $emailresult = email_to_user($user,
             $emailsenduser,
             $templateddetails['emailsubject'],
             $plaintext,
             $templateddetails['emailcontent']);
-    return $result;
+    return $emailresult;
 }
 
 /**
