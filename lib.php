@@ -406,9 +406,10 @@ function reengagement_email_user($reengagement, $inprogress) {
 
         // Create a shell user which contains what we know about the manager.
         $manager = new stdClass();
-        foreach(array('id', 'firstname', 'lastname', 'email', 'mailformat') as $fieldname) {
+        $fieldnames = array('id', 'firstname', 'lastname', 'email', 'mailformat');
+        foreach($fieldnames as $fieldname) {
             $mfieldname = 'm' . $fieldname;
-            $manager->fieldname = $user->$mfieldname;
+            $manager->$fieldname = $user->$mfieldname;
         }
         // Actually send the email.
         $emailresult = $emailresult && email_to_user($manager,
@@ -449,7 +450,7 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
     $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
 
     // Array to describe which fields in reengagement object should have a template replacement.
-    $replacementfields = array('emailsubject', 'emailcontent');
+    $replacementfields = array('emailsubject', 'emailcontent', 'emailsubjectmanager', 'emailcontentmanager');
 
     $results = array();
     // Replace %variable% with relevant value everywhere it occurs in reengagement->field.
