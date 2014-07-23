@@ -213,7 +213,10 @@ function reengagement_cron() {
         $activity_completion->completionstate = COMPLETION_INCOMPLETE;
         $activity_completion->timemodified = $timenow;
         $userlist = array_keys($startusers);
-        mtrace("Adding " . count($userlist) . " reengagements-in-progress to reengagementid " . $reengagementcm->rid);
+        $newripcount = count($userlist); // Count of new reengagements-in-progress.
+        if (debugging('', DEBUG_DEVELOPER) || ($newripcount && debugging('', DEBUG_ALL))) {
+            mtrace("Adding $newripcount reengagements-in-progress to reengagementid " . $reengagementcm->rid);
+        }
 
         foreach ($userlist as $userid) {
             $reengagement_inprogress->userid = $userid;
@@ -241,9 +244,9 @@ function reengagement_cron() {
     $reengagements = $DB->get_records_sql($reengagementssql, array('moduleid' => $reengagementmod->id));
 
     $inprogresses = $DB->get_records_select('reengagement_inprogress', 'completiontime < ' . $timenow . ' AND completed = 0');
-    $count = count($inprogresses);
-    if ($count) {
-        mtrace("Found " . count($inprogresses) . " complete reengagements.");
+    $completeripcount = count($inprogresses);
+    if (debugging('', DEBUG_DEVELOPER) || ($completeripcount && debugging('', DEBUG_ALL))) {
+        mtrace("Found $completeripcount complete reengagements.");
     }
     foreach ($inprogresses as $inprogress) {
         // A user has completed an instance of the reengagement module.
@@ -269,11 +272,11 @@ function reengagement_cron() {
                 ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_TIME && !empty($inprogress->emailsent))) {
             // No need to keep 'inprogress' record for later emailing
             // Delete inprogress record.
-            mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. User marked complete, deleting inprogress record for user $userid");
+            debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. User marked complete, deleting inprogress record for user $userid");
             $result = $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
         } else {
             // Update inprogress record to indicate completion done.
-            mtrace("mode $reengagement->emailuser reengagementid $reengagement->id updating inprogress record for user $userid to indicate completion");
+            debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id updating inprogress record for user $userid to indicate completion");
             $updaterecord = new stdClass();
             $updaterecord->id = $inprogress->id;
             $updaterecord->completed = COMPLETION_COMPLETE;
@@ -281,9 +284,11 @@ function reengagement_cron() {
         }
         if (empty($result)) {
             // Skip emailing. Go on to next completion record so we don't risk emailing users continuously each cron.
+            debugging('', DEBUG_ALL) && mtrace("Reengagement: not sending email to $userid regarding reengagementid $reengagement->id due to failuer to update db");
             continue;
         }
         if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) {
+            debugging('', DEBUG_ALL) && mtrace("Reengagement: sending email to $userid regarding reengagementid $reengagement->id due to completion.");
             reengagement_email_user($reengagement, $inprogress);
         }
     }
@@ -300,24 +305,25 @@ function reengagement_cron() {
     $params = array('emailtime' => $timenow);
 
     $inprogresses = $DB->get_records_sql($inprogresssql, $params);
-    $count = count($inprogresses);
-    if ($count) {
-        mtrace("Found " . count($inprogresses) . " reengagements due to be emailed.");
+    $emailduecount = count($inprogresses);
+    if (debugging('', DEBUG_DEVELOPER) || ($emailduecount && debugging('', DEBUG_ALL))) {
+        mtrace("Found $emailduecount reengagements due to be emailed.");
     }
     foreach ($inprogresses as $inprogress) {
         $reengagement = $reengagements[$inprogress->reengagement];
         $userid = $inprogress->userid; // The userid which completed the module.
         if ($inprogress->completed == COMPLETION_COMPLETE) {
-            mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. User already marked complete. Deleting inprogress record for user $userid");
+            debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. User already marked complete. Deleting inprogress record for user $userid");
             $result = $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
         } else {
-            mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. Updating inprogress record to indicate email sent for user $userid");
+            debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. Updating inprogress record to indicate email sent for user $userid");
             $updaterecord = new stdClass();
             $updaterecord->id = $inprogress->id;
             $updaterecord->emailsent = 1;
             $result = $DB->update_record('reengagement_inprogress', $updaterecord);
         }
         if (!empty($result)) {
+            debugging('', DEBUG_ALL) && mtrace("Reengagement: sending email to $userid regarding reengagementid $reengagement->id due to emailduetime.");
             reengagement_email_user($reengagement, $inprogress);
         }
     }
@@ -353,7 +359,7 @@ function reengagement_email_user($reengagement, $inprogress) {
             // There is a target activity, and completion is enabled in that activity.
             $userstate = $activitycompletion->completionstate;
             if (in_array($userstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL))) {
-                mtrace('Reengagement modules: User:'.$user->id.' has completed target activity:'.$reengagement->suppresstarget.' suppressing email.');
+                debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:'.$user->id.' has completed target activity:'.$reengagement->suppresstarget.' suppressing email.');
                 return true;
             }
         }
@@ -362,17 +368,17 @@ function reengagement_email_user($reengagement, $inprogress) {
     if (!empty($inprogress->timedue) && (($inprogress->timedue + 2 * DAYSECS) < time())) {
         // We should have sent this email more than two days ago.
         // Don't send.
-        mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.' Email not sent - was due more than 2 days ago.');
+        debugging('', DEBUG_ALL) && mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.' Email not sent - was due more than 2 days ago.');
         return true;
     }
     if (!empty($inprogress->timeoverdue) && ($inprogress->timeoverdue < time())) {
         // There's a deadline hint provided, and we're past it.
         // Don't send.
-        mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.' Email not sent - past usefulness deadline.');
+        debugging('', DEBUG_ALL) && mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.' Email not sent - past usefulness deadline.');
         return true;
     }
 
-    mtrace('Reengagement modules: User:'.$user->id.' Sending email.');
+    debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:'.$user->id.' Sending email.');
     if (!empty($reengagement->emailsubject)) {
         $emailsubject = $reengagement->emailsubject;
     } else {
