@@ -231,7 +231,7 @@ function reengagement_cron() {
               c.fullname as coursefullname, c.id as courseid, r.emailrecipient
                FROM {reengagement} r
          INNER JOIN {course_modules} cm ON cm.instance = r.id
-         INNER JOIN {course} c ON cm.id = c.id
+         INNER JOIN {course} c ON cm.course = c.id
               WHERE cm.module = :moduleid
            ORDER BY r.id ASC";
 
