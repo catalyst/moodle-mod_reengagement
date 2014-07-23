@@ -395,32 +395,43 @@ function reengagement_email_user($reengagement, $inprogress) {
     $plaintext = html_to_text($templateddetails['emailcontent']);
 
     $emailresult = true;
-    if (!empty($user->mid) &&
-            (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_MANAGER) ||
-            ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH))) {
-        // This user has a manager, and we're supposed to email them.
-
-        // Create a shell user which contains what we know about the manager.
-        $manager = new stdClass();
-        $fieldnames = array('id', 'firstname', 'lastname', 'email', 'mailformat');
-        foreach($fieldnames as $fieldname) {
-            $mfieldname = 'm' . $fieldname;
-            $manager->$fieldname = $user->$mfieldname;
+    if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_MANAGER) || ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
+        // We're supposed to email the user's manager.
+        if (empty($user->mid)) {
+            // ... but the user doesn't have a manager.
+            debugging('', DEBUG_ALL) && mtrace("user $user->id has no manager present - unable to send email to manager");
+        } else {
+            // User has a manager.
+            // Create a shell user which contains what we know about the manager.
+            $manager = new stdClass();
+            $fieldnames = array('id', 'firstname', 'lastname', 'email', 'mailformat');
+            foreach($fieldnames as $fieldname) {
+                $mfieldname = 'm' . $fieldname;
+                $manager->$fieldname = $user->$mfieldname;
+            }
+            // Actually send the email.
+            $managersendresult = email_to_user($manager,
+                    $emailsenduser,
+                    $templateddetails['emailsubjectmanager'],
+                    $plaintext,
+                    $templateddetails['emailcontentmanager']);
+            if (!$managersendresult) {
+                mtrace("failed to send manager of user $user->id email for reengagement $reengagment->id");
+            }
+            $emailresult = $emailresult && $managersendresult;
         }
-        // Actually send the email.
-        $emailresult = $emailresult && email_to_user($manager,
-                $emailsenduser,
-                $templateddetails['emailsubjectmanager'],
-                $plaintext,
-                $templateddetails['emailcontentmanager']);
     }
     if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_USER) || ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
         // We are supposed to send email to the user.
-        $emailresult = $emailresult && email_to_user($user,
+        $usersendresult = email_to_user($user,
                 $emailsenduser,
                 $templateddetails['emailsubject'],
                 $plaintext,
                 $templateddetails['emailcontent']);
+        if (!$usersendresult) {
+            mtrace("failed to send user $user->id email for reengagement $reengagment->id");
+        }
+        $emailresult = $emailresult && $usersendresult;
     }
     return $emailresult;
 }
