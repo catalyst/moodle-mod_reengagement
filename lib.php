@@ -426,7 +426,7 @@ function reengagement_email_user($reengagement, $inprogress) {
                 $plaintext,
                 $templateddetails['emailcontent']);
     }
-    return $result;
+    return $emailresult;
 }
 
 /**
