@@ -7,7 +7,10 @@ $string['modulename'] = 'Reengagement';
 $string['modulenameplural'] = 'Reengagements';
 
 // Alphabetized.
+$string['activitycompleted'] = 'This activity has been marked as complete';
 $string['afterdelay'] = 'After Delay';
+$string['completeattimex'] = 'This activity will complete at {$a}';
+$string['completiontime'] = 'Completion Time';
 $string['days'] = 'Days';
 $string['duration'] = 'Duration';
 $string['duration_help'] = '<p>The reengagement duration is the period of time between a user starting a reengagement, and being marked as finished.
@@ -22,6 +25,7 @@ $string['emaildelay'] = 'Email Delay';
 $string['emaildelay_help'] = 'When module is set to email users "after delay", this setting controls how long the delay is.';
 $string['emailsubject'] = 'Email Subject';
 $string['emailsubject_help'] = 'When the module sends a user an email, it takes the email subject from this field.';
+$string['emailtime'] = 'Email Time';
 $string['emailuser'] = 'Email User';
 $string['emailuser_help'] = 'When the activity should email users: <ul>
 <li>Never: Don\'t email users.</li>
@@ -32,8 +36,11 @@ $string['hours'] = 'Hours';
 $string['introdefaultvalue'] = 'This is a reengagement activity.  Its purpose is to enforce a time lapse between the activities which preceed it, and the activities which follow it.';
 $string['minutes'] = 'Minutes';
 $string['never'] = 'Never';
+$string['noemailattimex'] = 'Message scheduled for {$a} will not be sent because you have completed the target activity';
 $string['nosuppresstarget'] = 'No target activity selected';
 $string['oncompletion'] = 'On Completion';
+$string['receiveemailattimex'] =  'Message will be sent on {$a}.';
+$string['receiveemailattimexunless'] =  'Message will be sent on {$a} unless you complete target activity.';
 $string['reengagement:startreengagement'] =  'Start Renengagement';
 $string['reengagement:getnotifications'] =  'Receive notification of reengagement completions';
 $string['reengagement:editreengagementduration'] =  'Edit Renengagement Duration';
