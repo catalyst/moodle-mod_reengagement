@@ -9,6 +9,8 @@ $string['modulenameplural'] = 'Reengagements';
 // Alphabetized.
 $string['activitycompleted'] = 'This activity has been marked as complete';
 $string['afterdelay'] = 'After Delay';
+$string['completion'] = 'Completion';
+$string['completionwillturnon'] = 'Note that adding this activity to the course will enable activity completion.';
 $string['completeattimex'] = 'This activity will complete at {$a}';
 $string['completiontime'] = 'Completion Time';
 $string['days'] = 'Days';
@@ -41,6 +43,7 @@ $string['nosuppresstarget'] = 'No target activity selected';
 $string['oncompletion'] = 'On Completion';
 $string['receiveemailattimex'] =  'Message will be sent on {$a}.';
 $string['receiveemailattimexunless'] =  'Message will be sent on {$a} unless you complete target activity.';
+$string['reengagement:addinstance'] =  'reengagement:addinstance';
 $string['reengagement:startreengagement'] =  'Start Renengagement';
 $string['reengagement:getnotifications'] =  'Receive notification of reengagement completions';
 $string['reengagement:editreengagementduration'] =  'Edit Renengagement Duration';
