@@ -36,6 +36,12 @@ class mod_reengagement_mod_form extends moodleform_mod {
 //-------------------------------------------------------------------------------
     /// Adding the "general" fieldset, where all the common settings are showed
         $mform->addElement('header', 'general', get_string('general', 'form'));
+        if (!$COURSE->enablecompletion) {
+            $coursecontext = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+            if (has_capability('moodle/course:update', $coursecontext)) {
+                $mform->addElement('static', 'completionwillturnon', get_string('completion', 'reengagement'), get_string('completionwillturnon', 'reengagement'));
+            }
+        }
 
     /// Adding the standard "name" field
         $mform->addElement('text', 'name', get_string('reengagementname', 'reengagement'), array('size'=>'64'));

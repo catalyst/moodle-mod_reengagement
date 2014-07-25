@@ -48,6 +48,17 @@ function reengagement_add_instance($reengagement) {
     }
     unset($reengagement->suppressemail);
 
+    // Check course has completion enabled, and enable it if not, and user has permission to do so.
+    $course = $DB->get_record('course', array('id' => $reengagement->course));
+    if (empty($course->enablecompletion)) {
+        $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+        if (has_capability('moodle/course:update', $coursecontext)) {
+            $data = array('id' => $course->id, 'enablecompletion' => '1');
+            $DB->update_record('course', $data);
+            rebuild_course_cache($course->id);
+        }
+    }
+
     return $DB->insert_record('reengagement', $reengagement);
 }
 
@@ -337,7 +348,7 @@ function reengagement_cron() {
  *
  * @param object $reengagement db record of details for this activity
  * @param object $inprogress record of user participation in this activity.
- * @return boolean - success indicator
+ * @return boolean true if everything we wanted to do worked. False otherwise.
  */
 function reengagement_email_user($reengagement, $inprogress) {
     global $DB, $SITE, $CFG;
@@ -351,17 +362,10 @@ function reengagement_email_user($reengagement, $inprogress) {
     $params = array('userid' => $inprogress->userid);
     $user = $DB->get_record_sql($usersql, $params);
     if (!empty($reengagement->suppresstarget)) {
-        // This reengagement is focused on getting people to do a particular (ie targeted) activity.
-        // If that target activity is already complete, suppress the would-be email.
-        $conditions = array('userid'=>$user->id, 'coursemoduleid'=>$reengagement->suppresstarget);
-        $activitycompletion = $DB->get_record('course_modules_completion', $conditions);
-        if ($activitycompletion) {
-            // There is a target activity, and completion is enabled in that activity.
-            $userstate = $activitycompletion->completionstate;
-            if (in_array($userstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL))) {
-                debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:'.$user->id.' has completed target activity:'.$reengagement->suppresstarget.' suppressing email.');
-                return true;
-            }
+        $targetcomplete = reengagement_check_target_completion($user->id, $targetcmid);
+        if (!$targetcomplete) {
+            debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:'.$user->id.' has completed target activity:'.$reengagement->suppresstarget.' suppressing email.');
+            return true;
         }
     }
     // Where cron isn't run regularly, we could get a glut requests to send email that are either ancient, or too late to be useful.
@@ -723,3 +727,26 @@ function reengagement_get_readable_duration($duration) {
     }
     return array($periodcount, $period); //eg (5,60): 5 minutes.
 }
+
+/**
+ * Check if user has completed the named course moduleid
+ * @param userid integer idnumber of the user to be checked.
+ * @param targetcmid integer the id of the coursemodule we should be checking.
+ * @return bool true if user has completed the target activity, false otherwise.
+ */
+function reengagement_check_target_completion($userid, $targetcmid) {
+    global $DB;
+    // This reengagement is focused on getting people to do a particular (ie targeted) activity.
+    // Behaviour of the module changes depending on whether the target activity is already complete.
+    $conditions = array('userid'=>$userid, 'coursemoduleid' => $targetcmid);
+    $activitycompletion = $DB->get_record('course_modules_completion', $conditions);
+    if ($activitycompletion) {
+        // There is a target activity, and completion is enabled in that activity.
+        $userstate = $activitycompletion->completionstate;
+        if (in_array($userstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL))) {
+            return true;
+        }
+    }
+    return false;
+}
+
