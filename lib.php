@@ -45,6 +45,17 @@ function reengagement_add_instance($reengagement) {
     }
     unset($reengagement->suppressemail);
 
+    // Check course has completion enabled, and enable it if not, and user has permission to do so.
+    $course = $DB->get_record('course', array('id' => $reengagement->course));
+    if (empty($course->enablecompletion)) {
+        $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+        if (has_capability('moodle/course:update', $coursecontext)) {
+            $data = array('id' => $course->id, 'enablecompletion' => '1');
+            $DB->update_record('course', $data);
+            rebuild_course_cache($course->id);
+        }
+    }
+
     return $DB->insert_record('reengagement', $reengagement);
 }
 
