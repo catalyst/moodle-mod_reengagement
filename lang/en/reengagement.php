@@ -32,9 +32,9 @@ $string['emailrecipient'] = 'Email Recipient(s)';
 $string['emailrecipient_help'] = 'When an email needs to be sent out to prompt a user\'s re-engagement with the course, this setting controls if an email is sent to the user, their manager, or both.';
 $string['emailsubject'] = 'Email Subject (User)';
 $string['emailsubject_help'] = 'When the module sends a user an email, it takes the email subject from this field.';
-$string['emailtime'] = 'Email Time';
 $string['emailsubjectmanager'] = 'Email Subject (Manager)';
 $string['emailsubjectmanager_help'] = 'When the module sends a user\'s manager an email, it takes the email subject from this field.';
+$string['emailtime'] = 'Email Time';
 $string['emailuser'] = 'Email User';
 $string['emailuser_help'] = 'When the activity should email users: <ul>
 <li>Never: Don\'t email users.</li>
