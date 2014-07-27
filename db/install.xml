@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/reengagement/db" VERSION="20140508" COMMENT="XMLDB file for Moodle mod/reengagement"
+<XMLDB PATH="mod/reengagement/db" VERSION="20140727" COMMENT="XMLDB file for Moodle mod/reengagement"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="reengagement" COMMENT="Details about instances of the reengagement activity">
+    <TABLE NAME="reengagement" COMMENT="Details about instances of the reengagement activity" NEXT="reengagement_inprogress">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course reengagement activity belongs to"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="emailuser" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="When should user be emailed"/>
-        <FIELD NAME="emailcontent" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The html-formatted text that should be sent to the user"/>
-        <FIELD NAME="emailcontentformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the emailcontent field"/>
-        <FIELD NAME="emailsubject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line"/>
-        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="how long the reengagement is"/>
-        <FIELD NAME="suppresstarget" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of module that, if completed, should prevent an email being sent out."/>
-        <FIELD NAME="emaildelay" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="Time setting related to email"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course reengagement activity belongs to" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances" PREVIOUS="course" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="name" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="timecreated" NEXT="emailuser"/>
+        <FIELD NAME="emailuser" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Under which circumstances user(s) should be emailed" PREVIOUS="timemodified" NEXT="emailcontent"/>
+        <FIELD NAME="emailcontent" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The html-formatted text that should be sent to the user" PREVIOUS="emailuser" NEXT="emailcontentformat"/>
+        <FIELD NAME="emailcontentformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the emailcontent field" PREVIOUS="emailcontent" NEXT="emailsubject"/>
+        <FIELD NAME="emailsubject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="emailcontentformat" NEXT="duration"/>
+        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" PREVIOUS="emailsubject" NEXT="suppresstarget"/>
+        <FIELD NAME="suppresstarget" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of module that, if completed, should prevent an email being sent out." PREVIOUS="duration" NEXT="emaildelay"/>
+        <FIELD NAME="emaildelay" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="604800" SEQUENCE="false" PREVIOUS="suppresstarget"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -26,15 +26,15 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="reengagement_inprogress" COMMENT="records of reengagement activities currently in progress">
+    <TABLE NAME="reengagement_inprogress" COMMENT="records of reengagement activities currently in progress" PREVIOUS="reengagement">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="reengagement" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id of the reengagement which is in progress"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id of user this record relates to."/>
-        <FIELD NAME="completiontime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix time when this module will be complete for this user."/>
-        <FIELD NAME="emailtime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix time when user should be emailed (if set to emailaftertime)"/>
-        <FIELD NAME="emailsent" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether the user has been sent the email"/>
-        <FIELD NAME="completed" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether the user has been marked as completed"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="reengagement"/>
+        <FIELD NAME="reengagement" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="reengagement" NEXT="completiontime"/>
+        <FIELD NAME="completiontime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix time when this module will be complete for this user." PREVIOUS="userid" NEXT="emailtime"/>
+        <FIELD NAME="emailtime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix time when user should be emailed (if set to emailaftertime)" PREVIOUS="completiontime" NEXT="emailsent"/>
+        <FIELD NAME="emailsent" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="emailtime" NEXT="completed"/>
+        <FIELD NAME="completed" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether the user has been marked as completed" PREVIOUS="emailsent"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
