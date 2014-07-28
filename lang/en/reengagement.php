@@ -21,7 +21,15 @@ The reengagement duration is specified as a period length (eg Weeks) and number 
 <p>This example would mean that a user starting a reengagement period now would be marked as compete in 7 weeks time.</p>
 ';
 $string['emailcontent'] = 'Email Content (User)';
-$string['emailcontent_help'] = 'When the module sends a user an email, it takes the email content from this field.';
+$string['emailcontent_help'] = '<p>When the module sends a user an email, it takes the email content from this field. </p><p>The following variables will be replaced with the appropriate values:
+<ul>
+<li>%courseshortname%</li>
+<li>%coursefullname%</li>
+<li>%courseid%</li>
+<li>%userfirstname%</li>
+<li>%userlastname%</li>
+<li>%userid%</li>
+</ul></p>';
 $string['emailcontentmanager'] = 'Email Content (Manager)';
 $string['emailcontentmanager_help'] = 'When the module sends a user\'s manager an email, it takes the email content from this field.';
 $string['emailcontentdefaultvalue'] = 'This is a reminder email from course %coursename%.';
