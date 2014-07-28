@@ -245,6 +245,7 @@ function reengagement_cron() {
     $reengagementssql =
             "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
               r.emailuser, r.name, r.suppresstarget, c.shortname as courseshortname,
+              r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
               c.fullname as coursefullname, c.id as courseid, r.emailrecipient
                FROM {reengagement} r
          INNER JOIN {course_modules} cm ON cm.instance = r.id
@@ -396,7 +397,6 @@ function reengagement_email_user($reengagement, $inprogress) {
     $emailsenduser->maildisplay = false;
 
     $templateddetails = reengagement_template_variables($reengagement, $inprogress, $user);
-    $plaintext = html_to_text($templateddetails['emailcontent']);
 
     $emailresult = true;
     if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_MANAGER) || ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
@@ -414,6 +414,7 @@ function reengagement_email_user($reengagement, $inprogress) {
                 $manager->$fieldname = $user->$mfieldname;
             }
             // Actually send the email.
+            $plaintext = html_to_text($templateddetails['emailcontentmanager']);
             $managersendresult = email_to_user($manager,
                     $emailsenduser,
                     $templateddetails['emailsubjectmanager'],
@@ -427,6 +428,7 @@ function reengagement_email_user($reengagement, $inprogress) {
     }
     if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_USER) || ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
         // We are supposed to send email to the user.
+        $plaintext = html_to_text($templateddetails['emailcontent']);
         $usersendresult = email_to_user($user,
                 $emailsenduser,
                 $templateddetails['emailsubject'],
