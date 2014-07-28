@@ -31,7 +31,15 @@ $string['emailcontent_help'] = '<p>When the module sends a user an email, it tak
 <li>%userid%</li>
 </ul></p>';
 $string['emailcontentmanager'] = 'Email Content (Manager)';
-$string['emailcontentmanager_help'] = 'When the module sends a user\'s manager an email, it takes the email content from this field.';
+$string['emailcontentmanager_help'] = '<p>When the module sends a user\'s manager an email, it takes the email content from this field. </p><p>The following variables will be replaced with the appropriate values:
+<ul>
+<li>%courseshortname%</li>
+<li>%coursefullname%</li>
+<li>%courseid%</li>
+<li>%userfirstname%</li>
+<li>%userlastname%</li>
+<li>%userid%</li>
+</ul></p>';
 $string['emailcontentdefaultvalue'] = 'This is a reminder email from course %coursename%.';
 $string['emailcontentmanagerdefaultvalue'] = 'This is a reminder email from course %coursename%, regarding user %userfirstname% %userlastname%.';
 $string['emaildelay'] = 'Email Delay';
