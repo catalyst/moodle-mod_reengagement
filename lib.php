@@ -405,15 +405,23 @@ function reengagement_email_user($reengagement, $inprogress) {
  */
 function reengagement_template_variables($reengagement, $inprogress, $user) {
     $templatevars = array(
-        '/%courseshortname%/' => $reengagement->courseshortname,
-        '/%coursefullname%/' => $reengagement->coursefullname,
-        '/%courseid%/' => $reengagement->courseid,
-        '/%userfirstname%/' => $user->firstname,
-        '/%userlastname%/' => $user->lastname,
-        '/%userid%/' => $user->id,
+        'courseshortname' => $reengagement->courseshortname,
+        'coursefullname' => $reengagement->coursefullname,
+        'courseid' => $reengagement->courseid,
+        'userfirstname' => $user->firstname,
+        'userlastname' => $user->lastname,
+        'userid' => $user->id,
     );
-    $patterns = array_keys($templatevars); // The placeholders which are to be replaced.
-    $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
+    $patterns = array(); // The placeholders we will be searching for.
+    $replacements = array(); // What we'll substitute in when we find a placeholder.
+    foreach ($templatevars as $key => $value) {
+        // Look for the literal %key%
+        $patterns[] = '/%'.$key.'%/';
+        $replacements[] = $value;
+        // ... and in case it's urlencoded. (Url encoded '%' is '%25')
+        $patterns[] = '/%25'.$key.'%25/';
+        $replacements[] = $value;
+    }
 
     // Array to describe which fields in reengagement object should have a template replacement.
     $replacementfields = array('emailsubject', 'emailcontent');
