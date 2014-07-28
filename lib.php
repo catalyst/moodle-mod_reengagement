@@ -363,6 +363,7 @@ function reengagement_email_user($reengagement, $inprogress) {
     $params = array('userid' => $inprogress->userid);
     $user = $DB->get_record_sql($usersql, $params);
     if (!empty($reengagement->suppresstarget)) {
+        $targetcmid = $reengagement->suppresstarget;
         $targetcomplete = reengagement_check_target_completion($user->id, $targetcmid);
         if ($targetcomplete) {
             debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:'.$user->id.' has completed target activity:'.$reengagement->suppresstarget.' suppressing email.');
