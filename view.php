@@ -144,7 +144,7 @@ if ($canstart) {
                 $emailmessage = get_string('receiveemailattimex', 'reengagement', $datestr);
             } else {
                 // There is a target activity, if the target activity is complete, we won't send the email.
-                $targetcomplete = reengagement_check_target_completion($USER->id, $id);
+                $targetcomplete = reengagement_check_target_completion($USER->id, $reengagement->id);
                 if (!$targetcomplete) {
                     // 'Message will be sent at xyz time unless you complete target activity'.
                     $emailmessage = get_string('receiveemailattimexunless', 'reengagement', $datestr);
