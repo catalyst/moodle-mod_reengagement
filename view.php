@@ -115,7 +115,7 @@ if ($canstart) {
             // The user has permission to start a reengagement, but not this one right now. (likely due to incomplete prerequiste activities).
             $report = "This reengagement is not available";
             if ($availabilityinfo) {
-                $report .= " ( $reengagement )";
+                $report .= " ( $availabilityinfo ) ";
             }
             echo $OUTPUT->box($report);
         }
