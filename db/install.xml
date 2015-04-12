@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/reengagement/db" VERSION="20140508" COMMENT="XMLDB file for Moodle mod/reengagement"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="reengagement" COMMENT="Details about instances of the reengagement activity">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course reengagement activity belongs to"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="emailuser" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Under what conditions should an email be sent"/>
+        <FIELD NAME="emailcontent" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The html-formatted text that should be sent to the user"/>
+        <FIELD NAME="emailcontentformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the emailcontent field"/>
+        <FIELD NAME="emailsubject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line for emails going to user"/>
+        <FIELD NAME="emailcontentmanager" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The html-formatted text that should be sent to the user's manager"/>
+        <FIELD NAME="emailcontentmanagerformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the emailcontentmanager field"/>
+        <FIELD NAME="emailsubjectmanager" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email subject line for emails going to user's manager"/>
+        <FIELD NAME="emailrecipient" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Who should receive any email - user|manager|both"/>
+        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="how long the reengagement is"/>
+        <FIELD NAME="suppresstarget" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of module that, if completed, should prevent an email being sent out."/>
+        <FIELD NAME="emaildelay" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="604800" SEQUENCE="false" COMMENT="Time setting related to email"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="reengagement_inprogress" COMMENT="records of reengagement activities currently in progress">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reengagement" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id of the reengagement which is in progress"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id of user this record relates to."/>
+        <FIELD NAME="completiontime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix time when this module will be complete for this user."/>
+        <FIELD NAME="emailtime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix time when user should be emailed (if set to emailaftertime)"/>
+        <FIELD NAME="emailsent" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether the user has been sent the email"/>
+        <FIELD NAME="completed" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether the user has been marked as completed"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
