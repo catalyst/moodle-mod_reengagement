@@ -420,7 +420,7 @@ function reengagement_email_user($reengagement, $inprogress) {
                     $plaintext,
                     $templateddetails['emailcontentmanager']);
             if (!$managersendresult) {
-                mtrace("failed to send manager of user $user->id email for reengagement $reengagment->id");
+                mtrace("failed to send manager of user $user->id email for reengagement $reengagement->id");
             }
             $emailresult = $emailresult && $managersendresult;
         }
@@ -433,7 +433,7 @@ function reengagement_email_user($reengagement, $inprogress) {
                 $plaintext,
                 $templateddetails['emailcontent']);
         if (!$usersendresult) {
-            mtrace("failed to send user $user->id email for reengagement $reengagment->id");
+            mtrace("failed to send user $user->id email for reengagement $reengagement->id");
         }
         $emailresult = $emailresult && $usersendresult;
     }
