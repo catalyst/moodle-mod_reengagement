@@ -19,13 +19,9 @@ if (! $course = $DB->get_record('course', array('id' => $id))) {
     error('Course ID is incorrect');
 }
 
-require_course_login($course);
-
-add_to_log($course->id, 'reengagement', 'view all', "index.php?id=$course->id", '');
-
+require_login($course);
 
 /// Get all required stringsreengagement
-
 $strreengagements = get_string('modulenameplural', 'reengagement');
 $strreengagement  = get_string('modulename', 'reengagement');
 
@@ -40,6 +36,14 @@ $PAGE->set_url('/mod/reengagement/index.php', $params);
 
 $PAGE->set_title(format_string($strreengagements));
 $PAGE->set_heading(format_string($course->fullname));
+
+// Add the page view to the Moodle log
+$event = \mod_reengagement\event\course_module_instance_list_viewed::create(array(
+    'context' => context_course::instance($course->id)
+));
+$event->add_record_snapshot('course', $course);
+$event->trigger();
+
 
 echo $OUTPUT->header();
 /// Get all the appropriate data

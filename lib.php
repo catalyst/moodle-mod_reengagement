@@ -51,7 +51,7 @@ function reengagement_add_instance($reengagement) {
     // Check course has completion enabled, and enable it if not, and user has permission to do so.
     $course = $DB->get_record('course', array('id' => $reengagement->course));
     if (empty($course->enablecompletion)) {
-        $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+        $coursecontext = context_course::instance($course->id);
         if (has_capability('moodle/course:update', $coursecontext)) {
             $data = array('id' => $course->id, 'enablecompletion' => '1');
             $DB->update_record('course', $data);
@@ -195,7 +195,7 @@ function reengagement_cron() {
     $reengagementmod = $DB->get_record('modules', array('name' => 'reengagement'));
 
     $reengagementssql =
-            "SELECT cm.id as id, cm.id as cmid, r.id as rid, r.duration, r.emaildelay
+            "SELECT cm.id as id, cm.id as cmid, cm.availability, r.id as rid, r.course as courseid, r.duration, r.emaildelay
                FROM {reengagement} r
          INNER JOIN {course_modules} cm on cm.instance = r.id
               WHERE cm.module = :moduleid
@@ -534,60 +534,6 @@ function reengagement_install() {
 
 
 /**
-    Take a condition from course_modules_availability table, and examine state to see which users comply
-    return array of compliant userid numbers
-*/
-function get_compliant_users($condition) {
-    global $CFG, $DB;
-
-    require_once($CFG->libdir."/completionlib.php");
-
-    $params = array();
-    if (!empty($condition->sourcecmid)) {
-        // This condition relates to the completion status of another cm
-        $completionsql = "SELECT cmc.userid, cmc.userid AS junk
-                          FROM {course_modules_completion} cmc
-                          WHERE coursemoduleid = :coursemoduleid ";
-
-        $params["coursemoduleid"] = $condition->sourcecmid;
-
-        if (isset($condition->requiredcompletion)) {
-            if ($condition->requiredcompletion == COMPLETION_COMPLETE) {
-                $completionsql .= ' AND (completionstate = ' . COMPLETION_COMPLETE .
-                        ' OR completionstate=' . COMPLETION_COMPLETE_PASS .
-                        ' OR completionstate = ' . COMPLETION_COMPLETE_FAIL .
-                        ' )';
-            } else {
-                $completionsql .= ' AND completionstate = ' . $condition->requiredcompletion;
-                $params["completionstate"] = $condition->requiredcompletion;
-            }
-        }
-
-        $compliantusers = $DB->get_records_sql($completionsql, $params);
-
-    } else {
-        //This condition relates to the grade attained in a grade item
-        $gradessql = "SELECT *
-                      FROM {grade_grades} gg
-                      WHERE gg.itemid = :gradeitemid ";
-
-        $params["gradeitemid"] = $condition->gradeitemid;
-
-        if (isset($condition->grademin)) {
-            $gradessql .= "AND gg.finalgrade >= :grademin ";
-            $params["grademin"] = $condition->grademin;
-        }
-        if (isset($condition->grademax)) {
-            $gradessql .= "AND gg.finalgrade <= :grademax ";
-            $params["grademax"] = $condition->grademax;
-        }
-        $compliantusers = $DB->get_records_sql($gradessql, $params);
-    }
-    return $compliantusers;
-}
-
-
-/**
  * Implementation of the function for printing the form elements that control
  * whether the course reset functionality affects the choice.
  *
@@ -636,20 +582,15 @@ function reengagement_reset_userdata($data) {
 /* Get array of users who can start supplied reengagement module */
 function reengagement_get_startusers($reengagement) {
     global $DB;
-    $context = get_context_instance(CONTEXT_MODULE, $reengagement->cmid);
+    $context = context_module::instance($reengagement->cmid);
     $startusers = get_enrolled_users($context, 'mod/reengagement:startreengagement');
 
-    $conditions = $DB->get_records('course_modules_availability', array('coursemoduleid' => $reengagement->cmid));
-    while (!empty($conditions)) {
-        $condition = array_shift($conditions);
-        //Get a list of users who are compliant with this condition.
-        $compliantusers = get_compliant_users($condition);
-        // Run over list of startable users, and remove those that aren't compliant with this condition.
-        $userlist = array_keys($startusers);
-        foreach ($userlist as $userid) {
-            if (!isset($compliantusers[$userid])) {
-                unset($startusers[$userid]);
-            }
+    $cm = get_fast_modinfo($reengagement->courseid)->get_cm($reengagement->cmid);
+    $ainfomod = new \core_availability\info_module($cm);
+    foreach ($startusers as $u) {
+        $information = '';
+        if (!$ainfomod->is_available($information, false, $u->id)) {
+            unset($startusers[$u->id]);
         }
     }
 
