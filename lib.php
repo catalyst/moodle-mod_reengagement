@@ -245,6 +245,7 @@ function reengagement_cron() {
 
     $reengagementssql =
             "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
+              r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
               r.emailuser, r.name, r.suppresstarget, c.shortname as courseshortname,
               c.fullname as coursefullname, c.id as courseid, r.emailrecipient
                FROM {reengagement} r
