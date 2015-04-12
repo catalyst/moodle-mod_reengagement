@@ -206,6 +206,7 @@ function reengagement_cron() {
     if (empty($reengagements)) {
         //No reengagement module instances in a course
         // Since there's no need to create reengagement-inprogress records, or send emails:
+        mtrace("No reengagement instances found - nothing to do :)");
         return true;
     }
 
@@ -270,6 +271,7 @@ function reengagement_cron() {
         $completionrecord = $DB->get_record('course_modules_completion', array('coursemoduleid' => $cmid, 'userid' => $userid));
         if (empty($completionrecord)) {
             // Unexpected error.
+            mtrace("Could not find completion record for updating to complete state - userid: $userid, cmid: $cmid");
             continue;
         }
         $updaterecord = new stdClass();
