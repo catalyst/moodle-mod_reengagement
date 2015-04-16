@@ -99,7 +99,7 @@ if ($canstart) {
     if (empty($completion)) {
         // User hasn't yet started this activity.
         $availabilityinfo = '';
-        if (!$ainfomod->is_available($information)) {
+        if (!$ainfomod->is_available($availabilityinfo)) {
             // User has satisfied all activity completion preconditions, start them on this activity.
             // Set a RIP record, so we know when to send an email/mark activity as complete by cron later.
             $reengagement_inprogress = new stdClass();
