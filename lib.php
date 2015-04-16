@@ -587,10 +587,10 @@ function reengagement_get_startusers($reengagement) {
 
     $cm = get_fast_modinfo($reengagement->courseid)->get_cm($reengagement->cmid);
     $ainfomod = new \core_availability\info_module($cm);
-    foreach ($startusers as $u) {
+    foreach ($startusers as $startcandidate) {
         $information = '';
-        if (!$ainfomod->is_available($information, false, $u->id)) {
-            unset($startusers[$u->id]);
+        if (!$ainfomod->is_available($information, false, $startcandidate->id)) {
+            unset($startusers[$startcandidate->id]);
         }
     }
 
