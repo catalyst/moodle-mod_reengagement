@@ -582,7 +582,7 @@ function reengagement_reset_userdata($data) {
 /* Get array of users who can start supplied reengagement module */
 function reengagement_get_startusers($reengagement) {
     global $DB;
-    $context = context_module::instance($reengagement->courseid);
+    $context = context_module::instance($reengagement->cmid);
     $startusers = get_enrolled_users($context, 'mod/reengagement:startreengagement');
 
     $conditions = $DB->get_records('course_modules_availability', array('coursemoduleid' => $reengagement->cmid));
