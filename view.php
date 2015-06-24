@@ -56,16 +56,7 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-$context = context_module::instance($cm->id);
-
-$event = \mod_reengagement\event\course_module_viewed::create(array(
-    'objectid' => $reengagement->id,
-    'context' => $context,
-));
-$event->add_record_snapshot('course', $course);
-$event->add_record_snapshot('reengagement', $reengagement);
-$event->trigger();
-
+add_to_log($course->id, "reengagement", "view", "view.php?id=$cm->id", "$reengagement->id");
 
 /// Print the page header
 $strreengagements = get_string('modulenameplural', 'reengagement');
@@ -76,8 +67,10 @@ $PAGE->set_title(format_string($reengagement->name));
 $PAGE->set_heading(format_string($course->fullname));
 
 echo $OUTPUT->header();
-/// Print the main part of the page
 
+/// Print the main part of the page
+$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+//$context = context_system::instance();
 $PAGE->set_context($context);
 
 $canstart = has_capability('mod/reengagement:startreengagement', $context, NULL, false);
@@ -87,10 +80,10 @@ if (empty($canstart) && empty($canedit)) {
     error("This reengagement module is not enabled for your account.  Please contact your administrator if you feel this is in error");
 }
 
-$modinfo = get_fast_modinfo($course->id);
-$cminfo = $modinfo->get_cm($cm->id);
+$modinfo = get_fast_modinfo($course);
 
-$ainfomod = new \core_availability\info_module($cminfo);
+
+$ci = new condition_info($modinfo->instances['reengagement'][$reengagement->id]);
 
 if ($canstart) {
     // User could have arrived here eligible to start, but before cron had a chance to start them in the activity.
@@ -98,8 +91,8 @@ if ($canstart) {
     $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
     if (empty($completion)) {
         // User hasn't yet started this activity.
-        $availabilityinfo = '';
-        if (!$ainfomod->is_available($availabilityinfo)) {
+        $availabilityinfo='';
+        if ($ci->is_available($availabilityinfo)) {
             // User has satisfied all activity completion preconditions, start them on this activity.
             // Set a RIP record, so we know when to send an email/mark activity as complete by cron later.
             $reengagement_inprogress = new stdClass();
@@ -123,7 +116,7 @@ if ($canstart) {
             // The user has permission to start a reengagement, but not this one right now. (likely due to incomplete prerequiste activities).
             $report = "This reengagement is not available";
             if ($availabilityinfo) {
-                $report .= " ( $availabilityinfo ) ";
+                $report .= " ( $reengagement )";
             }
             echo $OUTPUT->box($report);
         }

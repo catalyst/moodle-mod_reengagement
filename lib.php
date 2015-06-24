@@ -195,7 +195,7 @@ function reengagement_cron() {
     $reengagementmod = $DB->get_record('modules', array('name' => 'reengagement'));
 
     $reengagementssql =
-            "SELECT cm.id as id, cm.id as cmid, cm.availability, r.id as rid, r.course as courseid, r.duration, r.emaildelay
+            "SELECT cm.id as id, cm.id as cmid, r.id as rid, r.course as courseid, r.duration, r.emaildelay
                FROM {reengagement} r
          INNER JOIN {course_modules} cm on cm.instance = r.id
               WHERE cm.module = :moduleid
@@ -365,7 +365,7 @@ function reengagement_email_user($reengagement, $inprogress) {
     $params = array('userid' => $inprogress->userid);
     $user = $DB->get_record_sql($usersql, $params);
     if (!empty($reengagement->suppresstarget)) {
-        $targetcomplete = reengagement_check_target_completion($user->id, $reengagement->suppresstarget);
+        $targetcomplete = reengagement_check_target_completion($user->id, $reengagement->cmid);
         if (!$targetcomplete) {
             debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:'.$user->id.' has completed target activity:'.$reengagement->suppresstarget.' suppressing email.');
             return true;
@@ -582,15 +582,20 @@ function reengagement_reset_userdata($data) {
 /* Get array of users who can start supplied reengagement module */
 function reengagement_get_startusers($reengagement) {
     global $DB;
-    $context = context_module::instance($reengagement->cmid);
+    $context = context_module::instance($reengagement->courseid);
     $startusers = get_enrolled_users($context, 'mod/reengagement:startreengagement');
 
-    $cm = get_fast_modinfo($reengagement->courseid)->get_cm($reengagement->cmid);
-    $ainfomod = new \core_availability\info_module($cm);
-    foreach ($startusers as $startcandidate) {
-        $information = '';
-        if (!$ainfomod->is_available($information, false, $startcandidate->id)) {
-            unset($startusers[$startcandidate->id]);
+    $conditions = $DB->get_records('course_modules_availability', array('coursemoduleid' => $reengagement->cmid));
+    while (!empty($conditions)) {
+        $condition = array_shift($conditions);
+        //Get a list of users who are compliant with this condition.
+        $compliantusers = get_compliant_users($condition);
+        // Run over list of startable users, and remove those that aren't compliant with this condition.
+        $userlist = array_keys($startusers);
+        foreach ($userlist as $userid) {
+            if (!isset($compliantusers[$userid])) {
+                unset($startusers[$userid]);
+            }
         }
     }
 
