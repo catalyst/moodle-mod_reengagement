@@ -534,6 +534,61 @@ function reengagement_install() {
 
 
 /**
+    Take a condition from course_modules_availability table, and examine state to see which users comply
+    return array of compliant userid numbers
+*/
+function get_compliant_users($condition) {
+    global $CFG, $DB;
+
+    require_once($CFG->libdir."/completionlib.php");
+
+    $params = array();
+    if (!empty($condition->sourcecmid)) {
+        // This condition relates to the completion status of another cm
+        $completionsql = "SELECT cmc.userid, cmc.userid AS junk
+                          FROM {course_modules_completion} cmc
+                          WHERE coursemoduleid = :coursemoduleid ";
+
+        $params["coursemoduleid"] = $condition->sourcecmid;
+
+        if (isset($condition->requiredcompletion)) {
+            if ($condition->requiredcompletion == COMPLETION_COMPLETE) {
+                $completionsql .= ' AND (completionstate = ' . COMPLETION_COMPLETE .
+                        ' OR completionstate=' . COMPLETION_COMPLETE_PASS .
+                        ' OR completionstate = ' . COMPLETION_COMPLETE_FAIL .
+                        ' )';
+            } else {
+                $completionsql .= ' AND completionstate = ' . $condition->requiredcompletion;
+                $params["completionstate"] = $condition->requiredcompletion;
+            }
+        }
+
+        $compliantusers = $DB->get_records_sql($completionsql, $params);
+
+    } else {
+        //This condition relates to the grade attained in a grade item
+        $gradessql = "SELECT *
+                      FROM {grade_grades} gg
+                      WHERE gg.itemid = :gradeitemid ";
+
+        $params["gradeitemid"] = $condition->gradeitemid;
+
+        if (isset($condition->grademin)) {
+            $gradessql .= "AND gg.finalgrade >= :grademin ";
+            $params["grademin"] = $condition->grademin;
+        }
+        if (isset($condition->grademax)) {
+            $gradessql .= "AND gg.finalgrade <= :grademax ";
+            $params["grademax"] = $condition->grademax;
+        }
+        $compliantusers = $DB->get_records_sql($gradessql, $params);
+    }
+    return $compliantusers;
+}
+
+
+
+/**
  * Implementation of the function for printing the form elements that control
  * whether the course reset functionality affects the choice.
  *
