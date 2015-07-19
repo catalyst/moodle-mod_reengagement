@@ -124,7 +124,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();
         if ($mform->elementExists('completion')) {
-            $mform->removeElement('completion');
+            $mform->setDefault('completion', COMPLETION_TRACKING_AUTOMATIC);
+            $mform->freeze('completion');
         }
         if ($mform->elementExists('visible')) {
             $mform->removeElement('visible');
