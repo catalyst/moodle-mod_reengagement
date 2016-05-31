@@ -8,6 +8,6 @@
  * @package mod/reengagement
  */
 
-$module->version  = 2014071701;   // The current module version (Date: YYYYMMDDXX)
+$module->version  = 2016042200;   // The current module version (Date: YYYYMMDDXX)
 $module->requires  = 2011112900;
 $module->cron     = 150;         // Don't run more often than every 150 seconds - realistically expect ~every 300s.
