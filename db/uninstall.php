@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,9 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool true if success
  */
 function mod_reengagement_uninstall() {
-    // global $DB;
-
-    // $dbman = $DB->get_manager();
 
     return true;
 }

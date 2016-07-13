@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -24,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/reengagement/backup/moodle2/restore_reengagement_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/reengagement/backup/moodle2/restore_reengagement_stepslib.php');
 
 /**
  * reengagement restore task that provides all the settings and steps to perform one
@@ -36,14 +35,14 @@ class restore_reengagement_activity_task extends restore_activity_task {
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**
-     * Define (add) particular steps this activity can have
+     * Define (add) particular steps this activity can have.
      */
     protected function define_my_steps() {
-        // reengagement only has one structure step
+        // The reengagement only has one structure step.
         $this->add_step(new restore_reengagement_activity_structure_step('reengagement_structure', 'reengagement.xml'));
     }
 
@@ -96,7 +95,7 @@ class restore_reengagement_activity_task extends restore_activity_task {
     static public function define_restore_log_rules_for_course() {
         $rules = array();
 
-        // Fix old wrong uses (missing extension)
+        // Fix old wrong uses (missing extension).
         $rules[] = new restore_log_rule('reengagement', 'view all', 'index?id={course}', null,
                                         null, null, 'index.php?id={course}');
         $rules[] = new restore_log_rule('reengagement', 'view all', 'index.php?id={course}', null);
@@ -105,14 +104,15 @@ class restore_reengagement_activity_task extends restore_activity_task {
     }
 
     /**
-     * The reengagement module has a suppresstarget which is a cmid, we need to update that accordingly, however, in certain cases, that course may be restored to our target course
-     * After the reengagement itself is restored, so we do the cmid mapping fix after the restore has finished
+     * The reengagement module has a suppresstarget which is a cmid, we need to update that accordingly, however,
+     * in certain cases, that course may be restored to our target course
+     * After the reengagement itself is restored, so we do the cmid mapping fix after the restore has finished.
      */
     public function after_restore() {
         global $DB;
         $id = $this->get_activityid();
         $course = $this->get_courseid();
-        $reengagement = $DB->get_record('reengagement', array('id'=>$id));
+        $reengagement = $DB->get_record('reengagement', array('id' => $id));
         if (empty($reengagement)) {
             // Unexpected, but nothing needs doing.
             return;
@@ -121,22 +121,20 @@ class restore_reengagement_activity_task extends restore_activity_task {
             // Restored activity didn't have a targeted activity. Nothing needs mapping.
             return;
         }
-        //Find the mapping between old course_module id and new course_module id
+        // Find the mapping between old course_module id and new course_module id.
         $map = restore_dbops::get_backup_ids_record($this->get_restoreid(), 'course_module', $reengagement->suppresstarget);
         if ($map) {
             $newid = $map->newitemid;
-            //update cmid if the mapping exists
+            // Update cmid if the mapping exists.
             $reengagement->suppresstarget = $newid;
             $DB->update_record('reengagement', $reengagement);
         } else {
-            //If there is no new cm, then the course we are targeting is not included in the backup
-            //put out a log warning and set a target of 0. not much else we can do here
-            //nb: according to wiki doc these logs go nowhere!
+            // If there is no new cm, then the course we are targeting is not included in the backup
+            // put out a log warning and set a target of 0. not much else we can do here
+            // nb: according to wiki doc these logs go nowhere!
             $this->get_logger()->process("Failed to restore the suppressed email target in reengagement: '$id'. " .
-                "Backup and restore of this item will not work correctly unless you include the required activity in the restore to course:$course.",
-                        backup::LOG_ERROR);
-            //so lets do the error log as well
-            error_log('Failed to restore suppressed email target in reengagement: '.$id.' while restoring it to course:'.$course.', you likely didn\'t include the target activity');
+                "Backup and restore of this item will not work correctly unless you include the required activity ".
+                "in the restore to course:$course.", backup::LOG_ERROR);
             $reengagement->suppresstarget = 0;
             $DB->update_record('reengagement', $reengagement);
         }

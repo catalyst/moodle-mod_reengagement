@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -41,7 +40,7 @@ class restore_reengagement_activity_structure_step extends restore_activity_stru
             $paths[] = new restore_path_element('reengagement_inprogress', '/activity/reengagement/inprogresses/inprogress');
         }
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
 
@@ -54,9 +53,9 @@ class restore_reengagement_activity_structure_step extends restore_activity_stru
 
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
-        // insert the reengagement record
+        // Insert the reengagement record.
         $newitemid = $DB->insert_record('reengagement', $data);
-        // immediately after inserting "activity" record, call this
+        // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
     }
 
@@ -70,10 +69,10 @@ class restore_reengagement_activity_structure_step extends restore_activity_stru
 
         $newitemid = $DB->insert_record('reengagement_inprogress', $data);
         // No need to save this mapping as far as nothing depend on it
-        // (child paths, file areas nor links decoder)
+        // (child paths, file areas nor links decoder).
     }
 
     protected function after_execute() {
-        // Add reengagement related files, no need to match by itemname (just internally handled context)
+        // Add reengagement related files, no need to match by itemname (just internally handled context).
     }
 }

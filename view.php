@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * This page prints a particular instance of reengagement
@@ -11,7 +25,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
-$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
 $a  = optional_param('a', 0, PARAM_INT);  // reengagement instance ID.
 
 $params = array();
@@ -30,7 +44,7 @@ if ($id) {
     $reengagement = $DB->get_record('reengagement', array('id' => $cm->instance), '*', MUST_EXIST);
 
 } else if ($a) {
-    $reengagement = $DB->get_record('reengagement', array('id' =>  $a), '*', MUST_EXIST);
+    $reengagement = $DB->get_record('reengagement', array('id' => $a), '*', MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $reengagement->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('reengagement', $reengagement->id, $course->id, false, MUST_EXIST);
 } else {
@@ -63,11 +77,12 @@ echo $OUTPUT->header();
 
 $PAGE->set_context($context);
 
-$canstart = has_capability('mod/reengagement:startreengagement', $context, NULL, false);
+$canstart = has_capability('mod/reengagement:startreengagement', $context, null, false);
 $canedit = has_capability('mod/reengagement:editreengagementduration', $context);
 
 if (empty($canstart) && empty($canedit)) {
-    error("This reengagement module is not enabled for your account.  Please contact your administrator if you feel this is in error");
+    error("This reengagement module is not enabled for your account.
+      Please contact your administrator if you feel this is in error");
 }
 
 $modinfo = get_fast_modinfo($course->id);
@@ -85,25 +100,25 @@ if ($canstart) {
         if (!$ainfomod->is_available($availabilityinfo)) {
             // User has satisfied all activity completion preconditions, start them on this activity.
             // Set a RIP record, so we know when to send an email/mark activity as complete by cron later.
-            $reengagement_inprogress = new stdClass();
-            $reengagement_inprogress->reengagement = $reengagement->id;
-            $reengagement_inprogress->completiontime = time() + $reengagement->duration;
-            $reengagement_inprogress->emailtime = time() + $reengagement->emaildelay;
-            $reengagement_inprogress->userid = $USER->id;
-            $DB->insert_record('reengagement_inprogress', $reengagement_inprogress);
+            $reengagementinprogress = new stdClass();
+            $reengagementinprogress->reengagement = $reengagement->id;
+            $reengagementinprogress->completiontime = time() + $reengagement->duration;
+            $reengagementinprogress->emailtime = time() + $reengagement->emaildelay;
+            $reengagementinprogress->userid = $USER->id;
+            $DB->insert_record('reengagement_inprogress', $reengagementinprogress);
 
             // Set activity completion in-progress record to fit in with normal activity completion requirements.
-            $activity_completion = new stdClass();
-            $activity_completion->coursemoduleid = $cm->id;
-            $activity_completion->completionstate = COMPLETION_INCOMPLETE;
-            $activity_completion->timemodified = time();
-            $activity_completion->userid = $USER->id;
-            $DB->insert_record('course_modules_completion', $activity_completion);
+            $activitycompletion = new stdClass();
+            $activitycompletion->coursemoduleid = $cm->id;
+            $activitycompletion->completionstate = COMPLETION_INCOMPLETE;
+            $activitycompletion->timemodified = time();
+            $activitycompletion->userid = $USER->id;
+            $DB->insert_record('course_modules_completion', $activitycompletion);
             // Re-load that same info.
             $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
 
         } else {
-            // The user has permission to start a reengagement, but not this one right now. (likely due to incomplete prerequiste activities).
+            // The user has permission to start a reengagement, but not this one (likely due to incomplete prerequiste activities).
             $report = "This reengagement is not available";
             if ($availabilityinfo) {
                 $report .= " ( $availabilityinfo ) ";
@@ -116,11 +131,11 @@ if ($canstart) {
     }
     $dateformat = get_string('strftimedatetime', 'langconfig'); // Description of how to format times in user's language.
     if (!empty($completion && !empty($rip))) {
-        // User is genuinely in-progress
+        // User is genuinely in-progress.
         if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_TIME && empty($rip->emailsent)) {
             $emailpending = true;
             $emailtime = $rip->emailtime;
-        } elseif ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION && empty($rip->completed)) {
+        } else if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION && empty($rip->completed)) {
             $emailpending = true;
             $emailtime = $rip->completiontime;
         } else {
@@ -130,16 +145,16 @@ if ($canstart) {
         $datestr = userdate($rip->emailtime, $dateformat);
         if ($emailpending) {
             if (empty($reengagement->suppresstarget)) {
-                // 'You'll get an email at xyz time.'
+                // You'll get an email at xyz time.
                 $emailmessage = get_string('receiveemailattimex', 'reengagement', $datestr);
             } else {
                 // There is a target activity, if the target activity is complete, we won't send the email.
                 $targetcomplete = reengagement_check_target_completion($USER->id, $id);
                 if (!$targetcomplete) {
-                    // 'Message will be sent at xyz time unless you complete target activity'.
+                    // Message will be sent at xyz time unless you complete target activity.
                     $emailmessage = get_string('receiveemailattimexunless', 'reengagement', $datestr);
                 } else {
-                    // 'Message scheduled for xyz time will not be sent because you have completed the target activity'.
+                    // Message scheduled for xyz time will not be sent because you have completed the target activity.
                     $emailmessage = get_string('noemailattimex', 'reengagement', $datestr);
                 }
             }
@@ -149,10 +164,10 @@ if ($canstart) {
         // Activity completion can be independent of email time. Show completion time too.
         if ($completion->completionstate == COMPLETION_INCOMPLETE) {
             $datestr = userdate($rip->completiontime, $dateformat);
-            // 'This activity will complete at XYZ time'.
+            // This activity will complete at XYZ time.
             $completionmessage = get_string('completeattimex', 'reengagement', $datestr);
         } else {
-            // 'This activity has been marked as complete'.
+            // This activity has been marked as complete.
             $completionmessage = get_string('activitycompleted', 'reengagement');
         }
         echo $OUTPUT->box($completionmessage);
@@ -162,12 +177,11 @@ if ($canstart) {
 
 if ($canedit) {
     // User is able to see admin-type features of this plugin - ie not just their own re-engagement status.
-    $sql =
-            "SELECT *
-               FROM {reengagement_inprogress} rip
-         INNER JOIN {user} u ON u.id = rip.userid
-              WHERE rip.reengagement = :reengagementid
-           ORDER BY rip.completiontime ASC, u.lastname ASC, u.firstname ASC";
+    $sql = "SELECT *
+              FROM {reengagement_inprogress} rip
+        INNER JOIN {user} u ON u.id = rip.userid
+             WHERE rip.reengagement = :reengagementid
+          ORDER BY rip.completiontime ASC, u.lastname ASC, u.firstname ASC";
 
     $rips = $DB->get_records_sql($sql, array('reengagementid' => $reengagement->id));
 

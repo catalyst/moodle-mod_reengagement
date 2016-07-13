@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 $string['pluginname'] = 'Reengagement';
 $string['reengagement'] = 'reengagement';
@@ -48,12 +62,12 @@ $string['never'] = 'Never';
 $string['noemailattimex'] = 'Message scheduled for {$a} will not be sent because you have completed the target activity';
 $string['nosuppresstarget'] = 'No target activity selected';
 $string['oncompletion'] = 'On Completion';
-$string['receiveemailattimex'] =  'Message will be sent on {$a}.';
-$string['receiveemailattimexunless'] =  'Message will be sent on {$a} unless you complete target activity.';
-$string['reengagement:addinstance'] =  'reengagement:addinstance';
-$string['reengagement:startreengagement'] =  'Start Reengagement';
-$string['reengagement:getnotifications'] =  'Receive notification of reengagement completions';
-$string['reengagement:editreengagementduration'] =  'Edit Reengagement Duration';
+$string['receiveemailattimex'] = 'Message will be sent on {$a}.';
+$string['receiveemailattimexunless'] = 'Message will be sent on {$a} unless you complete target activity.';
+$string['reengagement:addinstance'] = 'reengagement:addinstance';
+$string['reengagement:startreengagement'] = 'Start Reengagement';
+$string['reengagement:getnotifications'] = 'Receive notification of reengagement completions';
+$string['reengagement:editreengagementduration'] = 'Edit Reengagement Duration';
 $string['reengagementduration'] = 'Reengagement Duration';
 $string['reengagementfieldset'] = 'Reengagement details';
 $string['reengagementintro'] = 'Reengagement Intro';
@@ -66,4 +80,3 @@ $string['suppresstarget_help'] = 'Use this dropdown to choose which activity sho
 $string['userandmanager'] = 'User and Manager';
 $string['weeks'] = 'Weeks';
 
-?>
