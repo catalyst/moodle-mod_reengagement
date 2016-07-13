@@ -8,20 +8,16 @@
  * @package mod/reengagement
  */
 
-/// Replace reengagement with the name of your module and remove this line
-
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
 $id = required_param('id', PARAM_INT);   // course
 
-if (! $course = $DB->get_record('course', array('id' => $id))) {
-    error('Course ID is incorrect');
-}
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 require_login($course);
 
-/// Get all required stringsreengagement
+// Get all required stringsreengagement.
 $strreengagements = get_string('modulenameplural', 'reengagement');
 $strreengagement  = get_string('modulename', 'reengagement');
 
@@ -31,13 +27,12 @@ $params['id'] = $id;
 
 $PAGE->set_url('/mod/reengagement/index.php', $params);
 
-/// Print the header
-
+// Print the header.
 
 $PAGE->set_title(format_string($strreengagements));
 $PAGE->set_heading(format_string($course->fullname));
 
-// Add the page view to the Moodle log
+// Add the page view to the Moodle log.
 $event = \mod_reengagement\event\course_module_instance_list_viewed::create(array(
     'context' => context_course::instance($course->id)
 ));
@@ -46,14 +41,14 @@ $event->trigger();
 
 
 echo $OUTPUT->header();
-/// Get all the appropriate data
+// Get all the appropriate data.
 
 if (! $reengagements = get_all_instances_in_course('reengagement', $course)) {
     notice('There are no instances of reengagement', "../../course/view.php?id=$course->id");
     die;
 }
 
-/// Print the list of instances (your module will probably extend this)
+// Print the list of instances.
 
 $timenow  = time();
 $strname  = get_string('name');
@@ -98,7 +93,7 @@ foreach ($reengagements as $reengagement) {
         $printsection = '<span class="smallinfo">'.userdate($reengagement->timemodified)."</span>";
     }
 
-    $class = $reengagement->visible ? '' : 'class="dimmed"'; // hidden modules are dimmed
+    $class = $reengagement->visible ? '' : 'class="dimmed"'; // Hidden modules are dimmed.
 
     $table->data[] = array (
         $printsection,
@@ -107,8 +102,6 @@ foreach ($reengagements as $reengagement) {
 }
 
 echo html_writer::table($table);
-
-/// Finish the page
 
 echo $OUTPUT->footer();
 

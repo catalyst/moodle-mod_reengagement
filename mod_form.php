@@ -50,7 +50,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
     /// Adding the required "intro" field to hold the description of the instance
-        $this->add_intro_editor(true, get_string('reengagementintro', 'reengagement'));
+        $this->standard_intro_elements(get_string('reengagementintro', 'reengagement'));
 
 
 //-------------------------------------------------------------------------------
@@ -248,5 +248,3 @@ class mod_reengagement_mod_form extends moodleform_mod {
         return true;
     }
 }
-
-?>

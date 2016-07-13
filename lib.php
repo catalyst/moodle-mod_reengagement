@@ -16,7 +16,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-/// (replace reengagement with the name of your module and delete this line)
 require_once($CFG->libdir."/completionlib.php");
 
 define('REENGAGEMENT_EMAILUSER_NEVER', 0);
