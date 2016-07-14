@@ -127,7 +127,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setType('emailcontent', PARAM_CLEANHTML);
         $mform->addHelpButton('emailcontent', 'emailcontent', 'reengagement');
         if ($istotara) {
-            $mform->addElement('text', 'emailsubjectmanager', get_string('emailsubjectmanager', 'reengagement'), array('size' => '64'));
+            $mform->addElement('text', 'emailsubjectmanager', get_string('emailsubjectmanager', 'reengagement'),
+                               array('size' => '64'));
             $mform->setType('emailsubjectmanager', PARAM_TEXT);
             $mform->addRule('emailsubjectmanager', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
             $mform->addHelpButton('emailsubjectmanager', 'emailsubjectmanager', 'reengagement');
@@ -223,6 +224,11 @@ class mod_reengagement_mod_form extends moodleform_mod {
     }
 
     public function get_data() {
+        global $CFG;
+        $istotara = false;
+        if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+            $istotara = true;
+        }
         $fromform = parent::get_data();
         if (!empty($fromform)) {
             // Force completion tracking to automatic.
@@ -250,8 +256,10 @@ class mod_reengagement_mod_form extends moodleform_mod {
             // Some special handling for the wysiwyg editor field.
             $fromform->emailcontentformat = $fromform->emailcontent['format'];
             $fromform->emailcontent = $fromform->emailcontent['text'];
-      //      $fromform->emailcontentmanagerformat = $fromform->emailcontentmanager['format'];
-         //   $fromform->emailcontentmanager = $fromform->emailcontentmanager['text'];
+            if ($istotara) {
+                $fromform->emailcontentmanagerformat = $fromform->emailcontentmanager['format'];
+                $fromform->emailcontentmanager = $fromform->emailcontentmanager['text'];
+            }
         }
         return $fromform;
     }
