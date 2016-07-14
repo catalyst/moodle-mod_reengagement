@@ -48,7 +48,6 @@ class restore_reengagement_activity_structure_step extends restore_activity_stru
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
         $data->course = $this->get_courseid();
 
         $data->timecreated = $this->apply_date_offset($data->timecreated);
@@ -67,7 +66,7 @@ class restore_reengagement_activity_structure_step extends restore_activity_stru
         $data->reengagement = $this->get_new_parentid('reengagement');
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $newitemid = $DB->insert_record('reengagement_inprogress', $data);
+        $DB->insert_record('reengagement_inprogress', $data);
         // No need to save this mapping as far as nothing depend on it
         // (child paths, file areas nor links decoder).
     }

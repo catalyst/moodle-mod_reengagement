@@ -141,7 +141,7 @@ function reengagement_delete_instance($id) {
  * @todo Finish documenting this function
  */
 function reengagement_user_outline($course, $user, $mod, $reengagement) {
-    return $return;
+    return;
 }
 
 
@@ -199,7 +199,7 @@ function reengagement_print_recent_activity($course, $isteacher, $timestart) {
  * @return boolean
  **/
 function reengagement_cron() {
-    global $CFG, $SITE, $DB;
+    global $CFG, $DB;
 
     require_once($CFG->libdir."/completionlib.php");
 
@@ -586,7 +586,7 @@ function reengagement_reset_course_form_defaults($course) {
  * @return array status array
  */
 function reengagement_reset_userdata($data) {
-    global $CFG, $DB;
+    global $DB;
 
     $componentstr = get_string('modulenameplural', 'reengagement');
     $status = array();
