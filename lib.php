@@ -373,15 +373,24 @@ function reengagement_cron() {
  */
 function reengagement_email_user($reengagement, $inprogress) {
     global $DB, $SITE, $CFG;
-    $usersql = "SELECT u.*, manager.id as mid, manager.firstname as mfirstname,
+    $istotara = false;
+    if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+        $istotara = true;
+    }
+    if ($istotara) {
+        $usersql = "SELECT u.*, manager.id as mid, manager.firstname as mfirstname,
                         manager.lastname as mlastname, manager.email as memail,
                         manager.mailformat as mmailformat
                   FROM {user} u
              LEFT JOIN {pos_assignment} pa ON u.id = pa.userid and pa.type = " . POSITION_TYPE_PRIMARY . "
              LEFT JOIN {user} manager ON pa.managerid = manager.id
                  WHERE u.id = :userid";
-    $params = array('userid' => $inprogress->userid);
-    $user = $DB->get_record_sql($usersql, $params);
+        $params = array('userid' => $inprogress->userid);
+        $user = $DB->get_record_sql($usersql, $params);
+
+    } else {
+        $user = $DB->get_record('user', array('id' => $inprogress->userid));
+    }
     if (!empty($reengagement->suppresstarget)) {
         $targetcomplete = reengagement_check_target_completion($user->id, $reengagement->suppresstarget);
         if ($targetcomplete) {
@@ -423,7 +432,8 @@ function reengagement_email_user($reengagement, $inprogress) {
     $plaintext = html_to_text($templateddetails['emailcontent']);
 
     $emailresult = true;
-    if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_MANAGER) ||
+    if ($istotara &&
+        ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_MANAGER) ||
         ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
         // We're supposed to email the user's manager.
         if (empty($user->mid)) {

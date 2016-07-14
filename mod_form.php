@@ -49,7 +49,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
      */
     public function definition() {
 
-        global $COURSE;
+        global $COURSE, $CFG;
         $mform =& $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are shown.
@@ -60,6 +60,11 @@ class mod_reengagement_mod_form extends moodleform_mod {
                 $mform->addElement('static', 'completionwillturnon', get_string('completion', 'reengagement'),
                                    get_string('completionwillturnon', 'reengagement'));
             }
+        }
+
+        $istotara = false;
+        if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+            $istotara = true;
         }
 
         // Adding the standard "name" field.
@@ -84,14 +89,19 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->addElement('select', 'emailuser', get_string('emailuser', 'reengagement'), $emailuseroptions);
         $mform->addHelpButton('emailuser', 'emailuser', 'reengagement');
 
-        // Add options to control who any notifications should go to.
-        $emailrecipientoptions = array(); // The message recipient options.
-        $emailrecipientoptions[REENGAGEMENT_RECIPIENT_USER] = get_string('user');
-        $emailrecipientoptions[REENGAGEMENT_RECIPIENT_MANAGER] = get_string('manager', 'role');
-        $emailrecipientoptions[REENGAGEMENT_RECIPIENT_BOTH] = get_string('userandmanager', 'reengagement');
+        if ($istotara) {
+            // Add options to control who any notifications should go to.
+            $emailrecipientoptions = array(); // The message recipient options.
+            $emailrecipientoptions[REENGAGEMENT_RECIPIENT_USER] = get_string('user');
+            $emailrecipientoptions[REENGAGEMENT_RECIPIENT_MANAGER] = get_string('manager', 'role');
+            $emailrecipientoptions[REENGAGEMENT_RECIPIENT_BOTH] = get_string('userandmanager', 'reengagement');
 
-        $mform->addElement('select', 'emailrecipient', get_string('emailrecipient', 'reengagement'), $emailrecipientoptions);
-        $mform->addHelpButton('emailrecipient', 'emailrecipient', 'reengagement');
+            $mform->addElement('select', 'emailrecipient', get_string('emailrecipient', 'reengagement'), $emailrecipientoptions);
+            $mform->addHelpButton('emailrecipient', 'emailrecipient', 'reengagement');
+        } else {
+            $mform->addElement('hidden', 'emailrecipient', REENGAGEMENT_RECIPIENT_USER);
+            $mform->setType('emailrecipient', PARAM_INT);
+        }
 
         // Add a group of controls to specify after how long an email should be sent.
         $emaildelay = array();
@@ -116,15 +126,21 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setDefault('emailcontent', get_string('emailcontentdefaultvalue', 'reengagement'));
         $mform->setType('emailcontent', PARAM_CLEANHTML);
         $mform->addHelpButton('emailcontent', 'emailcontent', 'reengagement');
-
-        $mform->addElement('text', 'emailsubjectmanager', get_string('emailsubjectmanager', 'reengagement'), array('size' => '64'));
-        $mform->setType('emailsubjectmanager', PARAM_TEXT);
-        $mform->addRule('emailsubjectmanager', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('emailsubjectmanager', 'emailsubjectmanager', 'reengagement');
-        $mform->addElement('editor', 'emailcontentmanager', get_string('emailcontentmanager', 'reengagement'), null, null);
-        $mform->setDefault('emailcontentmanager', get_string('emailcontentmanagerdefaultvalue', 'reengagement'));
-        $mform->setType('emailcontentmanager', PARAM_CLEANHTML);
-        $mform->addHelpButton('emailcontentmanager', 'emailcontentmanager', 'reengagement');
+        if ($istotara) {
+            $mform->addElement('text', 'emailsubjectmanager', get_string('emailsubjectmanager', 'reengagement'), array('size' => '64'));
+            $mform->setType('emailsubjectmanager', PARAM_TEXT);
+            $mform->addRule('emailsubjectmanager', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+            $mform->addHelpButton('emailsubjectmanager', 'emailsubjectmanager', 'reengagement');
+            $mform->addElement('editor', 'emailcontentmanager', get_string('emailcontentmanager', 'reengagement'), null, null);
+            $mform->setDefault('emailcontentmanager', get_string('emailcontentmanagerdefaultvalue', 'reengagement'));
+            $mform->setType('emailcontentmanager', PARAM_CLEANHTML);
+            $mform->addHelpButton('emailcontentmanager', 'emailcontentmanager', 'reengagement');
+        } else {
+            $mform->addElement('hidden', 'emailsubjectmanager');
+            $mform->setType('emailsubjectmanager', PARAM_ALPHA);
+            $mform->addElement('hidden', 'emailcontentmanager');
+            $mform->setType('emailcontentmanager', PARAM_ALPHA);
+        }
 
         $mform->addElement('advcheckbox', 'suppressemail', get_string('suppressemail', 'reengagement'));
         $mform->addHelpbutton('suppressemail', 'suppressemail', 'reengagement');
@@ -152,6 +168,11 @@ class mod_reengagement_mod_form extends moodleform_mod {
 
     }
     public function set_data ($toform) {
+        global $CFG;
+        $istotara = false;
+        if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+            $istotara = true;
+        }
         // Form expects durations as a number of periods eg 5 minutes.
         // Process dbtime (seconds) into form-appropraite times.
         if (!empty($toform->duration)) {
@@ -173,15 +194,16 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $toform->emailcontentformat = 1;
         }
         $toform->emailcontent = array('text' => $toform->emailcontent, 'format' => $toform->emailcontentformat);
-
-        if (empty($toform->emailcontentmanager)) {
-            $toform->emailcontentmanager = '';
+        if ($istotara) {
+            if (empty($toform->emailcontentmanager)) {
+                $toform->emailcontentmanager = '';
+            }
+            if (empty($toform->emailcontentmanagerformat)) {
+                $toform->emailcontentmanagerformat = 1;
+            }
+            $toform->emailcontentmanager = array('text' => $toform->emailcontentmanager,
+                'format' => $toform->emailcontentmanagerformat);
         }
-        if (empty($toform->emailcontentmanagerformat)) {
-            $toform->emailcontentmanagerformat = 1;
-        }
-        $toform->emailcontentmanager = array('text' => $toform->emailcontentmanager,
-                                             'format' => $toform->emailcontentmanagerformat);
 
         if (empty($toform->suppresstarget)) {
             // There is no target activity specified.
@@ -228,8 +250,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
             // Some special handling for the wysiwyg editor field.
             $fromform->emailcontentformat = $fromform->emailcontent['format'];
             $fromform->emailcontent = $fromform->emailcontent['text'];
-            $fromform->emailcontentmanagerformat = $fromform->emailcontentmanager['format'];
-            $fromform->emailcontentmanager = $fromform->emailcontentmanager['text'];
+      //      $fromform->emailcontentmanagerformat = $fromform->emailcontentmanager['format'];
+         //   $fromform->emailcontentmanager = $fromform->emailcontentmanager['text'];
         }
         return $fromform;
     }
