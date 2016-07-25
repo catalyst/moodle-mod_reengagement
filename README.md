@@ -13,3 +13,6 @@ When configuring the e-mails sent from the plugin there are six place holders yo
  * %userfirstname%
  * %userlastname%
  * %userid%
+ * %usercity%
+ * %userinstitution%
+ * %userdepartment%
