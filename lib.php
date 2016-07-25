@@ -492,6 +492,9 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
         '/%userfirstname%/' => $user->firstname,
         '/%userlastname%/' => $user->lastname,
         '/%userid%/' => $user->id,
+        '/%usercity%/' => $user->city,
+        '/%userinstitution%/' => $user->institution,
+        '/%userdepartment%/' => $user->department,
     );
     $patterns = array_keys($templatevars); // The placeholders which are to be replaced.
     $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
