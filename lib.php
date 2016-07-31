@@ -414,12 +414,6 @@ function reengagement_email_user($reengagement, $inprogress) {
     } else {
         $emailsubject = $SITE->shortname . ": " . $reengagement->name . " is complete";
     }
-    // Create an object which discribes the 'user' who is sending the email.
-    $emailsenduser = new stdClass();
-    $emailsenduser->firstname = $SITE->shortname;
-    $emailsenduser->lastname = '';
-    $emailsenduser->email = $CFG->noreplyaddress;
-    $emailsenduser->maildisplay = false;
 
     $templateddetails = reengagement_template_variables($reengagement, $inprogress, $user);
     $plaintext = html_to_text($templateddetails['emailcontent']);
@@ -443,7 +437,7 @@ function reengagement_email_user($reengagement, $inprogress) {
             }
             // Actually send the email.
             $managersendresult = email_to_user($manager,
-                    $emailsenduser,
+                    $SITE->shortname,
                     $templateddetails['emailsubjectmanager'],
                     $plaintext,
                     $templateddetails['emailcontentmanager']);
@@ -457,7 +451,7 @@ function reengagement_email_user($reengagement, $inprogress) {
         ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
         // We are supposed to send email to the user.
         $usersendresult = email_to_user($user,
-                $emailsenduser,
+                $SITE->shortname,
                 $templateddetails['emailsubject'],
                 $plaintext,
                 $templateddetails['emailcontent']);
