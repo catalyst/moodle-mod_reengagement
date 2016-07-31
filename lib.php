@@ -15,18 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Library of functions and constants for module reengagement
- * This file should have two well differenced parts:
- *   - All the core Moodle functions, neeeded to allow
- *     the module to work integrated in Moodle.
- *   - All the reengagement specific functions, needed
- *     to implement all the module logic. Please, note
- *     that, if the module become complex and this lib
- *     grows a lot, it's HIGHLY recommended to move all
- *     these module specific functions to a new php file,
- *     called "locallib.php" (see forum, quiz...). This will
- *     help to save some memory when Moodle is performing
- *     actions across all modules.
+ * This page lists all the instances of reengagement in a particular course
+ *
+ * @author  Catalyst IT
+ * @package mod_reengagement
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

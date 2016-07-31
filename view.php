@@ -18,8 +18,9 @@
  * This page prints a particular instance of reengagement
  * Depending on whether the user has a reengagement in progress (RIP) or not, it prints different content.
  *
- * @author  Your Name <your@email.address>
- * @package mod/reengagement
+ * @author  Catalyst IT
+ * @package mod_reengagement
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
