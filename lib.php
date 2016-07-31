@@ -409,11 +409,6 @@ function reengagement_email_user($reengagement, $inprogress) {
     }
 
     debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:'.$user->id.' Sending email.');
-    if (!empty($reengagement->emailsubject)) {
-        $emailsubject = $reengagement->emailsubject;
-    } else {
-        $emailsubject = $SITE->shortname . ": " . $reengagement->name . " is complete";
-    }
 
     $templateddetails = reengagement_template_variables($reengagement, $inprogress, $user);
     $plaintext = html_to_text($templateddetails['emailcontent']);
