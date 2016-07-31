@@ -124,7 +124,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->addHelpButton('emailsubject', 'emailsubject', 'reengagement');
         $mform->addElement('editor', 'emailcontent', get_string('emailcontent', 'reengagement'), null, null);
         $mform->setDefault('emailcontent', get_string('emailcontentdefaultvalue', 'reengagement'));
-        $mform->setType('emailcontent', PARAM_CLEANHTML);
+        $mform->setType('emailcontent', PARAM_RAW);
         $mform->addHelpButton('emailcontent', 'emailcontent', 'reengagement');
         if ($istotara) {
             $mform->addElement('text', 'emailsubjectmanager', get_string('emailsubjectmanager', 'reengagement'),
@@ -134,7 +134,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->addHelpButton('emailsubjectmanager', 'emailsubjectmanager', 'reengagement');
             $mform->addElement('editor', 'emailcontentmanager', get_string('emailcontentmanager', 'reengagement'), null, null);
             $mform->setDefault('emailcontentmanager', get_string('emailcontentmanagerdefaultvalue', 'reengagement'));
-            $mform->setType('emailcontentmanager', PARAM_CLEANHTML);
+            $mform->setType('emailcontentmanager', PARAM_RAW);
             $mform->addHelpButton('emailcontentmanager', 'emailcontentmanager', 'reengagement');
         } else {
             $mform->addElement('hidden', 'emailsubjectmanager');
