@@ -64,6 +64,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         // Adding the rest of reengagement settings, spreeading all them into this fieldset
         // or adding more fieldsets ('header' elements) if needed for better logic.
         $mform->addElement('header', 'reengagementfieldset', get_string('reengagementfieldset', 'reengagement'));
+        $mform->setExpanded('reengagementfieldset', true);
 
         // Adding email detail fields:
         $emailuseroptions = array(); // The sorts of emailing this module might do.
@@ -102,6 +103,13 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setType('emailperiodcount', PARAM_INT);
         $mform->setDefault('emailperiodcount', '1');
         $mform->setDefault('emailperiod', '604800');
+
+        // Add frequency of e-mails.
+        $mform->addElement('text', 'remindercount', get_string('remindercount', 'reengagement'), array('maxlength' => '2'));
+        $mform->setType('remindercount', PARAM_INT);
+        $mform->setDefault('remindercount', '1');
+        $mform->addRule('remindercount', get_string('err_numeric', 'form'), 'numeric', '', 'client');
+        $mform->addHelpButton('remindercount', 'remindercount', 'reengagement');
 
         $mform->addElement('text', 'emailsubject', get_string('emailsubject', 'reengagement'), array('size' => '64'));
         $mform->setType('emailsubject', PARAM_TEXT);
@@ -276,5 +284,37 @@ class mod_reengagement_mod_form extends moodleform_mod {
 
     public function completion_rule_enabled($data) {
         return true;
+    }
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+        if (!empty($data['emailperiod'])) {
+            $duration = $data['emailperiod'] * $data['emailperiodcount'];
+
+            if ($duration < (60 * 60 * 24) && $data['remindercount'] > 2) {
+                // If less than 24hrs, make sure only 2 e-mails can be sent.
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 2);
+            } else if ($duration < (60 * 60 * 24 * 5) && $data['remindercount'] > 5) {
+                // If less than 5 days, make sure only 5 e-mails can be sent.
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 5);
+            } else if ($duration < (60 * 60 * 24 * 10) && $data['remindercount'] > 10) {
+                // If less than 10 days, make sure only 10 e-mails can be sent.
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 10);
+            } else if ($duration < (60 * 60 * 24 * 15) && $data['remindercount'] > 15) {
+                // If less than 15 days, make sure only 15 e-mails can be sent.
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 15);
+            } else if ($duration < (60 * 60 * 24 * 30) && $data['remindercount'] > 30) {
+                // If less than 30 days, make sure only 30 e-mails can be sent.
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 30);
+            } else if ($duration < (60 * 60 * 24 * 60) && $data['remindercount'] > 60) {
+                // If less than 60 days, make sure only 60 e-mails can be sent.
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 60);
+            }
+        }
+
+        if ($data['emailperiod'] == 60 && $data['emailperiodcount'] < 5) {
+            $errors['emaildelay'] = get_string('periodtoolow', 'reengagement');
+        }
+
+        return $errors;
     }
 }

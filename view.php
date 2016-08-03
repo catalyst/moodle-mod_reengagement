@@ -205,7 +205,7 @@ if ($canedit) {
             $fullname = fullname($rip);
             print '<tr><td>' . $fullname . '</td>';
             if ($showemailtime) {
-                if ($rip->emailsent) {
+                if ($rip->emailsent > $reengagement->remindercount) {
                     // Email has already been sent - don't show a time in the past.
                     print '<td></td>';
                 } else {

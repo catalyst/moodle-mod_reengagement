@@ -251,7 +251,7 @@ function reengagement_cron() {
 
     $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
                                 r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
-                                r.emailuser, r.name, r.suppresstarget, c.shortname as courseshortname,
+                                r.emailuser, r.name, r.suppresstarget, r.remindercount, c.shortname as courseshortname,
                                 c.fullname as coursefullname, c.id as courseid, r.emailrecipient
                           FROM {reengagement} r
                     INNER JOIN {course_modules} cm ON cm.instance = r.id
@@ -322,7 +322,7 @@ function reengagement_cron() {
                   INNER JOIN {reengagement} r on r.id = ip.reengagement
                        WHERE ip.emailtime < :emailtime
                              AND r.emailuser = " . REENGAGEMENT_EMAILUSER_TIME . '
-                             AND ip.emailsent = 0
+                             AND ip.emailsent < r.remindercount
                     ORDER BY r.id ASC';
     $params = array('emailtime' => $timenow);
 
@@ -343,7 +343,10 @@ function reengagement_cron() {
                       Updating inprogress record to indicate email sent for user $userid");
             $updaterecord = new stdClass();
             $updaterecord->id = $inprogress->id;
-            $updaterecord->emailsent = 1;
+            if ($reengagement->remindercount > $inprogress->emailsent) {
+                $updaterecord->emailtime = $timenow + $reengagementcm->emaildelay;
+            }
+            $updaterecord->emailsent = $inprogress->emailsent + 1;
             $result = $DB->update_record('reengagement_inprogress', $updaterecord);
         }
         if (!empty($result)) {

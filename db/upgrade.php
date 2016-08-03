@@ -50,6 +50,17 @@ function xmldb_reengagement_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, $upgradeversion, 'reengagement');
     }
 
+    // Add remindercount fields.
+    if ($oldversion < 2016080301) {
+
+        $table = new xmldb_table('reengagement');
+        $field = new xmldb_field('remindercount', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '1');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2016080301, 'reengagement');
+    }
+
     return true;
 }
 
