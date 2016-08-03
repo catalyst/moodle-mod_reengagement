@@ -608,6 +608,11 @@ function reengagement_get_startusers($reengagement) {
     $ainfomod = new \core_availability\info_module($cm);
     foreach ($startusers as $startcandidate) {
         $information = '';
+        if (empty($startcandidate->confirmed)) {
+            // Exclude unconfirmed users. Typically this shouldn't happen, but if an unconfirmed user
+            // has been enrolled to a course we shouldn't e-mail them about activities they can't access yet.
+            unset($startusers[$startcandidate->id]);
+        }
         if (!$ainfomod->is_available($information, false, $startcandidate->id)) {
             unset($startusers[$startcandidate->id]);
         }
