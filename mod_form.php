@@ -10,18 +10,6 @@
  * The form must provide support for, at least these fields:
  *   - name: text element of 64cc max
  *
- * Also, it's usual to use these fields:
- *   - intro: one htmlarea element to describe the activity
- *            (will be showed in the list of activities of
- *             reengagement type (index.php) and in the header
- *             of the reengagement main page (view.php).
- *   - introformat: The format used to write the contents
- *             of the intro field. It automatically defaults
- *             to HTML when the htmleditor is used and can be
- *             manually selected if the htmleditor is not used
- *             (standard formats are: MOODLE, HTML, PLAIN, MARKDOWN)
- *             See lib/weblib.php Constants and the format_text()
- *             function for more info
  */
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
@@ -49,13 +37,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-    /// Adding the required "intro" field to hold the description of the instance
-        $this->add_intro_editor(true, get_string('reengagementintro', 'reengagement'));
-
-
-//-------------------------------------------------------------------------------
-    /// Adding the rest of reengagement settings, spreeading all them into this fieldset
-    /// or adding more fieldsets ('header' elements) if needed for better logic
+        // Adding the rest of reengagement settings, spreeading all them into this fieldset
+        // or adding more fieldsets ('header' elements) if needed for better logic.
         $mform->addElement('header', 'reengagementfieldset', get_string('reengagementfieldset', 'reengagement'));
 
         /// Adding email detail fields:
