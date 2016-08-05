@@ -387,6 +387,10 @@ function reengagement_email_user($reengagement, $inprogress) {
     } else {
         $user = $DB->get_record('user', array('id' => $inprogress->userid));
     }
+    if (!empty($user->deleted)) {
+        // User has been deleted - don't send an e-mail.
+        return true;
+    }
     if (!empty($reengagement->suppresstarget)) {
         $targetcomplete = reengagement_check_target_completion($user->id, $reengagement->suppresstarget);
         if ($targetcomplete) {

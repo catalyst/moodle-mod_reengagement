@@ -182,6 +182,7 @@ if ($canedit) {
               FROM {reengagement_inprogress} rip
         INNER JOIN {user} u ON u.id = rip.userid
              WHERE rip.reengagement = :reengagementid
+               AND u.deleted = 0
           ORDER BY rip.completiontime ASC, u.lastname ASC, u.firstname ASC";
 
     $rips = $DB->get_records_sql($sql, array('reengagementid' => $reengagement->id));
