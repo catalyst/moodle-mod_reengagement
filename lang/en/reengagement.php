@@ -55,7 +55,7 @@ $string['emailuser_help'] = 'When the activity should email users: <ul>
 <li>On Completion: Email the user as the module completes.</li>
 <li>After Delay: Email the user a set time after they have started the module.</li>
 </ul>';
-$string['frequencytoohigh'] = 'The reminder count is too high - it must be under {$a} with the delay period you have set.';
+$string['frequencytoohigh'] = 'The maximum reminder count with the delay period you have set is {$a}.';
 $string['periodtoolow'] = 'The delay is too low - it must be at least 5 minutes.';
 $string['hours'] = 'Hours';
 $string['introdefaultvalue'] = 'This is a reengagement activity.  Its purpose is to enforce a time lapse between the activities which preceed it, and the activities which follow it.';
@@ -77,12 +77,10 @@ $string['reengagementname'] = 'Reengagement Name';
 $string['reengagementsinprogress'] = 'Reengagements in progress';
 $string['remindercount'] = 'Reminder count';
 $string['remindercount_help'] = 'This is the number of times an e-mail is sent after each delay period. There are some limits to the values you can use<ul>
-<li>24 hrs or less - limit of 2 reminders.</li>
-<li>5 days or less - limit of 5 reminders.</li>
-<li>10 days or less - limit of 10 reminders.</li>
-<li>15 days or less - limit of 15 reminders.</li>
-<li>30 days or less - limit of 30 reminders.</li>
-<li>60 days or less - limit of 60 reminders.</li></ul>';
+<li>less than 24 hrs - limit of 2 reminders.</li>
+<li>less than 5 days - limit of 10 reminders.</li>
+<li>less than 15 days - limit of 26 reminders.</li>
+<li>over 15 days - maximum limit of 40 reminders.</li></ul>';
 $string['suppressemail'] = 'Suppress email if target activity complete';
 $string['suppressemail_help'] = 'This option instructs the activity to suppress emails to users where a named activity is complete.';
 $string['suppresstarget'] = 'Target activity.';

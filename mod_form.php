@@ -292,22 +292,16 @@ class mod_reengagement_mod_form extends moodleform_mod {
 
             if ($duration < (60 * 60 * 24) && $data['remindercount'] > 2) {
                 // If less than 24hrs, make sure only 2 e-mails can be sent.
-                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 2);
-            } else if ($duration < (60 * 60 * 24 * 5) && $data['remindercount'] > 5) {
-                // If less than 5 days, make sure only 5 e-mails can be sent.
-                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 5);
-            } else if ($duration < (60 * 60 * 24 * 10) && $data['remindercount'] > 10) {
-                // If less than 10 days, make sure only 10 e-mails can be sent.
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 3);
+            } else if ($duration < (60 * 60 * 24 * 5) && $data['remindercount'] > 10) {
+                // If less than 5 days, make sure only 10 e-mails can be sent.
                 $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 10);
-            } else if ($duration < (60 * 60 * 24 * 15) && $data['remindercount'] > 15) {
-                // If less than 15 days, make sure only 15 e-mails can be sent.
-                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 15);
-            } else if ($duration < (60 * 60 * 24 * 30) && $data['remindercount'] > 30) {
-                // If less than 30 days, make sure only 30 e-mails can be sent.
-                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 30);
-            } else if ($duration < (60 * 60 * 24 * 60) && $data['remindercount'] > 60) {
-                // If less than 60 days, make sure only 60 e-mails can be sent.
-                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 60);
+            } else if ($duration < (60 * 60 * 24 * 15) && $data['remindercount'] > 26) {
+                // If less than 15 days, make sure only 26 e-mails can be sent.
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 26);
+            } else if ($data['remindercount'] > 40) {
+                // Maximum number of reminders is set to 40 - we don't want to be emailing users for several years.
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 40);
             }
         }
 
