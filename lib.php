@@ -261,7 +261,12 @@ function reengagement_cron() {
 
     $reengagements = $DB->get_records_sql($reengagementssql, array('moduleid' => $reengagementmod->id));
 
-    $inprogresses = $DB->get_records_select('reengagement_inprogress', 'completiontime < ' . $timenow . ' AND completed = 0');
+    $inprogresssql = 'SELECT ri.*
+                        FROM {reengagement_inprogress} ri
+                        JOIN {user} u ON u.id = ri.userid
+                       WHERE u.deleted = 0 AND
+                       completiontime < ? AND completed = 0';
+    $inprogresses = $DB->get_records_sql($inprogresssql, array($timenow));
     $completeripcount = count($inprogresses);
     if (debugging('', DEBUG_DEVELOPER) || ($completeripcount && debugging('', DEBUG_ALL))) {
         mtrace("Found $completeripcount complete reengagements.");
@@ -320,9 +325,11 @@ function reengagement_cron() {
     $inprogresssql = "SELECT ip.*, ip.emailtime as timedue
                         FROM {reengagement_inprogress} ip
                   INNER JOIN {reengagement} r on r.id = ip.reengagement
+                        JOIN {user} u ON u.id = ip.userid
                        WHERE ip.emailtime < :emailtime
                              AND r.emailuser = " . REENGAGEMENT_EMAILUSER_TIME . '
                              AND ip.emailsent < r.remindercount
+                             AND u.deleted = 0
                     ORDER BY r.id ASC';
     $params = array('emailtime' => $timenow);
 
