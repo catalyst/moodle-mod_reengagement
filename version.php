@@ -22,9 +22,9 @@
  * @package mod/reengagement
  */
 
-$plugin->version  = 2016080301;   // The current module version.
+$plugin->version  = 2016080302;   // The current module version.
 $plugin->requires  = 2011112900;
 $plugin->cron     = 150;         // Don't run more often than every 150 seconds - realistically expect ~every 300s.
 $plugin->component = 'mod_reengagement';
-$plugin->release = '3.1.1';
+$plugin->release = '3.1.2';
 $plugin->maturity  = MATURITY_STABLE;
