@@ -190,8 +190,8 @@ function reengagement_print_recent_activity($course, $isteacher, $timestart) {
  *   and mark their activity completion as being complete
  *   and send an email if the reengagement instance calls for it.
  * @return boolean
- **/
-function reengagement_cron() {
+ */
+function reengagement_crontask() {
     global $CFG, $DB;
 
     require_once($CFG->libdir."/completionlib.php");

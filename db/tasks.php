@@ -15,16 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Code fragment to define the version of reengagement
- * This fragment is called by moodle_needs_upgrading() and /admin/index.php
+ * Definition of Reengagement scheduled tasks.
  *
- * @author  Peter Bulmer <peter.bulmer@catlayst.net.nz>
- * @package mod/reengagement
+ * @author     Dan Marsden
+ * @copyright  Catalyst IT
+ * @package    mod_reengagement
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version  = 2016080303;   // The current module version.
-$plugin->requires  = 2011112900;
-$plugin->cron     = 0; // Now uses a scheduled task.
-$plugin->component = 'mod_reengagement';
-$plugin->release = '3.1.2';
-$plugin->maturity  = MATURITY_STABLE;
+defined('MOODLE_INTERNAL') || die();
+
+$tasks = array(
+    array(
+        'classname' => 'mod_reengagement\task\cron_task',
+        'blocking' => 0,
+        'minute' => '5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    )
+);
