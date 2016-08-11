@@ -29,7 +29,7 @@ $tasks = array(
     array(
         'classname' => 'mod_reengagement\task\cron_task',
         'blocking' => 0,
-        'minute' => '5',
+        'minute' => '*/5',
         'hour' => '*',
         'day' => '*',
         'month' => '*',
