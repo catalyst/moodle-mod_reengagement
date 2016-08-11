@@ -211,7 +211,7 @@ if ($canedit) {
                     print '<td></td>';
                 } else {
                     // Email will be sent, but hasn't been yet.
-                    print '<td>' . date("g:i a d/m/Y", $rip->emailtime) . "</td>";
+                    print '<td>' . userdate($rip->emailtime, get_string('strftimedatetimeshort', 'langconfig')) . "</td>";
                 }
             }
             if ($rip->completed) {
@@ -220,7 +220,7 @@ if ($canedit) {
                 print '<td></td>';
             } else {
                 // User hasn't complted activity yet.
-                print '<td>' . date("g:i a d/m/Y", $rip->completiontime) . "</td>";
+                print '<td>' . userdate($rip->completiontime, get_string('strftimedatetimeshort', 'langconfig')) . "</td>";
             }
             print '</tr>';
         }
