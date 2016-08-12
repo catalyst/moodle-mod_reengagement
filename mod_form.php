@@ -103,6 +103,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setType('emailperiodcount', PARAM_INT);
         $mform->setDefault('emailperiodcount', '1');
         $mform->setDefault('emailperiod', '604800');
+        $mform->disabledif('emaildelay', 'emailuser', 'neq', REENGAGEMENT_EMAILUSER_TIME);
 
         // Add frequency of e-mails.
         $mform->addElement('text', 'remindercount', get_string('remindercount', 'reengagement'), array('maxlength' => '2'));
@@ -110,20 +111,24 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setDefault('remindercount', '1');
         $mform->addRule('remindercount', get_string('err_numeric', 'form'), 'numeric', '', 'client');
         $mform->addHelpButton('remindercount', 'remindercount', 'reengagement');
+        $mform->disabledif('remindercount', 'emailuser', 'neq', REENGAGEMENT_EMAILUSER_TIME);
 
         $mform->addElement('text', 'emailsubject', get_string('emailsubject', 'reengagement'), array('size' => '64'));
         $mform->setType('emailsubject', PARAM_TEXT);
         $mform->addRule('emailsubject', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->disabledif('emailsubject', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
         $mform->addHelpButton('emailsubject', 'emailsubject', 'reengagement');
         $mform->addElement('editor', 'emailcontent', get_string('emailcontent', 'reengagement'), null, null);
         $mform->setDefault('emailcontent', get_string('emailcontentdefaultvalue', 'reengagement'));
         $mform->setType('emailcontent', PARAM_RAW);
-        $mform->addHelpButton('emailcontent', 'emailcontent', 'reengagement');
+        $mform->disabledif('emailcontent', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
+
         if ($istotara) {
             $mform->addElement('text', 'emailsubjectmanager', get_string('emailsubjectmanager', 'reengagement'),
                                array('size' => '64'));
             $mform->setType('emailsubjectmanager', PARAM_TEXT);
             $mform->addRule('emailsubjectmanager', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+            $mform->disabledif('emailsubjectmanager', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
             $mform->addHelpButton('emailsubjectmanager', 'emailsubjectmanager', 'reengagement');
             $mform->addElement('editor', 'emailcontentmanager', get_string('emailcontentmanager', 'reengagement'), null, null);
             $mform->setDefault('emailcontentmanager', get_string('emailcontentmanagerdefaultvalue', 'reengagement'));
@@ -137,6 +142,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         }
 
         $mform->addElement('advcheckbox', 'suppressemail', get_string('suppressemail', 'reengagement'));
+        $mform->disabledif('suppressemail', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
         $mform->addHelpbutton('suppressemail', 'suppressemail', 'reengagement');
         $truemods = get_fast_modinfo($COURSE->id);
         $mods = array();
@@ -145,6 +151,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mods[$mod->id] = $mod->name;
         }
         $mform->addElement('select', 'suppresstarget', get_string('suppresstarget', 'reengagement'), $mods);
+        $mform->disabledif('suppresstarget', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
         $mform->addHelpbutton('suppresstarget', 'suppresstarget', 'reengagement');
 
         // Add standard elements, common to all modules.
