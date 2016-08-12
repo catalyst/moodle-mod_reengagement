@@ -22,9 +22,9 @@
  * @package mod/reengagement
  */
 
-$plugin->version  = 2016080304;   // The current module version.
+$plugin->version  = 2016080305;   // The current module version.
 $plugin->requires  = 2011112900;
 $plugin->cron     = 0; // Now uses a scheduled task.
 $plugin->component = 'mod_reengagement';
-$plugin->release = '3.1.2';
+$plugin->release = '3.1.3';
 $plugin->maturity  = MATURITY_STABLE;
