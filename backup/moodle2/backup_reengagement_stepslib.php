@@ -15,21 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
- * @subpackage backup-moodle2
- * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-/**
  * Define all the backup steps that will be used by the backup_reengagement_activity_task
+ *
+ * @package    mod_reengagement
+ * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
  * Define the complete reengagement structure for backup, with file and id annotations
+ *
+ * @package    mod_reengagement
+ * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_reengagement_activity_structure_step extends backup_activity_structure_step {
 
+    /**
+     * Define the structure for the assign activity
+     * @return void
+     */
     protected function define_structure() {
 
         // To know if we are including userinfo.

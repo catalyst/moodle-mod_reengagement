@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Strings for reengagement.
+ *
+ * @package    mod_reengagement
+ * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 $string['pluginname'] = 'Reengagement';
 $string['reengagement'] = 'reengagement';
 $string['pluginadministration'] = '';

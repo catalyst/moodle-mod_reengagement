@@ -17,8 +17,9 @@
 /**
  * This page lists all the instances of reengagement in a particular course
  *
- * @author  Catalyst IT
- * @package mod_reengagement
+ * @package    mod_reengagement
+ * @author     Peter Bulmer
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -122,16 +123,13 @@ function reengagement_delete_instance($id) {
     return $result;
 }
 
-
 /**
- * Return a small object with summary information about what a
- * user has done with a given particular instance of this module
- * Used for user activity reports.
- * $return->time = the time they did it
- * $return->info = a short text description
+ * Print the grade information for this user.
  *
- * @return null
- * @todo Finish documenting this function
+ * @param stdClass $course
+ * @param stdClass $user
+ * @param stdClass $mod
+ * @param stdClass $reengagement
  */
 function reengagement_user_outline($course, $user, $mod, $reengagement) {
     return;
@@ -139,11 +137,12 @@ function reengagement_user_outline($course, $user, $mod, $reengagement) {
 
 
 /**
- * Print a detailed representation of what a user has done with
- * a given particular instance of this module, for user activity reports.
+ * Prints the complete info about a user's interaction.
  *
- * @return boolean
- * @todo Finish documenting this function
+ * @param stdClass $course
+ * @param stdClass $user
+ * @param stdClass $mod
+ * @param stdClass $reengagement
  */
 function reengagement_user_complete($course, $user, $mod, $reengagement) {
     return true;
@@ -153,8 +152,6 @@ function reengagement_user_complete($course, $user, $mod, $reengagement) {
  * Obtains the automatic completion state for this forum based on any conditions
  * in forum settings.
  *
- * @global object
- * @global object
  * @param object $course Course
  * @param object $cm Course-module
  * @param int $userid User ID
@@ -169,13 +166,13 @@ function reengagement_get_completion_state($course, $cm, $userid, $type) {
     }
     return false;
 }
+
 /**
- * Given a course and a time, this module should find recent activity
- * that has occurred in reengagement activities and print it out.
- * Return true if there was output, or false is there was none.
+ * Prints the recent activity.
  *
- * @return boolean
- * @todo Finish documenting this function
+ * @param stdClass $course
+ * @param stdClass $isteacher
+ * @param stdClass $timestart
  */
 function reengagement_print_recent_activity($course, $isteacher, $timestart) {
     return false;  // True if anything was printed, otherwise false.
@@ -521,14 +518,12 @@ function reengagement_get_participants($reengagementid) {
 
 
 /**
- * This function returns if a scale is being used by one reengagement
- * if it has support for grading and scales. Commented code should be
- * modified if necessary. See forum, glossary or journal modules
- * as reference.
+ * Checks if a scale is being used.
  *
- * @param int $reengagementid ID of an instance of this module
- * @return mixed
- * @todo Finish documenting this function
+ * This is used by the backup code to decide whether to back up a scale
+ * @param int $reengagementid
+ * @param int $scaleid
+ * @return boolean True if the scale is used by the assignment
  */
 function reengagement_scale_used($reengagementid, $scaleid) {
     $return = false;
@@ -538,11 +533,9 @@ function reengagement_scale_used($reengagementid, $scaleid) {
 
 
 /**
- * Checks if scale is being used by any instance of reengagement.
- * This function was added in 1.9
+ * This is used to find out if scale used anywhere.
  *
- * This is used to find out if scale used anywhere
- * @param $scaleid int
+ * @param int $scaleid
  * @return boolean True if the scale is used by any reengagement
  */
 function reengagement_scale_used_anywhere($scaleid) {
@@ -579,6 +572,7 @@ function reengagement_reset_course_form_definition(&$mform) {
 /**
  * Course reset form defaults.
  *
+ * @param object $course
  * @return array
  */
 function reengagement_reset_course_form_defaults($course) {
@@ -589,8 +583,6 @@ function reengagement_reset_course_form_defaults($course) {
  * Actual implementation of the reset course functionality, delete all the
  * choice responses for course $data->courseid.
  *
- * @global object
- * @global object
  * @param object $data the data submitted from the reset course.
  * @return array status array
  */
@@ -612,7 +604,12 @@ function reengagement_reset_userdata($data) {
     return $status;
 }
 
-/* Get array of users who can start supplied reengagement module */
+/**
+ * Get array of users who can start supplied reengagement module
+ *
+ * @param object $reengagement - reengagement record.
+ * @return array
+ */
 function reengagement_get_startusers($reengagement) {
     global $DB;
     $context = context_module::instance($reengagement->cmid);
@@ -697,6 +694,9 @@ function reengagement_supports($feature) {
 
 /**
  * Process an arbitary number of seconds, and prepare to display it as X minutes, or Y hours or Z weeks.
+ *
+ * @param int $duration FEATURE_xx constant for requested feature
+ * @return array
  */
 function reengagement_get_readable_duration($duration) {
     if ($duration < 300) {
@@ -717,8 +717,8 @@ function reengagement_get_readable_duration($duration) {
 
 /**
  * Check if user has completed the named course moduleid
- * @param userid integer idnumber of the user to be checked.
- * @param targetcmid integer the id of the coursemodule we should be checking.
+ * @param int $userid idnumber of the user to be checked.
+ * @param int $targetcmid the id of the coursemodule we should be checking.
  * @return bool true if user has completed the target activity, false otherwise.
  */
 function reengagement_check_target_completion($userid, $targetcmid) {

@@ -15,18 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
- * @subpackage backup-moodle2
- * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Backup class
+ *
+ * @package    mod_reengagement
+ * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once($CFG->dirroot . '/mod/reengagement/backup/moodle2/backup_reengagement_stepslib.php');
 require_once($CFG->dirroot . '/mod/reengagement/backup/moodle2/backup_reengagement_settingslib.php');
 
 /**
- * reengagement backup task that provides all the settings and steps to perform one
- * complete backup of the activity.
+ * Task that provides all the settings and steps to perform one complete backup of the activity.
+ *
+ * @package    mod_reengagement
+ * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_reengagement_activity_task extends backup_activity_task {
 
@@ -48,6 +54,8 @@ class backup_reengagement_activity_task extends backup_activity_task {
     /**
      * Code the transformations to perform in the activity in
      * order to get transportable (encoded) links
+     * @param string $content
+     * @return string
      */
     static public function encode_content_links($content) {
         global $CFG;

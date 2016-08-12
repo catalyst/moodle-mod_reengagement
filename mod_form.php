@@ -15,19 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file defines the main reengagement configuration form
- * It uses the standard core Moodle (>1.8) formslib. For
- * more info about them, please visit:
+ * This file contains the forms to create and edit an instance of this module
  *
- * http://docs.moodle.org/en/Development:lib/formslib.php
- *
- * The form must provide support for, at least these fields:
- *   - name: text element of 64cc max
- *
+ * @package    mod_reengagement
+ * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
+/**
+ * Moodleform class.
+ *
+ * @package    mod_reengagement
+ * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_reengagement_mod_form extends moodleform_mod {
 
     /**
@@ -168,7 +173,13 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $this->add_action_buttons();
 
     }
-    public function set_data ($toform) {
+
+    /**
+     * Load in existing data as form defaults
+     *
+     * @param stdClass|array $toform object or array of default values
+     */
+    public function set_data($toform) {
         global $CFG;
         $istotara = false;
         if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
@@ -223,6 +234,11 @@ class mod_reengagement_mod_form extends moodleform_mod {
         return $result;
     }
 
+    /**
+     * Return the data that will be used upon saving.
+     *
+     * @return null|array
+     */
     public function get_data() {
         global $CFG;
         $istotara = false;
@@ -264,12 +280,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
         return $fromform;
     }
     /**
-     * Can be overridden to add custom completion rules if the module wishes
-     * them. If overriding this, you should also override completion_rule_enabled.
-     * <p>
-     * Just add elements to the form as needed and return the list of IDs. The
-     * system will call disabledIf and handle other behaviour for each returned
-     * ID.
+     *  Add custom completion rules for reengagement.
+     *
      * @return array Array of string IDs of added items, empty array if none
      */
     public function add_completion_rules() {
@@ -289,9 +301,22 @@ class mod_reengagement_mod_form extends moodleform_mod {
         return array('duration');
     }
 
+    /**
+     * A custom completion rule is enabled by reengagement.
+     *
+     * @param array $data Input data (not yet validated)
+     * @return bool True if one or more rules is enabled, false if none are;
+     *   default returns false
+     */
     public function completion_rule_enabled($data) {
         return true;
     }
+
+    /**
+     * Perform validation on the settings form
+     * @param array $data
+     * @param array $files
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         if (!empty($data['emailperiod'])) {

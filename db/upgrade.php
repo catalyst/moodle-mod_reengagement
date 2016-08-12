@@ -14,6 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Upgrade tasks.
+ *
+ * @package    mod_reengagement
+ * @author     Peter Bulmer
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * Code run to upgrade the reengagment database tables.
+ *
+ * @param int $oldversion
+ * @return bool always true
+ */
 function xmldb_reengagement_upgrade($oldversion=0) {
     global $DB;
     $dbman = $DB->get_manager();

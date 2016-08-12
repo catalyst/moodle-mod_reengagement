@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page lists all the instances of certificate in a particular course
+ * Define all the backup steps that will be used by the backup_reengagement_activity_task
  *
- * @package    mod
- * @subpackage reengagement
+ * @package    mod_reengagement
  * @author     Eugene Venter <eugene@catalyst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,5 +27,13 @@ namespace mod_reengagement\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Define all the backup steps that will be used by the backup_reengagement_activity_task
+ *
+ * @package    mod_reengagement
+ * @author     Eugene Venter <eugene@catalyst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
 }

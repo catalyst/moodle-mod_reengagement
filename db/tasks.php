@@ -17,9 +17,9 @@
 /**
  * Definition of Reengagement scheduled tasks.
  *
- * @author     Dan Marsden
- * @copyright  Catalyst IT
  * @package    mod_reengagement
+ * @author     Dan Marsden
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

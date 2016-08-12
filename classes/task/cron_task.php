@@ -15,12 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A scheduled task.
+ * Simple task to run the Reengagement cron.
  *
- * @package    enrol_imsenterprise
- * @copyright  2016 Catalyst IT
+ * @package    mod_reengagement
+ * @author     Dan Marsden
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_reengagement\task;
 
 /**

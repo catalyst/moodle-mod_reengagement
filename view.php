@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page prints a particular instance of reengagement
- * Depending on whether the user has a reengagement in progress (RIP) or not, it prints different content.
+ * Prints information about the reengagement to the user.
  *
- * @author  Catalyst IT
- * @package mod_reengagement
+ * @package    mod_reengagement
+ * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

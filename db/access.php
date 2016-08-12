@@ -14,16 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-//
-// Capability definitions for the reengagement module.
-//
-// The capabilities are loaded into the database table when the module is
-// installed or updated. Whenever the capability definitions are updated,
-// the module version number should be bumped up.
-//
-// The system has four possible values for a capability:
-// CAP_ALLOW, CAP_PREVENT, CAP_PROHIBIT, and inherit (not set).
-//
+/**
+ * Capability definitions for the reengagement module.
+ *
+ * @package    mod_reengagement
+ * @author     Peter Bulmer
+ * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 $capabilities = array(
 
