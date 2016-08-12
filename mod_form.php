@@ -292,7 +292,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
 
             if ($duration < (60 * 60 * 24) && $data['remindercount'] > 2) {
                 // If less than 24hrs, make sure only 2 e-mails can be sent.
-                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 3);
+                $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 2);
             } else if ($duration < (60 * 60 * 24 * 5) && $data['remindercount'] > 10) {
                 // If less than 5 days, make sure only 10 e-mails can be sent.
                 $errors['remindercount'] = get_string('frequencytoohigh', 'reengagement', 10);
