@@ -249,7 +249,7 @@ function reengagement_crontask() {
     $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
                                 r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
                                 r.emailuser, r.name, r.suppresstarget, r.remindercount, c.shortname as courseshortname,
-                                c.fullname as coursefullname, c.id as courseid, r.emailrecipient
+                                c.fullname as coursefullname, c.id as courseid, r.emailrecipient, r.remindercount
                           FROM {reengagement} r
                     INNER JOIN {course_modules} cm ON cm.instance = r.id
                     INNER JOIN {course} c ON cm.course = c.id
