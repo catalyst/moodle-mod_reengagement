@@ -249,7 +249,7 @@ function reengagement_crontask() {
     $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
                                 r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
                                 r.emailuser, r.name, r.suppresstarget, r.remindercount, c.shortname as courseshortname,
-                                c.fullname as coursefullname, c.id as courseid, r.emailrecipient, r.remindercount
+                                c.fullname as coursefullname, c.id as courseid, r.emailrecipient
                           FROM {reengagement} r
                     INNER JOIN {course_modules} cm ON cm.instance = r.id
                     INNER JOIN {course} c ON cm.course = c.id
@@ -348,7 +348,7 @@ function reengagement_crontask() {
             $updaterecord = new stdClass();
             $updaterecord->id = $inprogress->id;
             if ($reengagement->remindercount > $inprogress->emailsent) {
-                $updaterecord->emailtime = $timenow + $reengagementcm->emaildelay;
+                $updaterecord->emailtime = $timenow + $reengagement->emaildelay;
             }
             $updaterecord->emailsent = $inprogress->emailsent + 1;
             $result = $DB->update_record('reengagement_inprogress', $updaterecord);
