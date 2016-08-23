@@ -23,9 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version   = 2016081600;   // The current module version.
+$plugin->version   = 2016082300;   // The current module version.
 $plugin->requires  = 2011112900;
 $plugin->component = 'mod_reengagement';
-$plugin->release   = '3.1.5';
+$plugin->release   = '3.1.6';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->cron      = 0; // Now uses a scheduled task.
