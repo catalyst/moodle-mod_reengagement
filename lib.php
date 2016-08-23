@@ -539,12 +539,7 @@ function reengagement_scale_used($reengagementid, $scaleid) {
  * @return boolean True if the scale is used by any reengagement
  */
 function reengagement_scale_used_anywhere($scaleid) {
-    global $DB;
-    if ($scaleid and $DB->record_exists('reengagement', array('grade' => -$scaleid))) {
-        return true;
-    } else {
-        return false;
-    }
+    return false;
 }
 
 
