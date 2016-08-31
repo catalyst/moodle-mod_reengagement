@@ -15,17 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Search area for mod_reengagement activities.
  *
  * @package    mod_reengagement
- * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
- * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @copyright  2016 Catalyst IT
+ * @author     Dan Marsden
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version   = 2016083100;   // The current module version.
-$plugin->requires  = 2016082500;
-$plugin->component = 'mod_reengagement';
-$plugin->release   = '3.2.0';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->cron      = 0; // Now uses a scheduled task.
+namespace mod_reengagement\search;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Search area for mod_reengagement activities.
+ *
+ * @package    mod_reengagement
+ * @copyright  2016 Catalyst IT
+ * @author     Dan Marsden
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class activity extends \core_search\base_activity {
+}

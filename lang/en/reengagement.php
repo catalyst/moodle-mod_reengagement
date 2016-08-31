@@ -91,6 +91,7 @@ $string['remindercount_help'] = 'This is the number of times an e-mail is sent a
 <li>less than 5 days - limit of 10 reminders.</li>
 <li>less than 15 days - limit of 26 reminders.</li>
 <li>over 15 days - maximum limit of 40 reminders.</li></ul>';
+$string['search:activity'] = 'Reengagement - activity information';
 $string['suppressemail'] = 'Suppress email if target activity complete';
 $string['suppressemail_help'] = 'This option instructs the activity to suppress emails to users where a named activity is complete.';
 $string['suppresstarget'] = 'Target activity.';
