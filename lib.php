@@ -608,7 +608,7 @@ function reengagement_reset_userdata($data) {
 function reengagement_get_startusers($reengagement) {
     global $DB;
     $context = context_module::instance($reengagement->cmid);
-    $startusers = get_enrolled_users($context, 'mod/reengagement:startreengagement');
+    $startusers = get_enrolled_users($context, 'mod/reengagement:startreengagement', 0, 'u.*', null, 0, 0, true);
 
     $cm = get_fast_modinfo($reengagement->courseid)->get_cm($reengagement->cmid);
     $ainfomod = new \core_availability\info_module($cm);
