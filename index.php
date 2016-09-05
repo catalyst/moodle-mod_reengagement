@@ -69,22 +69,18 @@ $timenow  = time();
 $strname  = get_string('name');
 $strweek  = get_string('week');
 $strtopic = get_string('topic');
-$strintro = get_string('moduleintro');
 $strsectionname  = get_string('sectionname', 'format_'.$course->format);
 
 $usesections = course_format_uses_sections($course->format);
-if ($usesections) {
-    $sections = get_all_sections($course->id);
-}
 
 $table = new html_table();
 $table->attributes['class'] = 'generaltable mod_index';
 
 if ($usesections) {
-    $table->head  = array ($strsectionname, $strname, $strintro);
+    $table->head  = array ($strsectionname, $strname);
     $table->align = array ('center', 'left', 'left');
 } else {
-    $table->head  = array ($strlastmodified, $strname, $strintro);
+    $table->head  = array ($strlastmodified, $strname);
     $table->align = array ('left', 'left', 'left');
 }
 
@@ -97,7 +93,7 @@ foreach ($reengagements as $reengagement) {
         $printsection = '';
         if ($reengagement->section !== $currentsection) {
             if ($reengagement->section) {
-                $printsection = get_section_name($course, $sections[$reengagement->section]);
+                $printsection = get_section_name($course, $reengagement->section);
             }
             if ($currentsection !== '') {
                 $table->data[] = 'hr';
@@ -112,8 +108,7 @@ foreach ($reengagements as $reengagement) {
 
     $table->data[] = array (
         $printsection,
-        "<a $class href=\"view.php?id=$cm->id\">".format_string($reengagement->name)."</a>",
-        format_module_intro('reengagement', $reengagement, $cm->id));
+        "<a $class href=\"view.php?id=$cm->id\">".format_string($reengagement->name)."</a>");
 }
 
 echo html_writer::table($table);
