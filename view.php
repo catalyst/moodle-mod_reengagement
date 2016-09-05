@@ -131,7 +131,7 @@ if ($canstart) {
         $rip = $DB->get_record('reengagement_inprogress', array('userid' => $USER->id, 'reengagement' => $reengagement->id));
     }
     $dateformat = get_string('strftimedatetime', 'langconfig'); // Description of how to format times in user's language.
-    if (!empty($completion && !empty($rip))) {
+    if (!empty($completion) && !empty($rip)) {
         // User is genuinely in-progress.
         if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_TIME && empty($rip->emailsent)) {
             $emailpending = true;
