@@ -101,6 +101,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mods[$mod->id] = $mod->name;
         }
         $mform->addElement('select', 'suppresstarget', get_string('suppresstarget', 'reengagement'), $mods);
+        $mform->disabledif('suppresstarget', 'suppressemail', 'notchecked');
         $mform->addHelpbutton('suppresstarget', 'suppresstarget', 'reengagement');
 
 //-------------------------------------------------------------------------------
