@@ -275,6 +275,13 @@ function reengagement_crontask() {
         $cmid = $reengagement->cmid; // The cm id of the module which was completed.
         $userid = $inprogress->userid; // The userid which completed the module.
 
+        // Check if user is still enrolled in the course.
+        $context = context_module::instance($reengagement->cmid);
+        if (!is_enrolled($context, $userid, 'mod/reengagement:startreengagement')) {
+            $DB->delete_records('reengagement_inprogress', array('id' => $inprogresses->id));
+            continue;
+        }
+
         // Update completion record to indicate completion so the user can continue with any dependant activities.
         $completionrecord = $DB->get_record('course_modules_completion', array('coursemoduleid' => $cmid, 'userid' => $userid));
         if (empty($completionrecord)) {
