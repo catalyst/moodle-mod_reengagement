@@ -31,11 +31,11 @@ $string['modulenameplural'] = 'Reengagements';
 
 // Alphabetized.
 $string['activitycompleted'] = 'This activity has been marked as complete';
-$string['afterdelay'] = 'After Delay';
+$string['afterdelay'] = 'After delay';
 $string['completion'] = 'Completion';
 $string['completionwillturnon'] = 'Note that adding this activity to the course will enable activity completion.';
 $string['completeattimex'] = 'This activity will complete at {$a}';
-$string['completiontime'] = 'Completion Time';
+$string['completiontime'] = 'Completion time';
 $string['crontask'] = 'Reengagement cron task';
 $string['days'] = 'Days';
 $string['duration'] = 'Duration';
@@ -44,25 +44,25 @@ The reengagement duration is specified as a period length (eg Weeks) and number 
 
 <p>This example would mean that a user starting a reengagement period now would be marked as compete in 7 weeks time.</p>
 ';
-$string['emailcontent'] = 'Email Content (User)';
+$string['emailcontent'] = 'Email content (User)';
 $string['emailcontent_help'] = 'When the module sends a user an email, it takes the email content from this field.';
-$string['emailcontentmanager'] = 'Email Content (Manager)';
+$string['emailcontentmanager'] = 'Email content (Manager)';
 $string['emailcontentmanager_help'] = 'When the module sends a user\'s manager an email, it takes the email content from this field.';
 $string['emailcontentdefaultvalue'] = 'This is a reminder email from course %coursename%.';
 $string['emailcontentmanagerdefaultvalue'] = 'This is a reminder email from course %coursename%, regarding user %userfirstname% %userlastname%.';
-$string['emaildelay'] = 'Email Delay';
+$string['emaildelay'] = 'Email delay';
 $string['emaildelay_help'] = 'When module is set to email users "after delay", this setting controls how long the delay is.';
-$string['emailrecipient'] = 'Email Recipient(s)';
+$string['emailrecipient'] = 'Email recipient(s)';
 $string['emailrecipient_help'] = 'When an email needs to be sent out to prompt a user\'s re-engagement with the course, this setting controls if an email is sent to the user, their manager, or both.';
-$string['emailsubject'] = 'Email Subject (User)';
+$string['emailsubject'] = 'Email subject (User)';
 $string['emailsubject_help'] = 'When the module sends a user an email, it takes the email subject from this field.';
-$string['emailsubjectmanager'] = 'Email Subject (Manager)';
+$string['emailsubjectmanager'] = 'Email subject (Manager)';
 $string['emailsubjectmanager_help'] = 'When the module sends a user\'s manager an email, it takes the email subject from this field.';
-$string['emailtime'] = 'Email Time';
-$string['emailuser'] = 'Email User';
+$string['emailtime'] = 'Email time';
+$string['emailuser'] = 'Email user';
 $string['emailuser_help'] = 'When the activity should email users: <ul>
 <li>Never: Don\'t email users.</li>
-<li>On Completion: Email the user as the module completes.</li>
+<li>On reengagement completion: Email the user when the reengagement activity is completed.</li>
 <li>After Delay: Email the user a set time after they have started the module.</li>
 </ul>';
 $string['frequencytoohigh'] = 'The maximum reminder count with the delay period you have set is {$a}.';
@@ -73,17 +73,17 @@ $string['minutes'] = 'Minutes';
 $string['never'] = 'Never';
 $string['noemailattimex'] = 'Message scheduled for {$a} will not be sent because you have completed the target activity';
 $string['nosuppresstarget'] = 'No target activity selected';
-$string['oncompletion'] = 'On Completion';
+$string['oncompletion'] = 'On reengagement completion';
 $string['receiveemailattimex'] = 'Message will be sent on {$a}.';
 $string['receiveemailattimexunless'] = 'Message will be sent on {$a} unless you complete target activity.';
 $string['reengagement:addinstance'] = 'reengagement:addinstance';
 $string['reengagement:startreengagement'] = 'Start Reengagement';
 $string['reengagement:getnotifications'] = 'Receive notification of reengagement completions';
 $string['reengagement:editreengagementduration'] = 'Edit Reengagement Duration';
-$string['reengagementduration'] = 'Reengagement Duration';
+$string['reengagementduration'] = 'Reengagement duration';
 $string['reengagementfieldset'] = 'Reengagement details';
-$string['reengagementintro'] = 'Reengagement Intro';
-$string['reengagementname'] = 'Reengagement Name';
+$string['reengagementintro'] = 'Reengagement intro';
+$string['reengagementname'] = 'Reengagement name';
 $string['reengagementsinprogress'] = 'Reengagements in progress';
 $string['remindercount'] = 'Reminder count';
 $string['remindercount_help'] = 'This is the number of times an e-mail is sent after each delay period. There are some limits to the values you can use<ul>
