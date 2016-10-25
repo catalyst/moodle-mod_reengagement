@@ -157,6 +157,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         }
         $mform->addElement('select', 'suppresstarget', get_string('suppresstarget', 'reengagement'), $mods);
         $mform->disabledif('suppresstarget', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
+        $mform->disabledif('suppresstarget', 'suppressemail', 'notchecked');
         $mform->addHelpbutton('suppresstarget', 'suppresstarget', 'reengagement');
 
         // Add standard elements, common to all modules.
