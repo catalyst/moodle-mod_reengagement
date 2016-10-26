@@ -270,7 +270,7 @@ function reengagement_cron() {
 
         // Check if user is still enrolled in the course.
         $context = context_module::instance($reengagement->cmid);
-        if (!is_enrolled($context, $userid, 'mod/reengagement:startreengagement')) {
+        if (!is_enrolled($context, $userid, 'mod/reengagement:startreengagement', true)) {
             $DB->delete_records('reengagement_inprogress', array('id' => $inprogresses->id));
             continue;
         }
@@ -333,6 +333,14 @@ function reengagement_cron() {
     foreach ($inprogresses as $inprogress) {
         $reengagement = $reengagements[$inprogress->reengagement];
         $userid = $inprogress->userid; // The userid which completed the module.
+
+        // Check if user is still enrolled in the course.
+        $context = context_module::instance($reengagement->cmid);
+        if (!is_enrolled($context, $userid, 'mod/reengagement:startreengagement', true)) {
+            $DB->delete_records('reengagement_inprogress', array('id' => $inprogresses->id));
+            continue;
+        }
+
         if ($inprogress->completed == COMPLETION_COMPLETE) {
             debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id. User already marked complete. Deleting inprogress record for user $userid");
             $result = $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
