@@ -460,7 +460,7 @@ function reengagement_email_user($reengagement, $inprogress) {
             $managersendresult = email_to_user($manager,
                     $SITE->shortname,
                     $templateddetails['emailsubjectmanager'],
-                    $plaintext,
+                    html_to_text($templateddetails['emailcontentmanager']),
                     $templateddetails['emailcontentmanager']);
             if (!$managersendresult) {
                 mtrace("failed to send manager of user $user->id email for reengagement $reengagement->id");
