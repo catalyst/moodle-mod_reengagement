@@ -200,18 +200,18 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $toform->emailperiodcount = $periodcount;
             unset($toform->emaildelay);
         }
-        if (empty($toform->emailcontent)) {
-            $toform->emailcontent = '';
+        if (!isset($toform->emailcontent)) {
+            $toform->emailcontent = get_string('emailcontentdefaultvalue', 'reengagement');
         }
-        if (empty($toform->emailcontentformat)) {
+        if (!isset($toform->emailcontentformat)) {
             $toform->emailcontentformat = 1;
         }
         $toform->emailcontent = array('text' => $toform->emailcontent, 'format' => $toform->emailcontentformat);
         if ($istotara) {
-            if (empty($toform->emailcontentmanager)) {
-                $toform->emailcontentmanager = '';
+            if (!isset($toform->emailcontentmanager)) {
+                $toform->emailcontentmanager = get_string('emailcontentmanagerdefaultvalue', 'reengagement');
             }
-            if (empty($toform->emailcontentmanagerformat)) {
+            if (!isset($toform->emailcontentmanagerformat)) {
                 $toform->emailcontentmanagerformat = 1;
             }
             $toform->emailcontentmanager = array('text' => $toform->emailcontentmanager,
