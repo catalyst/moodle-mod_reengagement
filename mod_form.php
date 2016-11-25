@@ -94,6 +94,10 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setType('emailrecipient', PARAM_INT);
         }
 
+        $mform->addElement('text', 'thirdpartyemails', get_string('thirdpartyemails', 'reengagement'), array('size'=>'80'));
+        $mform->addHelpButton('thirdpartyemails', 'thirdpartyemails', 'reengagement');
+        $mform->setType('thirdpartyemails', PARAM_TEXT);
+
         // Add a group of controls to specify after how long an email should be sent.
         $emaildelay = array();
         $periods = array();
@@ -145,6 +149,15 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->addElement('hidden', 'emailcontentmanager');
             $mform->setType('emailcontentmanager', PARAM_ALPHA);
         }
+
+        $mform->addElement('text', 'emailsubjectthirdparty', get_string('emailsubjectthirdparty', 'reengagement'), array('size'=>'64'));
+        $mform->setType('emailsubjectthirdparty', PARAM_TEXT);
+        $mform->addRule('emailsubjectthirdparty', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addHelpButton('emailsubjectthirdparty', 'emailsubjectthirdparty', 'reengagement');
+        $mform->addElement('editor', 'emailcontentthirdparty', get_string('emailcontentthirdparty', 'reengagement'), null, null);
+        $mform->setDefault('emailcontentthirdparty', get_string('emailcontentthirdpartydefaultvalue','reengagement'));
+        $mform->setType('emailcontentthirdparty', PARAM_CLEANHTML);
+        $mform->addHelpButton('emailcontentthirdparty', 'emailcontentthirdparty', 'reengagement');
 
         $mform->addElement('advcheckbox', 'suppressemail', get_string('suppressemail', 'reengagement'));
         $mform->disabledif('suppressemail', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
@@ -218,6 +231,14 @@ class mod_reengagement_mod_form extends moodleform_mod {
                 'format' => $toform->emailcontentmanagerformat);
         }
 
+        if (!isset($toform->emailcontentthirdparty)) {
+            $toform->emailcontentthirdparty = get_string('emailcontentthirdpartydefaultvalue', 'reengagement');
+        }
+        if (!isset($toform->emailcontentthirdpartyformat)) {
+            $toform->emailcontentthirdpartyformat = 1;
+        }
+        $toform->emailcontentthirdparty = array('text'=>$toform->emailcontentthirdparty, 'format'=>$toform->emailcontentthirdpartyformat);
+
         if (empty($toform->suppresstarget)) {
             // There is no target activity specified.
             // Configure the box to have this dropdown disabled by default.
@@ -277,6 +298,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
                 $fromform->emailcontentmanagerformat = $fromform->emailcontentmanager['format'];
                 $fromform->emailcontentmanager = $fromform->emailcontentmanager['text'];
             }
+            $fromform->emailcontentthirdpartyformat = $fromform->emailcontentthirdparty['format'];
+            $fromform->emailcontentthirdparty = $fromform->emailcontentthirdparty['text'];
         }
         return $fromform;
     }
