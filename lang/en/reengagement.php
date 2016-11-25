@@ -44,12 +44,17 @@ The reengagement duration is specified as a period length (eg Weeks) and number 
 
 <p>This example would mean that a user starting a reengagement period now would be marked as compete in 7 weeks time.</p>
 ';
+$string['thirdpartyemails'] = 'Third-party recipients';
+$string['thirdpartyemails_help'] = 'A comma-separated list of email addresses for third-parties that should be receiving an email when the user does.';
 $string['emailcontent'] = 'Email content (User)';
 $string['emailcontent_help'] = 'When the module sends a user an email, it takes the email content from this field.';
+$string['emailcontentthirdparty'] = 'Email content (Third-party)';
+$string['emailcontentthirdparty_help'] = 'When the module sends a third-party an email, it takes the email content from this field.';
 $string['emailcontentmanager'] = 'Email content (Manager)';
 $string['emailcontentmanager_help'] = 'When the module sends a user\'s manager an email, it takes the email content from this field.';
 $string['emailcontentdefaultvalue'] = 'This is a reminder email from course %courseshortname%.';
 $string['emailcontentmanagerdefaultvalue'] = 'This is a reminder email from course %courseshortname%, regarding user %userfirstname% %userlastname%.';
+$string['emailcontentthirdpartydefaultvalue'] = 'This is a reminder email from course %coursename%, regarding user %userfirstname% %userlastname%.';
 $string['emaildelay'] = 'Email delay';
 $string['emaildelay_help'] = 'When module is set to email users "after delay", this setting controls how long the delay is.';
 $string['emailrecipient'] = 'Email recipient(s)';
@@ -58,6 +63,8 @@ $string['emailsubject'] = 'Email subject (User)';
 $string['emailsubject_help'] = 'When the module sends a user an email, it takes the email subject from this field.';
 $string['emailsubjectmanager'] = 'Email subject (Manager)';
 $string['emailsubjectmanager_help'] = 'When the module sends a user\'s manager an email, it takes the email subject from this field.';
+$string['emailsubjectthirdparty'] = 'Email subject (Third-party)';
+$string['emailsubjectthirdparty_help'] = 'When the module sends a third-party an email, it takes the email subject from this field.';
 $string['emailtime'] = 'Email time';
 $string['emailuser'] = 'Email user';
 $string['emailuser_help'] = 'When the activity should email users: <ul>

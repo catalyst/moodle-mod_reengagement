@@ -32,8 +32,7 @@
 function xmldb_reengagement_upgrade($oldversion=0) {
     global $DB;
     $dbman = $DB->get_manager();
-    $upgradeversion = 2014071701;
-    if ($oldversion < $upgradeversion) {
+    if ($oldversion < 2014071701) {
         // Define new fields to support emailing managers.
         // Define field emailrecipient to be added to reengagement to record who should receive emails.
         $table = new xmldb_table('reengagement');
@@ -62,7 +61,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, $upgradeversion, 'reengagement');
+        upgrade_mod_savepoint(true, 2014071701, 'reengagement');
     }
 
     // Add remindercount fields.
@@ -126,6 +125,37 @@ function xmldb_reengagement_upgrade($oldversion=0) {
         $missingprogress->close();
 
         upgrade_mod_savepoint(true, 2016082303, 'reengagement');
+    }
+
+    // Add third-party email fields
+    if ($oldversion < 2016082305) {
+        // Define new fields to support emailing thirdparties.
+        $table = new xmldb_table('reengagement');
+
+        // Define field thirdpartyemails to be added to reengagement to record who should receive emails.
+        $field = new xmldb_field('thirdpartyemails', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field to hold the email subject which should be used in emails to user's thirdparties.
+        $field = new xmldb_field('emailsubjectthirdparty', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field to hold the email content which should be used in emails to user's thirdparties.
+        $field = new xmldb_field('emailcontentthirdparty', XMLDB_TYPE_TEXT, null, null,null, null,null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('emailcontentthirdpartyformat', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2016082305, 'reengagement');
     }
 
     return true;
