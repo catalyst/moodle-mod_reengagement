@@ -152,7 +152,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setType('emailcontentmanager', PARAM_ALPHA);
         }
 
-        $mform->addElement('text', 'emailsubjectthirdparty', get_string('emailsubjectthirdparty', 'reengagement'), array('size' => '64'));
+        $mform->addElement('text', 'emailsubjectthirdparty',
+            get_string('emailsubjectthirdparty', 'reengagement'), array('size' => '64'));
         $mform->setType('emailsubjectthirdparty', PARAM_TEXT);
         $mform->addRule('emailsubjectthirdparty', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('emailsubjectthirdparty', 'emailsubjectthirdparty', 'reengagement');

@@ -77,7 +77,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016080301, 'reengagement');
     }
 
-    // Add third-party email fields
+    // Add third-party email fields.
     if ($oldversion < 2016112400) {
         // Define new fields to support emailing thirdparties.
         $table = new xmldb_table('reengagement');
