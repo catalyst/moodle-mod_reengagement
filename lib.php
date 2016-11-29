@@ -247,7 +247,8 @@ function reengagement_crontask() {
     // and email users.
 
     $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
-                                r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
+                                r.thirdpartyemails,, r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
+                                r.emailcontentthirdparty, r.emailcontentthirdpartyformat, r.emailsubjectthirdparty,
                                 r.emailuser, r.name, r.suppresstarget, r.remindercount, c.shortname as courseshortname,
                                 c.fullname as coursefullname, c.id as courseid, r.emailrecipient, r.emaildelay
                           FROM {reengagement} r
@@ -481,6 +482,40 @@ function reengagement_email_user($reengagement, $inprogress) {
         }
         $emailresult = $emailresult && $usersendresult;
     }
+
+    if (!empty($reengagement->thirdpartyemails)) {
+        // Process third-party emails.
+        $emails = array_map('trim', explode(',', $reengagement->thirdpartyemails));
+        foreach ($emails as $emailaddress) {
+            if (!validate_email($emailaddress)) {
+                debugging('', DEBUG_ALL) && mtrace("invalid third-party email: $email - skipping send");
+                continue;
+            }
+            if ($istotara) {
+                $thirdpartyuser = \totara_core\totara_user::get_external_user($emailaddress);
+            } else {
+                $thirdpartyuser = core_user::get_noreply_user();
+                $thirdpartyuser->firstname = $emailaddress;
+                $thirdpartyuser->email = $emailaddress;
+                $thirdpartyuser->maildisplay = 1;
+                $thirdpartyuser->emailstop = 0;
+            }
+
+            debugging('', DEBUG_ALL) && mtrace("sending third-party email to: $emailaddress");
+
+            $usersendresult = email_to_user($thirdpartyuser,
+                    $emailsenduser,
+                    $templateddetails['emailsubjectthirdparty'],
+                    html_to_text($templateddetails['emailcontentthirdparty']),
+                    $templateddetails['emailcontentthirdparty']);
+            if (!$usersendresult) {
+                mtrace("failed to send user $user->id email for reengagement $reengagement->id");
+            }
+            $emailresult = $emailresult && $usersendresult;
+
+        }
+    }
+
     return $emailresult;
 }
 
@@ -508,7 +543,7 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
     $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
 
     // Array to describe which fields in reengagement object should have a template replacement.
-    $replacementfields = array('emailsubject', 'emailcontent', 'emailsubjectmanager', 'emailcontentmanager');
+    $replacementfields = array('emailsubject', 'emailcontent', 'emailsubjectmanager', 'emailcontentmanager', 'emailsubjectthirdparty', 'emailcontentthirdparty');
 
     $results = array();
     // Replace %variable% with relevant value everywhere it occurs in reengagement->field.
