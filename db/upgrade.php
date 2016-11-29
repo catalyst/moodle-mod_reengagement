@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Code run to upgrade the reengagment database tables.
  *
@@ -145,7 +147,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
         }
 
         // Define field to hold the email content which should be used in emails to user's thirdparties.
-        $field = new xmldb_field('emailcontentthirdparty', XMLDB_TYPE_TEXT, null, null,null, null,null);
+        $field = new xmldb_field('emailcontentthirdparty', XMLDB_TYPE_TEXT, null, null, null, null, null);
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -160,4 +162,3 @@ function xmldb_reengagement_upgrade($oldversion=0) {
 
     return true;
 }
-

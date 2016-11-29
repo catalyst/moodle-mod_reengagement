@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 /**
@@ -94,7 +96,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setType('emailrecipient', PARAM_INT);
         }
 
-        $mform->addElement('text', 'thirdpartyemails', get_string('thirdpartyemails', 'reengagement'), array('size'=>'80'));
+        $mform->addElement('text', 'thirdpartyemails', get_string('thirdpartyemails', 'reengagement'), array('size' => '80'));
         $mform->addHelpButton('thirdpartyemails', 'thirdpartyemails', 'reengagement');
         $mform->setType('thirdpartyemails', PARAM_TEXT);
 
@@ -150,12 +152,12 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setType('emailcontentmanager', PARAM_ALPHA);
         }
 
-        $mform->addElement('text', 'emailsubjectthirdparty', get_string('emailsubjectthirdparty', 'reengagement'), array('size'=>'64'));
+        $mform->addElement('text', 'emailsubjectthirdparty', get_string('emailsubjectthirdparty', 'reengagement'), array('size' => '64'));
         $mform->setType('emailsubjectthirdparty', PARAM_TEXT);
         $mform->addRule('emailsubjectthirdparty', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('emailsubjectthirdparty', 'emailsubjectthirdparty', 'reengagement');
         $mform->addElement('editor', 'emailcontentthirdparty', get_string('emailcontentthirdparty', 'reengagement'), null, null);
-        $mform->setDefault('emailcontentthirdparty', get_string('emailcontentthirdpartydefaultvalue','reengagement'));
+        $mform->setDefault('emailcontentthirdparty', get_string('emailcontentthirdpartydefaultvalue', 'reengagement'));
         $mform->setType('emailcontentthirdparty', PARAM_CLEANHTML);
         $mform->addHelpButton('emailcontentthirdparty', 'emailcontentthirdparty', 'reengagement');
 
@@ -237,7 +239,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
         if (!isset($toform->emailcontentthirdpartyformat)) {
             $toform->emailcontentthirdpartyformat = 1;
         }
-        $toform->emailcontentthirdparty = array('text'=>$toform->emailcontentthirdparty, 'format'=>$toform->emailcontentthirdpartyformat);
+        $toform->emailcontentthirdparty = array('text' => $toform->emailcontentthirdparty,
+                                                'format' => $toform->emailcontentthirdpartyformat);
 
         if (empty($toform->suppresstarget)) {
             // There is no target activity specified.

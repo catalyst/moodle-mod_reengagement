@@ -573,7 +573,8 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
     $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
 
     // Array to describe which fields in reengagement object should have a template replacement.
-    $replacementfields = array('emailsubject', 'emailcontent', 'emailsubjectmanager', 'emailcontentmanager', 'emailsubjectthirdparty', 'emailcontentthirdparty');
+    $replacementfields = array('emailsubject', 'emailcontent', 'emailsubjectmanager', 'emailcontentmanager',
+                               'emailsubjectthirdparty', 'emailcontentthirdparty');
 
     $results = array();
     // Replace %variable% with relevant value everywhere it occurs in reengagement->field.
