@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2016112400;   // The current module version.
-$plugin->requires  = 2016082500;
+$plugin->requires  = 2015111606; // Totara 9
 $plugin->component = 'mod_reengagement';
 $plugin->release   = '3.2.1';
 $plugin->maturity  = MATURITY_STABLE;
