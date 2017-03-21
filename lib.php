@@ -246,7 +246,7 @@ function reengagement_crontask() {
     // and email users.
 
     $reengagementssql = "SELECT r.id as id, cm.id as cmid, r.emailcontent, r.emailcontentformat, r.emailsubject,
-                                r.thirdpartyemails,, r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
+                                r.thirdpartyemails, r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
                                 r.emailcontentthirdparty, r.emailcontentthirdpartyformat, r.emailsubjectthirdparty,
                                 r.emailuser, r.name, r.suppresstarget, r.remindercount, c.shortname as courseshortname,
                                 c.fullname as coursefullname, c.id as courseid, r.emailrecipient, r.emaildelay
