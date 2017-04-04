@@ -107,6 +107,24 @@ function xmldb_reengagement_upgrade($oldversion=0) {
 
         upgrade_mod_savepoint(true, 2016112400, 'reengagement');
     }
+    // Set default value
+    if ($oldversion < 2017040400) {
+
+        $table = new xmldb_table('reengagement');
+        $field = new xmldb_field('thirdpartyemails', XMLDB_TYPE_TEXT, null, null, false, null, null);
+        $dbman->change_field_notnull($table, $field);
+
+        $field = new xmldb_field('emailsubjectthirdparty', XMLDB_TYPE_CHAR, '255', null, false, null, null);
+        $dbman->change_field_notnull($table, $field);
+
+        $field = new xmldb_field('emailcontentthirdparty', XMLDB_TYPE_TEXT, null, null, false, null, null);
+        $dbman->change_field_notnull($table, $field);
+
+        $field = new xmldb_field('emailcontentthirdpartyformat', XMLDB_TYPE_INTEGER, '4', null, false, null, '0');
+        $dbman->change_field_notnull($table, $field);
+
+        upgrade_mod_savepoint(true, 2017040400, 'reengagement');
+    }
 
     return true;
 }
