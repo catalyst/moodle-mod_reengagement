@@ -504,7 +504,7 @@ function reengagement_email_user($reengagement, $inprogress) {
             debugging('', DEBUG_ALL) && mtrace("sending third-party email to: $emailaddress");
 
             $usersendresult = email_to_user($thirdpartyuser,
-                    $emailsenduser,
+                    $SITE->shortname,
                     $templateddetails['emailsubjectthirdparty'],
                     html_to_text($templateddetails['emailcontentthirdparty']),
                     $templateddetails['emailcontentthirdparty']);
