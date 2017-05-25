@@ -1,4 +1,4 @@
-@mod_reengagement
+@mod @mod_reengagement
 Feature: Teachers can create reengagment activity
 
   Background:
