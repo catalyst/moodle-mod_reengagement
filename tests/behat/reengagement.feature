@@ -14,5 +14,5 @@ Feature: Teachers can create reengagment activity
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Reengagement" to section "1" and I fill the form with:
-      | Name        | Reengagement test       |
+      | Reengagement name        | Reengagement test       |
     Then I should see "Reengagement test"
