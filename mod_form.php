@@ -182,7 +182,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setDefault('completion', COMPLETION_TRACKING_AUTOMATIC);
             $mform->freeze('completion');
         }
-        // Hide some elements not relevant to this activity (student visibility) 
+        // Hide some elements not relevant to this activity (student visibility)
         if ($mform->elementExists('visible')) {
             $mform->removeElement('visible');
             $mform->addElement('hidden', 'visible', 0);
