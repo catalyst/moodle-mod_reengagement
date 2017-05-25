@@ -1,7 +1,7 @@
 @mod @mod_reengagement
 Feature: Teachers can create reengagment activity
 
-  Background:
+  Scenario:
     Given the following "courses" exist:
       | fullname | shortname | summary                             | category | timecreated   | timemodified  |
       | Course 1 | C1        | Prove the attendance activity works | 0        | ##yesterday## | ##yesterday## |
