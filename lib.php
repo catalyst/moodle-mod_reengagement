@@ -673,20 +673,6 @@ function reengagement_get_startusers($reengagement) {
     $context = context_module::instance($reengagement->cmid);
     $startusers = get_enrolled_users($context, 'mod/reengagement:startreengagement', 0, 'u.*', null, 0, 0, true);
 
-    $cm = get_fast_modinfo($reengagement->courseid)->get_cm($reengagement->cmid);
-    $ainfomod = new \core_availability\info_module($cm);
-    foreach ($startusers as $startcandidate) {
-        $information = '';
-        if (empty($startcandidate->confirmed)) {
-            // Exclude unconfirmed users. Typically this shouldn't happen, but if an unconfirmed user
-            // has been enrolled to a course we shouldn't e-mail them about activities they can't access yet.
-            unset($startusers[$startcandidate->id]);
-        }
-        if (!$ainfomod->is_available($information, false, $startcandidate->id)) {
-            unset($startusers[$startcandidate->id]);
-        }
-    }
-
     // Get a list of people who already started this reengagement (finished users are included in this list)
     // (based on activity completion records).
     $alreadysql = "SELECT userid, userid as junk
@@ -711,6 +697,22 @@ function reengagement_get_startusers($reengagement) {
     foreach ($alreadyusers as $auser) {
         if (isset($startusers[$auser->userid])) {
             unset($startusers[$auser->userid]);
+        }
+    }
+
+    $cm = get_fast_modinfo($reengagement->courseid)->get_cm($reengagement->cmid);
+    $ainfomod = new \core_availability\info_module($cm);
+    foreach ($startusers as $startcandidate) {
+        $information = '';
+        if (empty($startcandidate->confirmed)) {
+            // Exclude unconfirmed users. Typically this shouldn't happen, but if an unconfirmed user
+            // has been enrolled to a course we shouldn't e-mail them about activities they can't access yet.
+            unset($startusers[$startcandidate->id]);
+            continue;
+        }
+        // Exclude users who can't see this activity.
+        if (!$ainfomod->is_available($information, false, $startcandidate->id)) {
+            unset($startusers[$startcandidate->id]);
         }
     }
 
