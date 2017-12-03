@@ -402,7 +402,7 @@ function reengagement_crontask() {
 function reengagement_email_user($reengagement, $inprogress) {
     global $DB, $SITE, $CFG;
     $istotara = false;
-    if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+    if (file_exists($CFG->dirroot.'/totara')) {
         $istotara = true;
     }
     if ($istotara) {
