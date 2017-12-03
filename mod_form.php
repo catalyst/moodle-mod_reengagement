@@ -58,7 +58,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         }
 
         $istotara = false;
-        if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+        if (file_exists($CFG->dirroot.'/totara')) {
             $istotara = true;
         }
 
@@ -199,7 +199,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
     public function set_data($toform) {
         global $CFG;
         $istotara = false;
-        if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+        if (file_exists($CFG->dirroot.'/totara')) {
             $istotara = true;
         }
         // Form expects durations as a number of periods eg 5 minutes.
@@ -268,7 +268,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
     public function get_data() {
         global $CFG;
         $istotara = false;
-        if (file_exists($CFG->wwwroot.'/totara/hierarchy')) {
+        if (file_exists($CFG->dirroot.'/totara')) {
             $istotara = true;
         }
         $fromform = parent::get_data();
