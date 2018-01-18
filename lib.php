@@ -469,12 +469,13 @@ function reengagement_email_user($reengagement, $inprogress) {
                 $mfieldname = 'm' . $fieldname;
                 $manager->$fieldname = $user->$mfieldname;
             }
-            // Actually send the email.
-            $managersendresult = email_to_user($manager,
-                    $SITE->shortname,
-                    $templateddetails['emailsubjectmanager'],
-                    html_to_text($templateddetails['emailcontentmanager']),
-                    $templateddetails['emailcontentmanager']);
+
+            $managersendresult = reengagement_send_notification($manager,
+                $templateddetails['emailsubjectmanager'],
+                html_to_text($templateddetails['emailcontentmanager']),
+                $templateddetails['emailcontentmanager'],
+                $reengagement
+            );
             if (!$managersendresult) {
                 mtrace("failed to send manager of user $user->id email for reengagement $reengagement->id");
             }
@@ -484,11 +485,12 @@ function reengagement_email_user($reengagement, $inprogress) {
     if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_USER) ||
         ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
         // We are supposed to send email to the user.
-        $usersendresult = email_to_user($user,
-                $SITE->shortname,
-                $templateddetails['emailsubject'],
-                $plaintext,
-                $templateddetails['emailcontent']);
+        $usersendresult = reengagement_send_notification($user,
+            $templateddetails['emailsubject'],
+            $plaintext,
+            $templateddetails['emailcontent'],
+            $reengagement
+        );
         if (!$usersendresult) {
             mtrace("failed to send user $user->id email for reengagement $reengagement->id");
         }
@@ -515,11 +517,12 @@ function reengagement_email_user($reengagement, $inprogress) {
 
             debugging('', DEBUG_ALL) && mtrace("sending third-party email to: $emailaddress");
 
-            $usersendresult = email_to_user($thirdpartyuser,
-                    $SITE->shortname,
+            $usersendresult = reengagement_send_notification($thirdpartyuser,
                     $templateddetails['emailsubjectthirdparty'],
                     html_to_text($templateddetails['emailcontentthirdparty']),
-                    $templateddetails['emailcontentthirdparty']);
+                    $templateddetails['emailcontentthirdparty'],
+                    $reengagement
+                );
             if (!$usersendresult) {
                 mtrace("failed to send user $user->id email for reengagement $reengagement->id");
             }
@@ -530,6 +533,36 @@ function reengagement_email_user($reengagement, $inprogress) {
 
     return $emailresult;
 }
+
+
+/**
+ * Send reengagement notifications using the messaging system.
+ *
+ * @param object $user
+ * @param string $subject message subject
+ * @param string $messageplain plain text message
+ * @param string $messagehtml html message
+ * @param object $reengagement database record
+ */
+function reengagement_send_notification($userto, $subject, $messageplain, $messagehtml, $reengagement) {
+    $eventdata = new \core\message\message();
+    $eventdata->courseid = $reengagement->courseid;
+    $eventdata->modulename = 'reengagement';
+    $eventdata->userfrom = core_user::get_support_user();
+    $eventdata->userto = $userto;
+    $eventdata->subject = $subject;
+    $eventdata->fullmessage = $messageplain;
+    $eventdata->fullmessageformat = FORMAT_HTML;
+    $eventdata->fullmessagehtml = $messagehtml;
+    $eventdata->smallmessage = $subject;
+
+    // Required for messaging framework
+    $eventdata->name = 'mod_reengagement';
+    $eventdata->component = 'mod_reengagement';
+
+    return message_send($eventdata);
+}
+
 
 /**
  * Template variables into place in supplied email content.
