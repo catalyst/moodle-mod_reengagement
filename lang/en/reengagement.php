@@ -37,6 +37,7 @@ $string['completionwillturnon'] = 'Note that adding this activity to the course 
 $string['completeattimex'] = 'This activity will complete at {$a}';
 $string['completiontime'] = 'Completion time';
 $string['crontask'] = 'Reengagement cron task';
+$string['cronwarning'] = 'The Reengagment scheduled task has not been run for at least 60 min - Cron must be configured to allow Reenagagements to function correctly.';
 $string['days'] = 'Days';
 $string['duration'] = 'Duration';
 $string['duration_help'] = '<p>The reengagement duration is the period of time between a user starting a reengagement, and being marked as finished.
