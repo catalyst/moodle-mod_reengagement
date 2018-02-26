@@ -26,8 +26,16 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
+define('DEFAULT_PAGE_SIZE', 20);
+define('SHOW_ALL_PAGE_SIZE', 5000);
+
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
 $a  = optional_param('a', 0, PARAM_INT);  // reengagement instance ID.
+$page         = optional_param('page', 0, PARAM_INT); // Which page to show.
+$perpage      = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
+$selectall    = optional_param('selectall', false, PARAM_BOOL); // When rendering checkboxes against users mark them all checked.
+$roleid       = optional_param('roleid', 0, PARAM_INT);
+$groupparam   = optional_param('group', 0, PARAM_INT);
 
 $params = array();
 
@@ -64,11 +72,9 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('reengagement', $reengagement);
 $event->trigger();
 
-
 // Print the page header.
 $strreengagements = get_string('modulenameplural', 'reengagement');
 $strreengagement  = get_string('modulename', 'reengagement');
-
 
 $PAGE->set_title(format_string($reengagement->name));
 $PAGE->set_heading(format_string($course->fullname));
@@ -80,155 +86,224 @@ $PAGE->set_context($context);
 
 $canstart = has_capability('mod/reengagement:startreengagement', $context, null, false);
 $canedit = has_capability('mod/reengagement:editreengagementduration', $context);
+$bulkoperations = has_capability('mod/reengagement:bulkactions', $context);
 
 if (empty($canstart) && empty($canedit)) {
     error("This reengagement module is not enabled for your account.
       Please contact your administrator if you feel this is in error");
 }
 
-$modinfo = get_fast_modinfo($course->id);
-$cminfo = $modinfo->get_cm($cm->id);
-
-$ainfomod = new \core_availability\info_module($cminfo);
-
 if ($canstart) {
-    // User could have arrived here eligible to start, but before cron had a chance to start them in the activity.
-    // Check for that scenario.
-    $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
-    if (empty($completion)) {
-        // User hasn't yet started this activity.
-        $availabilityinfo = '';
-        if (!$ainfomod->is_available($availabilityinfo)) {
-            // User has satisfied all activity completion preconditions, start them on this activity.
-            // Set a RIP record, so we know when to send an email/mark activity as complete by cron later.
-            $reengagementinprogress = new stdClass();
-            $reengagementinprogress->reengagement = $reengagement->id;
-            $reengagementinprogress->completiontime = time() + $reengagement->duration;
-            $reengagementinprogress->emailtime = time() + $reengagement->emaildelay;
-            $reengagementinprogress->userid = $USER->id;
-            $DB->insert_record('reengagement_inprogress', $reengagementinprogress);
-
-            // Set activity completion in-progress record to fit in with normal activity completion requirements.
-            $activitycompletion = new stdClass();
-            $activitycompletion->coursemoduleid = $cm->id;
-            $activitycompletion->completionstate = COMPLETION_INCOMPLETE;
-            $activitycompletion->timemodified = time();
-            $activitycompletion->userid = $USER->id;
-            $DB->insert_record('course_modules_completion', $activitycompletion);
-            // Re-load that same info.
-            $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
-
-        } else {
-            // The user has permission to start a reengagement, but not this one (likely due to incomplete prerequiste activities).
-            $report = "This reengagement is not available";
-            if ($availabilityinfo) {
-                $report .= " ( $availabilityinfo ) ";
-            }
-            echo $OUTPUT->box($report);
-        }
-    }
-    if (!empty($completion)) {
-        $rip = $DB->get_record('reengagement_inprogress', array('userid' => $USER->id, 'reengagement' => $reengagement->id));
-    }
-    $dateformat = get_string('strftimedatetime', 'langconfig'); // Description of how to format times in user's language.
-    if (!empty($completion) && !empty($rip)) {
-        // User is genuinely in-progress.
-        if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_TIME && empty($rip->emailsent)) {
-            $emailpending = true;
-            $emailtime = $rip->emailtime;
-        } else if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION && empty($rip->completed)) {
-            $emailpending = true;
-            $emailtime = $rip->completiontime;
-        } else {
-            $emailpending = false;
-        }
-
-        $datestr = userdate($rip->emailtime, $dateformat);
-        if ($emailpending) {
-            if (empty($reengagement->suppresstarget)) {
-                // You'll get an email at xyz time.
-                $emailmessage = get_string('receiveemailattimex', 'reengagement', $datestr);
-            } else {
-                // There is a target activity, if the target activity is complete, we won't send the email.
-                $targetcomplete = reengagement_check_target_completion($USER->id, $id);
-                if (!$targetcomplete) {
-                    // Message will be sent at xyz time unless you complete target activity.
-                    $emailmessage = get_string('receiveemailattimexunless', 'reengagement', $datestr);
-                } else {
-                    // Message scheduled for xyz time will not be sent because you have completed the target activity.
-                    $emailmessage = get_string('noemailattimex', 'reengagement', $datestr);
-                }
-            }
-            echo $OUTPUT->box($emailmessage);
-        }
-
-        // Activity completion can be independent of email time. Show completion time too.
-        if ($completion->completionstate == COMPLETION_INCOMPLETE) {
-            $datestr = userdate($rip->completiontime, $dateformat);
-            // This activity will complete at XYZ time.
-            $completionmessage = get_string('completeattimex', 'reengagement', $datestr);
-        } else {
-            // This activity has been marked as complete.
-            $completionmessage = get_string('activitycompleted', 'reengagement');
-        }
-        echo $OUTPUT->box($completionmessage);
-    }
+    // Check reengagement record for this user.
+    echo reengagement_checkstart($course, $cm, $reengagement);
 }
-
 
 if ($canedit) {
-    // User is able to see admin-type features of this plugin - ie not just their own re-engagement status.
-    $sql = "SELECT *
-              FROM {reengagement_inprogress} rip
-        INNER JOIN {user} u ON u.id = rip.userid
-             WHERE rip.reengagement = :reengagementid
-               AND u.deleted = 0
-          ORDER BY rip.completiontime ASC, u.lastname ASC, u.firstname ASC";
 
-    $rips = $DB->get_records_sql($sql, array('reengagementid' => $reengagement->id));
+// Get the currently applied filters.
+    $filtersapplied = optional_param_array('unified-filters', [], PARAM_NOTAGS);
+    $filterwassubmitted = optional_param('unified-filter-submitted', 0, PARAM_BOOL);
 
-    if ($rips) {
-        // There are re-engagements in progress.
-        if (!in_array($reengagement->emailuser, array(REENGAGEMENT_EMAILUSER_NEVER, REENGAGEMENT_EMAILUSER_COMPLETION))) {
-            // Include an extra column to show the time the user will be emailed.
-            $showemailtime = true;
+// If they passed a role make sure they can view that role.
+    if ($roleid) {
+        $viewableroles = get_profile_roles($context);
+
+        // Check if the user can view this role.
+        if (array_key_exists($roleid, $viewableroles)) {
+            $filtersapplied[] = USER_FILTER_ROLE . ':' . $roleid;
         } else {
-            $showemailtime = false;
+            $roleid = 0;
         }
-        print '<table class="reengagementlist">' . "\n";
-        print "<tr><th>" . get_string('user') . "</th>";
-        if ($showemailtime) {
-            print "<th>" . get_string('emailtime', 'reengagement') . '</th>';
-        }
-        print "<th>" . get_string('completiontime', 'reengagement') . '</th>';
-        print "</tr>";
-        foreach ($rips as $rip) {
-            $fullname = fullname($rip);
-            print '<tr><td>' . $fullname . '</td>';
-            if ($showemailtime) {
-                if ($rip->emailsent > $reengagement->remindercount) {
-                    // Email has already been sent - don't show a time in the past.
-                    print '<td></td>';
-                } else {
-                    // Email will be sent, but hasn't been yet.
-                    print '<td>' . userdate($rip->emailtime, get_string('strftimedatetimeshort', 'langconfig')) . "</td>";
-                }
-            }
-            if ($rip->completed) {
-                // User has completed the activity, but email hasn't been sent yet.
-                // Show an empty completion time.
-                print '<td></td>';
-            } else {
-                // User hasn't complted activity yet.
-                print '<td>' . userdate($rip->completiontime, get_string('strftimedatetimeshort', 'langconfig')) . "</td>";
-            }
-            print '</tr>';
-        }
-        print "</table>\n";
-    } else {
-        echo $OUTPUT->box('No reengagements in progress');
     }
+
+// Default group ID.
+    $groupid = false;
+    $canaccessallgroups = has_capability('moodle/site:accessallgroups', $context);
+    if ($course->groupmode != NOGROUPS) {
+        if ($canaccessallgroups) {
+            // Change the group if the user can access all groups and has specified group in the URL.
+            if ($groupparam) {
+                $groupid = $groupparam;
+            }
+        } else {
+            // Otherwise, get the user's default group.
+            $groupid = groups_get_course_group($course, true);
+            if ($course->groupmode == SEPARATEGROUPS && !$groupid) {
+                // The user is not in the group so show message and exit.
+                echo $OUTPUT->notification(get_string('notingroup'));
+                echo $OUTPUT->footer();
+                exit;
+            }
+        }
+    }
+    $hasgroupfilter = false;
+    $lastaccess = 0;
+    $searchkeywords = [];
+    $enrolid = 0;
+    $status = -1;
+    foreach ($filtersapplied as $filter) {
+        $filtervalue = explode(':', $filter, 2);
+        $value = null;
+        if (count($filtervalue) == 2) {
+            $key = clean_param($filtervalue[0], PARAM_INT);
+            $value = clean_param($filtervalue[1], PARAM_INT);
+        } else {
+            // Search string.
+            $key = USER_FILTER_STRING;
+            $value = clean_param($filtervalue[0], PARAM_TEXT);
+        }
+
+        switch ($key) {
+            case USER_FILTER_ENROLMENT:
+                $enrolid = $value;
+                break;
+            case USER_FILTER_GROUP:
+                $groupid = $value;
+                $hasgroupfilter = true;
+                break;
+            case USER_FILTER_LAST_ACCESS:
+                $lastaccess = $value;
+                break;
+            case USER_FILTER_ROLE:
+                $roleid = $value;
+                break;
+            case USER_FILTER_STATUS:
+                // We only accept active/suspended statuses.
+                if ($value == ENROL_USER_ACTIVE || $value == ENROL_USER_SUSPENDED) {
+                    $status = $value;
+                }
+                break;
+            default:
+                // Search string.
+                $searchkeywords[] = $value;
+                break;
+        }
+    }
+
+// If course supports groups we may need to set a default.
+    if ($groupid !== false) {
+        if ($canaccessallgroups) {
+            // User can access all groups, let them filter by whatever was selected.
+            $filtersapplied[] = USER_FILTER_GROUP . ':' . $groupid;
+        } else if (!$filterwassubmitted && $course->groupmode == VISIBLEGROUPS) {
+            // If we are in a course with visible groups and the user has not submitted anything and does not have
+            // access to all groups, then set a default group.
+            $filtersapplied[] = USER_FILTER_GROUP . ':' . $groupid;
+        } else if (!$hasgroupfilter && $course->groupmode != VISIBLEGROUPS) {
+            // The user can't access all groups and has not set a group filter in a course where the groups are not visible
+            // then apply a default group filter.
+            $filtersapplied[] = USER_FILTER_GROUP . ':' . $groupid;
+        } else if (!$hasgroupfilter) { // No need for the group id to be set.
+            $groupid = false;
+        }
+    }
+
+    if ($groupid && ($course->groupmode != SEPARATEGROUPS || $canaccessallgroups)) {
+        $grouprenderer = $PAGE->get_renderer('core_group');
+        $groupdetailpage = new \core_group\output\group_details($groupid);
+        echo $grouprenderer->group_details($groupdetailpage);
+    }
+
+
+// Render the unified filter.
+    $renderer = $PAGE->get_renderer('core_user');
+    echo $renderer->unified_filter($course, $context, $filtersapplied);
+
+    echo '<div class="userlist">';
+
+// Should use this variable so that we don't break stuff every time a variable is added or changed.
+    $baseurl = new moodle_url('/mod/reengagement/view.php', array(
+        'contextid' => $context->id,
+        'id' => $cm->id,
+        'perpage' => $perpage));
+
+    $participanttable = new \mod_reengagement\table\participants($reengagement, $course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
+        $searchkeywords, $bulkoperations, $selectall);
+    $participanttable->define_baseurl($baseurl);
+
+// Do this so we can get the total number of rows.
+    ob_start();
+    $participanttable->out($perpage, true);
+    $participanttablehtml = ob_get_contents();
+    ob_end_clean();
+
+    if ($bulkoperations) {
+        echo '<form action="action_redir.php" method="post" id="participantsform">';
+        echo '<div>';
+        echo '<input type="hidden" name="sesskey" value="' . sesskey() . '" />';
+        echo '<input type="hidden" name="returnto" value="' . s($PAGE->url->out(false)) . '" />';
+    }
+
+    echo $participanttablehtml;
+
+    $PAGE->requires->js_call_amd('core_user/name_page_filter', 'init');
+
+    $perpageurl = clone($baseurl);
+    $perpageurl->remove_params('perpage');
+    if ($perpage == SHOW_ALL_PAGE_SIZE && $participanttable->totalrows > DEFAULT_PAGE_SIZE) {
+        $perpageurl->param('perpage', DEFAULT_PAGE_SIZE);
+        echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', DEFAULT_PAGE_SIZE)), array(), 'showall');
+
+    } else if ($participanttable->get_page_size() < $participanttable->totalrows) {
+        $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
+        echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showall', '', $participanttable->totalrows)),
+            array(), 'showall');
+    }
+
+    if ($bulkoperations) {
+        echo '<br /><div class="buttons">';
+
+        if ($participanttable->get_page_size() < $participanttable->totalrows) {
+            $perpageurl = clone($baseurl);
+            $perpageurl->remove_params('perpage');
+            $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
+            $perpageurl->param('selectall', true);
+            $showalllink = $perpageurl;
+        } else {
+            $showalllink = false;
+        }
+
+        echo html_writer::start_tag('div', array('class' => 'btn-group'));
+        if ($participanttable->get_page_size() < $participanttable->totalrows) {
+            // Select all users, refresh page showing all users and mark them all selected.
+            $label = get_string('selectalluserswithcount', 'moodle', $participanttable->totalrows);
+            echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkall', 'class' => 'btn btn-secondary',
+                'value' => $label, 'data-showallink' => $showalllink));
+            // Select all users, mark all users on page as selected.
+            echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkallonpage', 'class' => 'btn btn-secondary',
+                'value' => get_string('selectallusersonpage')));
+        } else {
+            echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkallonpage', 'class' => 'btn btn-secondary',
+                'value' => get_string('selectall')));
+        }
+
+        echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checknone', 'class' => 'btn btn-secondary',
+            'value' => get_string('deselectall')));
+        echo html_writer::end_tag('div');
+        $displaylist = array();
+        $displaylist['#messageselect'] = get_string('messageselectadd');
+
+        echo $OUTPUT->help_icon('withselectedusers');
+        echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
+        echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
+
+        echo '<input type="hidden" name="id" value="'.$course->id.'" />';
+        echo '<noscript style="display:inline">';
+        echo '<div><input type="submit" value="'.get_string('ok').'" /></div>';
+        echo '</noscript>';
+        echo '</div></div>';
+        echo '</form>';
+
+        $options = new stdClass();
+        $options->courseid = $course->id;
+        $options->stateHelpIcon = $OUTPUT->help_icon('publishstate', 'notes');
+        $PAGE->requires->js_call_amd('core_user/participants', 'init', [$options]);
+    }
+
+    echo '</div>';  // Userlist.
+
 }
+
 
 // Finish the page.
 echo $OUTPUT->footer($course);
