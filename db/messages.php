@@ -15,19 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Defines message providers (types of message sent) for the Re-engagement activity.
  *
  * @package    mod_reengagement
- * @author     Peter Bulmer <peter.bulmer@catlayst.net.nz>
- * @copyright  2016 Catalyst IT {@link http://www.catalyst.net.nz}
+ * @author     Eugene Venter <eugene@catalyst.net.nz>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018021600;   // The current module version.
-$plugin->requires  = 2017111300;
-$plugin->component = 'mod_reengagement';
-$plugin->release   = '3.3.5';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->cron      = 0; // Now uses a scheduled task.
+$messageproviders = array(
+    'mod_reengagement' => array(),
+);
