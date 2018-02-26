@@ -760,3 +760,102 @@ function reengagement_check_target_completion($userid, $targetcmid) {
     }
     return false;
 }
+
+/**
+ * Method to check if existing user is eligble and cron hasn't run yet.
+ * @param stdclass $course the course record.
+ * @param stdclass $cm the coursemodule we should be checking.
+ * @param stdclass $reengagment the full record.
+ * @return string
+ */
+function reengagement_checkstart($course, $cm, $reengagement) {
+    global $DB, $USER, $OUTPUT;
+    $output = '';
+    $modinfo = get_fast_modinfo($course->id);
+    $cminfo = $modinfo->get_cm($cm->id);
+
+    $ainfomod = new \core_availability\info_module($cminfo);
+
+    // User could have arrived here eligible to start, but before cron had a chance to start them in the activity.
+    // Check for that scenario.
+    $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
+    if (empty($completion)) {
+        // User hasn't yet started this activity.
+        $availabilityinfo = '';
+        if (!$ainfomod->is_available($availabilityinfo)) {
+            // User has satisfied all activity completion preconditions, start them on this activity.
+            // Set a RIP record, so we know when to send an email/mark activity as complete by cron later.
+            $reengagementinprogress = new stdClass();
+            $reengagementinprogress->reengagement = $reengagement->id;
+            $reengagementinprogress->completiontime = time() + $reengagement->duration;
+            $reengagementinprogress->emailtime = time() + $reengagement->emaildelay;
+            $reengagementinprogress->userid = $USER->id;
+            $DB->insert_record('reengagement_inprogress', $reengagementinprogress);
+
+            // Set activity completion in-progress record to fit in with normal activity completion requirements.
+            $activitycompletion = new stdClass();
+            $activitycompletion->coursemoduleid = $cm->id;
+            $activitycompletion->completionstate = COMPLETION_INCOMPLETE;
+            $activitycompletion->timemodified = time();
+            $activitycompletion->userid = $USER->id;
+            $DB->insert_record('course_modules_completion', $activitycompletion);
+            // Re-load that same info.
+            $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
+
+        } else {
+            // The user has permission to start a reengagement, but not this one (likely due to incomplete prerequiste activities).
+            $report = "This reengagement is not available";
+            if ($availabilityinfo) {
+                $report .= " ( $availabilityinfo ) ";
+            }
+            $output .= $OUTPUT->box($report);
+        }
+    }
+    if (!empty($completion)) {
+        $rip = $DB->get_record('reengagement_inprogress', array('userid' => $USER->id, 'reengagement' => $reengagement->id));
+    }
+    $dateformat = get_string('strftimedatetime', 'langconfig'); // Description of how to format times in user's language.
+    if (!empty($completion) && !empty($rip)) {
+        // User is genuinely in-progress.
+        if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_TIME && empty($rip->emailsent)) {
+            $emailpending = true;
+            $emailtime = $rip->emailtime;
+        } else if ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION && empty($rip->completed)) {
+            $emailpending = true;
+            $emailtime = $rip->completiontime;
+        } else {
+            $emailpending = false;
+        }
+
+        $datestr = userdate($rip->emailtime, $dateformat);
+        if ($emailpending) {
+            if (empty($reengagement->suppresstarget)) {
+                // You'll get an email at xyz time.
+                $emailmessage = get_string('receiveemailattimex', 'reengagement', $datestr);
+            } else {
+                // There is a target activity, if the target activity is complete, we won't send the email.
+                $targetcomplete = reengagement_check_target_completion($USER->id, $cm->id);
+                if (!$targetcomplete) {
+                    // Message will be sent at xyz time unless you complete target activity.
+                    $emailmessage = get_string('receiveemailattimexunless', 'reengagement', $datestr);
+                } else {
+                    // Message scheduled for xyz time will not be sent because you have completed the target activity.
+                    $emailmessage = get_string('noemailattimex', 'reengagement', $datestr);
+                }
+            }
+            $output .= $OUTPUT->box($emailmessage);
+        }
+
+        // Activity completion can be independent of email time. Show completion time too.
+        if ($completion->completionstate == COMPLETION_INCOMPLETE) {
+            $datestr = userdate($rip->completiontime, $dateformat);
+            // This activity will complete at XYZ time.
+            $completionmessage = get_string('completeattimex', 'reengagement', $datestr);
+        } else {
+            // This activity has been marked as complete.
+            $completionmessage = get_string('activitycompleted', 'reengagement');
+        }
+        $output .= $OUTPUT->box($completionmessage);
+    }
+    return $output;
+}

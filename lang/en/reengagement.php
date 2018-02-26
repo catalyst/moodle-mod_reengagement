@@ -32,11 +32,14 @@ $string['modulenameplural'] = 'Reengagements';
 // Alphabetized.
 $string['activitycompleted'] = 'This activity has been marked as complete';
 $string['afterdelay'] = 'After delay';
+$string['areyousure'] = 'Are you sure you want to make this change?';
 $string['completion'] = 'Completion';
 $string['completionwillturnon'] = 'Note that adding this activity to the course will enable activity completion.';
 $string['completeattimex'] = 'This activity will complete at {$a}';
 $string['completiontime'] = 'Completion time';
+$string['completiondatesupdated'] = 'Completion dates updated.';
 $string['crontask'] = 'Reengagement cron task';
+$string['cronwarning'] = 'The Reengagment scheduled task has not been run for at least 60 min - Cron must be configured to allow Reenagagements to function correctly.';
 $string['days'] = 'Days';
 $string['duration'] = 'Duration';
 $string['duration_help'] = '<p>The reengagement duration is the period of time between a user starting a reengagement, and being marked as finished.
@@ -71,6 +74,9 @@ $string['hours'] = 'Hours';
 $string['introdefaultvalue'] = 'This is a reengagement activity.  Its purpose is to enforce a time lapse between the activities which preceed it, and the activities which follow it.';
 $string['minutes'] = 'Minutes';
 $string['never'] = 'Never';
+$string['newcompletiontime'] = 'New completion time';
+$string['nochange'] = 'No change';
+$string['nochangenoaccess'] = 'No change (user has not accessed course)';
 $string['noemailattimex'] = 'Message scheduled for {$a} will not be sent because you have completed the target activity';
 $string['nosuppresstarget'] = 'No target activity selected';
 $string['oncompletion'] = 'On reengagement completion';
@@ -80,6 +86,7 @@ $string['reengagement:addinstance'] = 'reengagement:addinstance';
 $string['reengagement:startreengagement'] = 'Start Reengagement';
 $string['reengagement:getnotifications'] = 'Receive notification of reengagement completions';
 $string['reengagement:editreengagementduration'] = 'Edit Reengagement Duration';
+$string['reengagement:bulkactions'] = 'Perform bulk actions on reengagment';
 $string['reengagementduration'] = 'Reengagement duration';
 $string['reengagementfieldset'] = 'Reengagement details';
 $string['reengagementintro'] = 'Reengagement intro';
@@ -91,6 +98,8 @@ $string['remindercount_help'] = 'This is the number of times an e-mail is sent a
 <li>less than 5 days - limit of 10 reminders.</li>
 <li>less than 15 days - limit of 26 reminders.</li>
 <li>over 15 days - maximum limit of 40 reminders.</li></ul>';
+$string['resetbyfirstaccess'] = 'By first course access';
+$string['resetcompletion'] = 'Reset completion date';
 $string['search:activity'] = 'Reengagement - activity information';
 $string['suppressemail'] = 'Suppress email if target activity complete';
 $string['suppressemail_help'] = 'This option instructs the activity to suppress emails to users where a named activity is complete.';
@@ -98,4 +107,7 @@ $string['suppresstarget'] = 'Target activity.';
 $string['suppresstarget_help'] = 'Use this dropdown to choose which activity should be checked for completion before sending the reminder email.';
 $string['userandmanager'] = 'User and Manager';
 $string['weeks'] = 'Weeks';
+$string['withselectedusers'] = 'With selected users...';
+$string['withselectedusers_help'] = '* Send message - For sending a message to one or more participants
+* Reset completion date by course access - For adjusting the reengagement completion date based on the first access to this course.';
 

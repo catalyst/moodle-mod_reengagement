@@ -23,7 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version   = 2016082303;   // The current module version.
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version   = 2016082304;   // The current module version.
 $plugin->requires  = 2011112900;
 $plugin->component = 'mod_reengagement';
 $plugin->release   = '3.1.7';
