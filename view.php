@@ -99,6 +99,11 @@ if ($canstart) {
 }
 
 if ($canedit) {
+    $task = \core\task\manager::get_scheduled_task('\mod_reengagement\task\cron_task');
+    $lastrun = $task->get_last_run_time();
+    if ($lastrun < time() - 3600) { // Check if cron run in last 60min.
+        echo $OUTPUT->notification(get_string('cronwarning', 'reengagement'));
+    }
 
 // Get the currently applied filters.
     $filtersapplied = optional_param_array('unified-filters', [], PARAM_NOTAGS);
