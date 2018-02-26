@@ -105,11 +105,11 @@ if ($canedit) {
         echo $OUTPUT->notification(get_string('cronwarning', 'reengagement'));
     }
 
-// Get the currently applied filters.
+    // Get the currently applied filters.
     $filtersapplied = optional_param_array('unified-filters', [], PARAM_NOTAGS);
     $filterwassubmitted = optional_param('unified-filter-submitted', 0, PARAM_BOOL);
 
-// If they passed a role make sure they can view that role.
+    // If they passed a role make sure they can view that role.
     if ($roleid) {
         $viewableroles = get_profile_roles($context);
 
@@ -121,7 +121,7 @@ if ($canedit) {
         }
     }
 
-// Default group ID.
+    // Default group ID.
     $groupid = false;
     $canaccessallgroups = has_capability('moodle/site:accessallgroups', $context);
     if ($course->groupmode != NOGROUPS) {
@@ -185,7 +185,7 @@ if ($canedit) {
         }
     }
 
-// If course supports groups we may need to set a default.
+    // If course supports groups we may need to set a default.
     if ($groupid !== false) {
         if ($canaccessallgroups) {
             // User can access all groups, let them filter by whatever was selected.
@@ -210,13 +210,13 @@ if ($canedit) {
     }
 
 
-// Render the unified filter.
+    // Render the unified filter.
     $renderer = $PAGE->get_renderer('core_user');
     echo $renderer->unified_filter($course, $context, $filtersapplied);
 
     echo '<div class="userlist">';
 
-// Should use this variable so that we don't break stuff every time a variable is added or changed.
+    // Should use this variable so that we don't break stuff every time a variable is added or changed.
     $baseurl = new moodle_url('/mod/reengagement/view.php', array(
         'contextid' => $context->id,
         'id' => $cm->id,
@@ -226,7 +226,7 @@ if ($canedit) {
         $searchkeywords, $bulkoperations, $selectall);
     $participanttable->define_baseurl($baseurl);
 
-// Do this so we can get the total number of rows.
+    // Do this so we can get the total number of rows.
     ob_start();
     $participanttable->out($perpage, true);
     $participanttablehtml = ob_get_contents();
