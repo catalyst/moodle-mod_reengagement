@@ -427,8 +427,8 @@ class participants extends \table_sql {
             $sort = 'ORDER BY ' . $sort;
         }
 
-        list($select, $from, $where, $params) = user_get_participants_sql($this->course->id, $this->currentgroup, $this->accesssince,
-            $this->roleid, $this->enrolid,
+        list($select, $from, $where, $params) = user_get_participants_sql($this->course->id, $this->currentgroup,
+            $this->accesssince, $this->roleid, $this->enrolid,
             $this->status, $this->search, $twhere, $tparams);
 
         $select .= ', rip.completiontime, rip.emailtime, rip.completiontime, rip.completed as ripcompleted ';
@@ -436,7 +436,6 @@ class participants extends \table_sql {
         $sql = "$select $from $where $sort";
 
         $this->rawdata = $DB->get_recordset_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
-
 
         // Set initial bars.
         if ($useinitialsbar) {

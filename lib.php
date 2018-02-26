@@ -845,7 +845,6 @@ function reengagement_checkstart($course, $cm, $reengagement) {
 
     $ainfomod = new \core_availability\info_module($cminfo);
 
-
     // User could have arrived here eligible to start, but before cron had a chance to start them in the activity.
     // Check for that scenario.
     $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
