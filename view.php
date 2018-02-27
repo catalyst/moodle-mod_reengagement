@@ -222,8 +222,8 @@ if ($canedit) {
         'id' => $cm->id,
         'perpage' => $perpage));
 
-    $participanttable = new \mod_reengagement\table\participants($reengagement, $course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
-        $searchkeywords, $bulkoperations, $selectall);
+    $participanttable = new \mod_reengagement\table\participants($reengagement, $course->id, $groupid,
+        $lastaccess, $roleid, $enrolid, $status, $searchkeywords, $bulkoperations, $selectall);
     $participanttable->define_baseurl($baseurl);
 
     // Do this so we can get the total number of rows.
@@ -233,8 +233,9 @@ if ($canedit) {
     ob_end_clean();
 
     if ($bulkoperations) {
-        echo '<form action="action_redir.php" method="post" id="participantsform">';
+        echo '<form action="bulkchange.php" method="post" id="participantsform">';
         echo '<div>';
+        echo '<input type="hidden" name="id" value="' . $cm->id . '" />';
         echo '<input type="hidden" name="sesskey" value="' . sesskey() . '" />';
         echo '<input type="hidden" name="returnto" value="' . s($PAGE->url->out(false)) . '" />';
     }
@@ -247,7 +248,8 @@ if ($canedit) {
     $perpageurl->remove_params('perpage');
     if ($perpage == SHOW_ALL_PAGE_SIZE && $participanttable->totalrows > DEFAULT_PAGE_SIZE) {
         $perpageurl->param('perpage', DEFAULT_PAGE_SIZE);
-        echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', DEFAULT_PAGE_SIZE)), array(), 'showall');
+        echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', DEFAULT_PAGE_SIZE)),
+            array(), 'showall');
 
     } else if ($participanttable->get_page_size() < $participanttable->totalrows) {
         $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
@@ -288,11 +290,18 @@ if ($canedit) {
         $displaylist = array();
         $displaylist['#messageselect'] = get_string('messageselectadd');
 
-        echo $OUTPUT->help_icon('withselectedusers');
+        $pluginoptions = [];
+        $params = ['operation' => 'resetbyfirstcourseaccess'];
+        $url = new moodle_url('bulkchange.php', $params);
+        $pluginoptions['resetbyfirstaccess'] = get_string('resetbyfirstaccess', 'mod_reengagement');
+
+        $name = get_string('resetcompletion', 'mod_reengagement');
+        $displaylist[] = [$name => $pluginoptions];
+
+        echo $OUTPUT->help_icon('withselectedusers', 'mod_reengagement');
         echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
         echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
 
-        echo '<input type="hidden" name="id" value="'.$course->id.'" />';
         echo '<noscript style="display:inline">';
         echo '<div><input type="submit" value="'.get_string('ok').'" /></div>';
         echo '</noscript>';
