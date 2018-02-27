@@ -32,10 +32,12 @@ $string['modulenameplural'] = 'Reengagements';
 // Alphabetized.
 $string['activitycompleted'] = 'This activity has been marked as complete';
 $string['afterdelay'] = 'After delay';
+$string['areyousure'] = 'Are you sure you want to make this change?';
 $string['completion'] = 'Completion';
 $string['completionwillturnon'] = 'Note that adding this activity to the course will enable activity completion.';
 $string['completeattimex'] = 'This activity will complete at {$a}';
 $string['completiontime'] = 'Completion time';
+$string['completiondatesupdated'] = 'Completion dates updated.';
 $string['crontask'] = 'Reengagement cron task';
 $string['cronwarning'] = 'The Reengagment scheduled task has not been run for at least 60 min - Cron must be configured to allow Reenagagements to function correctly.';
 $string['days'] = 'Days';
@@ -80,6 +82,9 @@ $string['introdefaultvalue'] = 'This is a reengagement activity.  Its purpose is
 $string['messageprovider:mod_reengagement'] = 'Re-engagement notifications';
 $string['minutes'] = 'Minutes';
 $string['never'] = 'Never';
+$string['newcompletiontime'] = 'New completion time';
+$string['nochange'] = 'No change';
+$string['nochangenoaccess'] = 'No change (user has not accessed course)';
 $string['noemailattimex'] = 'Message scheduled for {$a} will not be sent because you have completed the target activity';
 $string['nosuppresstarget'] = 'No target activity selected';
 $string['oncompletion'] = 'On reengagement completion';
@@ -101,6 +106,8 @@ $string['remindercount_help'] = 'This is the number of times an e-mail is sent a
 <li>less than 5 days - limit of 10 reminders.</li>
 <li>less than 15 days - limit of 26 reminders.</li>
 <li>over 15 days - maximum limit of 40 reminders.</li></ul>';
+$string['resetbyfirstaccess'] = 'By first course access';
+$string['resetcompletion'] = 'Reset completion date';
 $string['search:activity'] = 'Reengagement - activity information';
 $string['suppressemail'] = 'Suppress notification if target activity complete';
 $string['suppressemail_help'] = 'This option instructs the activity to suppress notifications to users where a named activity is complete.';
@@ -108,4 +115,7 @@ $string['suppresstarget'] = 'Target activity.';
 $string['suppresstarget_help'] = 'Use this dropdown to choose which activity should be checked for completion before sending the reminder notification.';
 $string['userandmanager'] = 'User and Manager';
 $string['weeks'] = 'Weeks';
+$string['withselectedusers'] = 'With selected users...';
+$string['withselectedusers_help'] = '* Send message - For sending a message to one or more participants
+* Reset completion date by course access - For adjusting the reengagement completion date based on the first access to this course.';
 
