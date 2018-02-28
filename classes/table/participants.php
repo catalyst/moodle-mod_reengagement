@@ -434,8 +434,9 @@ class participants extends \table_sql {
 
         $select .= ', rip.completiontime, rip.emailtime, rip.completiontime, rip.completed as ripcompleted ';
         $from .= ' JOIN {reengagement_inprogress} rip ON rip.userid = u.id ';
+        $where .= ' AND rip.reengagement = :reengagement ';
         $sql = "$select $from $where $sort";
-
+        $params['reengagement'] = $this->reengagement->id;
         $this->rawdata = $DB->get_recordset_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
 
         // Set initial bars.
