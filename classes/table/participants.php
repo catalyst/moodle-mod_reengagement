@@ -417,8 +417,15 @@ class participants extends \table_sql {
         global $DB;
         list($twhere, $tparams) = $this->get_sql_where();
 
-        $total = user_get_total_participants($this->course->id, $this->currentgroup, $this->accesssince,
-            $this->roleid, $this->enrolid, $this->status, $this->search, $twhere, $tparams);
+        list($select, $from, $where, $params) = user_get_participants_sql($this->course->id,  $this->currentgroup,
+            $this->accesssince, $this->roleid, $this->enrolid, $this->status, $this->search, $twhere, $tparams);
+
+        // Join with Reengagement in progress table.
+        $from .= ' JOIN {reengagement_inprogress} rip ON rip.userid = u.id ';
+        $where .= ' AND rip.reengagement = :reengagement ';
+        $params['reengagement'] = $this->reengagement->id;
+
+        $total = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
 
         $this->pagesize($pagesize, $total);
 
