@@ -135,9 +135,6 @@ class participants extends \table_sql {
      */
     protected $profileroles;
 
-    /** @var \stdClass[] $viewableroles */
-    private $viewableroles;
-
     /** \stdClass[] $reengagementdata data from reengagment table for this engagement. */
     protected $reengagmentdata;
     /**
@@ -250,7 +247,6 @@ class participants extends \table_sql {
         $this->allroleassignments = get_users_roles($this->context, [], true, 'c.contextlevel DESC, r.sortorder ASC');
         $this->assignableroles = get_assignable_roles($this->context, ROLENAME_ALIAS, false);
         $this->profileroles = get_profile_roles($this->context);
-        $this->viewableroles = get_viewable_roles($this->context);
     }
 
     /**
