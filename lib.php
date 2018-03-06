@@ -290,7 +290,7 @@ function reengagement_crontask() {
             $activitycompletion->completionstate = COMPLETION_COMPLETE_PASS;
             $activitycompletion->timemodified = $timenow;
             $activitycompletion->userid = $userid;
-            $DB->insert_record('course_modules_completion', $activitycompletion);
+            $completionrecord = $DB->insert_record('course_modules_completion', $activitycompletion);
         } else {
             $updaterecord = new stdClass();
             $updaterecord->id = $completionrecord->id;
@@ -298,6 +298,22 @@ function reengagement_crontask() {
             $updaterecord->timemodified = $timenow;
             $DB->update_record('course_modules_completion', $updaterecord) . " \n";
         }
+        $completioncache = cache::make('core', 'completion');
+        $completioncache->delete($userid . '_' . $reengagement->courseid);
+
+        $cmcontext = context_module::instance($cmid, MUST_EXIST);
+        // Trigger an event for course module completion changed.
+        $event = \core\event\course_module_completion_updated::create(array(
+            'objectid' => $completionrecord->id,
+            'context' => $cmcontext,
+            'relateduserid' => $userid,
+            'other' => array(
+                'relateduserid' => $userid
+            )
+        ));
+        $event->add_record_snapshot('course_modules_completion', $completionrecord);
+        $event->trigger();
+
         $result = false;
         if (($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) ||
                 ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_NEVER) ||
