@@ -280,13 +280,25 @@ function reengagement_crontask() {
             $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
             continue;
         }
-        $course = new stdClass();
-        $course->id = $reengagement->courseid;
-        $completion = new completion_info($course);
-        $cm = get_coursemodule_from_id('reengagement', $cmid, $reengagement->courseid);
 
-        $completion->update_state($cm, COMPLETION_COMPLETE_PASS, $userid);
-
+        // Update completion record to indicate completion so the user can continue with any dependant activities.
+        $completionrecord = $DB->get_record('course_modules_completion', array('coursemoduleid' => $cmid, 'userid' => $userid));
+        if (empty($completionrecord)) {
+            mtrace("Could not find completion record for updating to complete state - userid: $userid, cmid: $cmid - recreating record.");
+            // This might happen when reset_all_state has been triggered, deleting an "in-progress" record. so recreate it.
+            $activitycompletion = new stdClass();
+            $activitycompletion->coursemoduleid = $cmid;
+            $activitycompletion->completionstate = COMPLETION_COMPLETE_PASS;
+            $activitycompletion->timemodified = $timenow;
+            $activitycompletion->userid = $userid;
+            $DB->insert_record('course_modules_completion', $activitycompletion);
+        } else {
+            $updaterecord = new stdClass();
+            $updaterecord->id = $completionrecord->id;
+            $updaterecord->completionstate = COMPLETION_COMPLETE_PASS;
+            $updaterecord->timemodified = $timenow;
+            $DB->update_record('course_modules_completion', $updaterecord) . " \n";
+        }
         $result = false;
         if (($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) ||
                 ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_NEVER) ||
