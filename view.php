@@ -178,6 +178,7 @@ if ($canedit) {
         $duration = $periodcount ." " .$period;
         $pluginoptions['resetbyfirstaccess'] = get_string('resetbyfirstaccess', 'mod_reengagement', $duration);
         $pluginoptions['resetbyenrolment'] = get_string('resetbyenrolment', 'mod_reengagement', $duration);
+        $pluginoptions['resetbyspecificdate'] = get_string('resetbyspecificdate', 'mod_reengagement');
 
         $name = get_string('resetcompletion', 'mod_reengagement');
         $displaylist[] = [$name => $pluginoptions];

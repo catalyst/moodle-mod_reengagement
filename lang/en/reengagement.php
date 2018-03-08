@@ -100,10 +100,12 @@ $string['remindercount_help'] = 'This is the number of times an e-mail is sent a
 <li>over 15 days - maximum limit of 40 reminders.</li></ul>';
 $string['resetbyfirstaccess'] = 'By first course access and a duration of: {$a}';
 $string['resetbyenrolment'] = 'By enrolment creation date and a duration of: {$a}';
+$string['resetbyspecificdate'] = 'By specified date';
 $string['resetcompletion'] = 'Reset completion date';
 $string['search:activity'] = 'Reengagement - activity information';
 $string['suppressemail'] = 'Suppress email if target activity complete';
 $string['suppressemail_help'] = 'This option instructs the activity to suppress emails to users where a named activity is complete.';
+$string['specifydate'] = 'Set completion date to:';
 $string['suppresstarget'] = 'Target activity.';
 $string['suppresstarget_help'] = 'Use this dropdown to choose which activity should be checked for completion before sending the reminder email.';
 $string['userandmanager'] = 'User and Manager';
