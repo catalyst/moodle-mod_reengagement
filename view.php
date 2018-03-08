@@ -293,7 +293,10 @@ if ($canedit) {
         $pluginoptions = [];
         $params = ['operation' => 'resetbyfirstcourseaccess'];
         $url = new moodle_url('bulkchange.php', $params);
-        $pluginoptions['resetbyfirstaccess'] = get_string('resetbyfirstaccess', 'mod_reengagement');
+        list ($periodcount, $period) = reengagement_get_readable_duration($reengagement->duration, true);
+        $duration = $periodcount ." " .$period;
+        $pluginoptions['resetbyfirstaccess'] = get_string('resetbyfirstaccess', 'mod_reengagement', $duration);
+        $pluginoptions['resetbyenrolment'] = get_string('resetbyenrolment', 'mod_reengagement', $duration);
 
         $name = get_string('resetcompletion', 'mod_reengagement');
         $displaylist[] = [$name => $pluginoptions];
