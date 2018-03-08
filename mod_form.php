@@ -252,15 +252,17 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $fromform->completion = COMPLETION_TRACKING_AUTOMATIC;
             // Force activity to hidden.
             $fromform->visible = 0;
-            // Format, regulate module duration.
-            if (isset($fromform->period) && isset($fromform->periodcount)) {
-                $fromform->duration = $fromform->period * $fromform->periodcount;
+            if (!empty($fromform->completionunlocked)) {
+                // Format, regulate module duration.
+                if (isset($fromform->period) && isset($fromform->periodcount)) {
+                    $fromform->duration = $fromform->period * $fromform->periodcount;
+                }
+                if (empty($fromform->duration) || $fromform->duration < 300) {
+                    $fromform->duration = 300;
+                }
+                unset($fromform->period);
+                unset($fromform->periodcount);
             }
-            if (empty($fromform->duration) || $fromform->duration < 300) {
-                $fromform->duration = 300;
-            }
-            unset($fromform->period);
-            unset($fromform->periodcount);
             // Format, regulate email notification delay.
             if (isset($fromform->emailperiod) && isset($fromform->emailperiodcount)) {
                 $fromform->emaildelay = $fromform->emailperiod * $fromform->emailperiodcount;

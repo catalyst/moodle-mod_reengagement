@@ -758,11 +758,11 @@ function reengagement_get_readable_duration($duration, $periodstring = false) {
     if ($periodstring) {
         if ($period == 60) {
             $period = get_string('minutes', 'reengagement');
-        } else if ($period = 3600) {
+        } else if ($period == 3600) {
             $period = get_string('hours', 'reengagement');
-        } else if ($period = 86400) {
+        } else if ($period == 86400) {
             $period = get_string('days', 'reengagement');
-        } else if ($period = 604800) {
+        } else if ($period == 604800) {
             $period = get_string('weeks', 'reengagement');
         }
     }
