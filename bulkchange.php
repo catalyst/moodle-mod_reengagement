@@ -68,18 +68,19 @@ if (!$confirm) {
 }
 
 if ($formaction == 'resetbyspecificdate') {
-    for ($i=1; $i<=31; $i++) {
+    for ($i = 1; $i <= 31; $i++) {
         $days[$i] = $i;
     }
-    for ($i=1; $i<=12; $i++) {
-        $months[$i] = userdate(gmmktime(12,0,0,$i,15,2000), "%B");
+    for ($i = 1; $i <= 12; $i++) {
+        $months[$i] = userdate(gmmktime(12, 0, 0, $i, 15, 2000), "%B");
     }
-    for ($i=2017; $i<=date('Y')+4; $i++) {
+    for ($i = 2017; $i <= date('Y') + 4; $i++) {
         $years[$i] = $i;
     }
     echo '<div align="center">';
     echo '<h4>'.get_string('specifydate', 'mod_reengagement').'</h4>';
-    echo '<form action="'.$CFG->wwwroot.'/mod/reengagement/bulkchange.php" method="POST" id="reengagementbulkchange" class="popupform">';
+    echo '<form action="'.$CFG->wwwroot.'/mod/reengagement/bulkchange.php" method="POST"
+           id="reengagementbulkchange" class="popupform">';
     echo html_writer::select($days, 'day', date('n'));
     echo html_writer::select($months, 'month', date('n'));
     echo html_writer::select($years,  'year',  date('Y'));
