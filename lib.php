@@ -286,12 +286,14 @@ function reengagement_crontask() {
         if (empty($completionrecord)) {
             mtrace("Could not find completion record for updating to complete state - userid: $userid, cmid: $cmid - recreating record.");
             // This might happen when reset_all_state has been triggered, deleting an "in-progress" record. so recreate it.
-            $activitycompletion = new stdClass();
-            $activitycompletion->coursemoduleid = $cmid;
-            $activitycompletion->completionstate = COMPLETION_COMPLETE_PASS;
-            $activitycompletion->timemodified = $timenow;
-            $activitycompletion->userid = $userid;
-            $completionrecord = $DB->insert_record('course_modules_completion', $activitycompletion);
+            $completionrecord = new stdClass();
+            $completionrecord->coursemoduleid = $cmid;
+            $completionrecord->completionstate = COMPLETION_COMPLETE_PASS;
+            $completionrecord->viewed = COMPLETION_VIEWED;
+            $completionrecord->overrideby = null;
+            $completionrecord->timemodified = $timenow;
+            $completionrecord->userid = $userid;
+            $completionrecord->id = $DB->insert_record('course_modules_completion', $completionrecord);
         } else {
             $updaterecord = new stdClass();
             $updaterecord->id = $completionrecord->id;
