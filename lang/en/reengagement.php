@@ -98,7 +98,8 @@ $string['remindercount_help'] = 'This is the number of times an e-mail is sent a
 <li>less than 5 days - limit of 10 reminders.</li>
 <li>less than 15 days - limit of 26 reminders.</li>
 <li>over 15 days - maximum limit of 40 reminders.</li></ul>';
-$string['resetbyfirstaccess'] = 'By first course access';
+$string['resetbyfirstaccess'] = 'By first course access and a duration of: {$a}';
+$string['resetbyenrolment'] = 'By enrolment creation date and a duration of: {$a}';
 $string['resetcompletion'] = 'Reset completion date';
 $string['search:activity'] = 'Reengagement - activity information';
 $string['suppressemail'] = 'Suppress email if target activity complete';

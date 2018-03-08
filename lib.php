@@ -736,9 +736,10 @@ function reengagement_supports($feature) {
  * Process an arbitary number of seconds, and prepare to display it as X minutes, or Y hours or Z weeks.
  *
  * @param int $duration FEATURE_xx constant for requested feature
+ * @param boolean $periodstring - return period as string.
  * @return array
  */
-function reengagement_get_readable_duration($duration) {
+function reengagement_get_readable_duration($duration, $periodstring = false) {
     if ($duration < 300) {
         $period = 60;
         $periodcount = 5;
@@ -750,6 +751,17 @@ function reengagement_get_readable_duration($duration) {
                 $periodcount = floor((int)$duration / (int)$period);
                 break;
             }
+        }
+    }
+    if ($periodstring) {
+        if ($period == 60) {
+            $period = get_string('minutes', 'reengagement');
+        } else if ($period = 3600) {
+            $period = get_string('hours', 'reengagement');
+        } else if ($period = 86400) {
+            $period = get_string('days', 'reengagement');
+        } else if ($period = 604800) {
+            $period = get_string('weeks', 'reengagement');
         }
     }
     return array($periodcount, $period); // Example 5, 60 is 5 minutes.
