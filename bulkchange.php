@@ -67,10 +67,10 @@ if (!$confirm) {
     echo $OUTPUT->header();
 }
 
+$usernamefields = get_all_user_name_fields(true, 'u');
+list($usql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+
 if ($formaction == 'resetbyfirstaccess') {
-    // Get information on users and the updated date.
-    $usernamefields = get_all_user_name_fields(true, 'u');
-    list($usql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
     $sql = "SELECT u.id, $usernamefields, rip.id as ripid,
                    rip.completiontime, rip.emailtime, rip.completiontime, rip.completed,
                    min(l.timecreated) as firstaccess
@@ -82,6 +82,24 @@ if ($formaction == 'resetbyfirstaccess') {
                  rip.completiontime, rip.emailtime, rip.completiontime, rip.completed";
     $params['courseid'] = $course->id;
     $users = $DB->get_records_sql($sql, $params);
+} else if ($formaction == 'resetbyenrolment') {
+    $sql = "SELECT u.id, $usernamefields, rip.id as ripid,
+                   rip.completiontime, rip.emailtime, rip.completiontime, rip.completed,
+                   min(ue.timecreated) as firstaccess
+        FROM {reengagement_inprogress} rip
+        JOIN {user} u on u.id = rip.userid
+        JOIN {user_enrolments} ue ON ue.userid = u.id
+        JOIN {enrol} e ON (e.id = ue.enrolid) AND e.courseid = :courseid
+        WHERE u.id ".$usql ."
+        GROUP BY u.id, u.firstname, u.lastname, rip.id,
+                 rip.completiontime, rip.emailtime, rip.completiontime, rip.completed";
+    $params['courseid'] = $course->id;
+    $users = $DB->get_records_sql($sql, $params);
+}
+
+if (!empty($formaction) && !empty($users)) {
+    // Get information on users and the updated date.
+
     if (!$confirm) {
         print '<table class="reengagementlist">' . "\n";
         print "<tr><th>" . get_string('user') . "</th>";
