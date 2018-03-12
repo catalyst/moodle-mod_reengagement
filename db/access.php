@@ -47,13 +47,6 @@ $capabilities = array(
         )
     ),
 
-    'mod/reengagement:getnotifications' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'legacy' => array(
-        )
-    ),
-
     'mod/reengagement:editreengagementduration' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
