@@ -78,7 +78,6 @@ $string['receiveemailattimex'] = 'Message will be sent on {$a}.';
 $string['receiveemailattimexunless'] = 'Message will be sent on {$a} unless you complete target activity.';
 $string['reengagement:addinstance'] = 'reengagement:addinstance';
 $string['reengagement:startreengagement'] = 'Start Reengagement';
-$string['reengagement:getnotifications'] = 'Receive notification of reengagement completions';
 $string['reengagement:editreengagementduration'] = 'Edit Reengagement Duration';
 $string['reengagementduration'] = 'Reengagement duration';
 $string['reengagementfieldset'] = 'Reengagement details';
