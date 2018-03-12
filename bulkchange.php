@@ -103,10 +103,11 @@ if ($formaction == 'resetbyfirstaccess') {
         FROM {reengagement_inprogress} rip
         JOIN {user} u on u.id = rip.userid
         LEFT JOIN {logstore_standard_log} l ON l.userid = u.id AND l.courseid = :courseid
-        WHERE u.id ".$usql ."
+        WHERE rip.reengagement = :re AND u.id ".$usql ."
         GROUP BY u.id, u.firstname, u.lastname, rip.id,
                  rip.completiontime, rip.emailtime, rip.completiontime, rip.completed";
     $params['courseid'] = $course->id;
+    $params['re'] = $reengagement->id;
     $users = $DB->get_records_sql($sql, $params);
     $duration = $reengagement->duration;
 } else if ($formaction == 'resetbyenrolment') {
@@ -117,10 +118,11 @@ if ($formaction == 'resetbyfirstaccess') {
         JOIN {user} u on u.id = rip.userid
         JOIN {user_enrolments} ue ON ue.userid = u.id
         JOIN {enrol} e ON (e.id = ue.enrolid) AND e.courseid = :courseid
-        WHERE u.id ".$usql ."
+        WHERE rip.reengagement = :re AND u.id ".$usql ."
         GROUP BY u.id, u.firstname, u.lastname, rip.id,
                  rip.completiontime, rip.emailtime, rip.completiontime, rip.completed";
     $params['courseid'] = $course->id;
+    $params['re'] = $reengagement->id;
     $users = $DB->get_records_sql($sql, $params);
     $duration = $reengagement->duration;
 } else if ($formaction == 'resetbyspecificdate2') {
@@ -137,10 +139,11 @@ if ($formaction == 'resetbyfirstaccess') {
                    '".$timestamp."' as firstaccess
         FROM {reengagement_inprogress} rip
         JOIN {user} u on u.id = rip.userid
-        WHERE u.id ".$usql ."
+        WHERE rip.reengagement = :re AND u.id ".$usql ."
         GROUP BY u.id, u.firstname, u.lastname, rip.id,
                  rip.completiontime, rip.emailtime, rip.completiontime, rip.completed";
     $params['courseid'] = $course->id;
+    $params['re'] = $reengagement->id;
     $users = $DB->get_records_sql($sql, $params);
     $duration = 0; // Don't add duration to this status - use specified date instead.
 }
