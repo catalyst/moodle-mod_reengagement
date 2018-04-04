@@ -405,20 +405,7 @@ function reengagement_email_user($reengagement, $inprogress) {
     if (file_exists($CFG->dirroot.'/totara')) {
         $istotara = true;
     }
-    if ($istotara) {
-        $usersql = "SELECT u.*, manager.id as mid, manager.firstname as mfirstname,
-                        manager.lastname as mlastname, manager.email as memail,
-                        manager.mailformat as mmailformat
-                  FROM {user} u
-             LEFT JOIN {pos_assignment} pa ON u.id = pa.userid and pa.type = " . POSITION_TYPE_PRIMARY . "
-             LEFT JOIN {user} manager ON pa.managerid = manager.id
-                 WHERE u.id = :userid";
-        $params = array('userid' => $inprogress->userid);
-        $user = $DB->get_record_sql($usersql, $params);
-
-    } else {
-        $user = $DB->get_record('user', array('id' => $inprogress->userid));
-    }
+    $user = $DB->get_record('user', array('id' => $inprogress->userid));
     if (!empty($user->deleted)) {
         // User has been deleted - don't send an e-mail.
         return true;
@@ -456,29 +443,26 @@ function reengagement_email_user($reengagement, $inprogress) {
     if ($istotara &&
         ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_MANAGER) ||
         ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
-        // We're supposed to email the user's manager.
-        if (empty($user->mid)) {
-            // ... but the user doesn't have a manager.
-            debugging('', DEBUG_ALL) && mtrace("user $user->id has no manager present - unable to send email to manager");
+        // We're supposed to email the user's manager(s).
+        $managerids = \totara_job\job_assignment::get_all_manager_userids($user->id);
+        if (empty($managerids)) {
+            // User has no manager(s).
+            debugging('', DEBUG_ALL) && mtrace("user $user->id has no managers - not sending any manager emails.");
         } else {
-            // User has a manager.
-            // Create a shell user which contains what we know about the manager.
-            $manager = new stdClass();
-            $fieldnames = array('id', 'firstname', 'lastname', 'email', 'mailformat');
-            foreach ($fieldnames as $fieldname) {
-                $mfieldname = 'm' . $fieldname;
-                $manager->$fieldname = $user->$mfieldname;
-            }
-            // Actually send the email.
-            $managersendresult = email_to_user($manager,
-                    $SITE->shortname,
+            // User has manager(s).
+            foreach ($managerids as $managerid) {
+                $manager = $DB->get_record('user', array('id' => $managerid));
+                $managersendresult = reengagement_send_notification($manager,
                     $templateddetails['emailsubjectmanager'],
                     html_to_text($templateddetails['emailcontentmanager']),
-                    $templateddetails['emailcontentmanager']);
-            if (!$managersendresult) {
-                mtrace("failed to send manager of user $user->id email for reengagement $reengagement->id");
+                    $templateddetails['emailcontentmanager'],
+                    $reengagement
+                );
+                if (!$managersendresult) {
+                    mtrace("failed to send manager of user $user->id email for reengagement $reengagement->id");
+                }
+                $emailresult = $emailresult && $managersendresult;
             }
-            $emailresult = $emailresult && $managersendresult;
         }
     }
     if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_USER) ||
