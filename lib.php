@@ -683,8 +683,8 @@ function reengagement_get_startusers($reengagement) {
             unset($startusers[$auser->userid]);
         }
     }
-
-    $cm = get_fast_modinfo($reengagement->courseid)->get_cm($reengagement->cmid);
+    $modinfo = get_fast_modinfo($reengagement->courseid);
+    $cm = $modinfo->get_cm($reengagement->cmid);
     $ainfomod = new \core_availability\info_module($cm);
     foreach ($startusers as $startcandidate) {
         $information = '';
@@ -695,7 +695,7 @@ function reengagement_get_startusers($reengagement) {
             continue;
         }
         // Exclude users who can't see this activity.
-        if (!$ainfomod->is_available($information, false, $startcandidate->id)) {
+        if (!$ainfomod->is_available($information, false, $startcandidate->id, $modinfo)) {
             unset($startusers[$startcandidate->id]);
         }
     }
