@@ -705,34 +705,32 @@ function reengagement_reset_userdata($data) {
 function reengagement_get_startusers($reengagement) {
     global $DB;
     $context = context_module::instance($reengagement->cmid);
-    $startusers = get_enrolled_users($context, 'mod/reengagement:startreengagement', 0, 'u.*', null, 0, 0, true);
+
+    list($esql, $params) = get_enrolled_sql($context, 'mod/reengagement:startreengagement', 0, true);
 
     // Get a list of people who already started this reengagement (finished users are included in this list)
     // (based on activity completion records).
-    $alreadysql = "SELECT userid, userid as junk
-                   FROM  {course_modules_completion}
-                   WHERE coursemoduleid = :moduleid";
-    $alreadyusers = $DB->get_records_sql($alreadysql, array('moduleid' => $reengagement->id));
-
-    // Remove users who have already started the module from the starting list.
-    foreach ($alreadyusers as $auser) {
-        if (isset($startusers[$auser->userid])) {
-            unset($startusers[$auser->userid]);
-        }
-    }
+    $alreadycompletionsql = "SELECT userid
+                               FROM {course_modules_completion}
+                              WHERE coursemoduleid = :alcmoduleid";
+    $params['alcmoduleid'] = $reengagement->id;
 
     // Get a list of people who already started this reengagement
     // (based on reengagement_inprogress records).
-    $alreadysql = "SELECT userid, userid as junk
-                   FROM  {reengagement_inprogress}
-                   WHERE reengagement = :moduleid";
-    $alreadyusers = $DB->get_records_sql($alreadysql, array('moduleid' => $reengagement->rid));
-    // Remove users who have already started the module from the starting list.
-    foreach ($alreadyusers as $auser) {
-        if (isset($startusers[$auser->userid])) {
-            unset($startusers[$auser->userid]);
-        }
-    }
+    $alreadyripsql = "SELECT userid
+                        FROM {reengagement_inprogress}
+                       WHERE reengagement = :ripmoduleid";
+    $params['ripmoduleid'] = $reengagement->rid;
+
+    $sql = "SELECT u.*
+              FROM {user} u
+              JOIN ($esql) je ON je.id = u.id
+             WHERE u.deleted = 0
+             AND u.id NOT IN ($alreadycompletionsql)
+             AND u.id NOT IN ($alreadyripsql)";
+
+    $startusers = $DB->get_records_sql($sql, $params);
+
     $modinfo = get_fast_modinfo($reengagement->courseid);
     $cm = $modinfo->get_cm($reengagement->cmid);
     $ainfomod = new \core_availability\info_module($cm);
