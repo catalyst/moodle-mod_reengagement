@@ -121,3 +121,10 @@ $string['withselectedusers'] = 'With selected users...';
 $string['withselectedusers_help'] = '* Send message - For sending a message to one or more participants
 * Reset completion date by course access - For adjusting the reengagement completion date based on the first access to this course.';
 
+$string['privacy:metadata:reengagement'] = 'Reengagement ID';
+$string['privacy:metadata:userid'] = 'User id this record relates to';
+$string['privacy:metadata:completiontime'] = 'When this module will be complete';
+$string['privacy:metadata:emailtime'] = 'When this user should be emailed';
+$string['privacy:metadata:emailsent'] = 'Email has been sent';
+$string['privacy:metadata:reengagement_inprogress'] = 'Reengagement activities in progress';
+
