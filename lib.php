@@ -201,7 +201,7 @@ function reengagement_crontask() {
                           FROM {reengagement} r
                     INNER JOIN {course_modules} cm on cm.instance = r.id
                           JOIN {modules} m on m.id = cm.module
-                         WHERE m.name = 'reengagement'
+                         WHERE m.name = 'reengagement' AND cm.deletioninprogress = 0
                       ORDER BY r.id ASC";
 
     $reengagements = $DB->get_recordset_sql($reengagementssql);
