@@ -247,7 +247,7 @@ class participants extends \table_sql {
             $this->groups = groups_get_all_groups($courseid, 0, 0, 'g.*', true);
         }
         $this->allroles = role_fix_names(get_all_roles($this->context), $this->context);
-        $this->allroleassignments = get_users_roles($this->context, [], true, 'c.contextlevel DESC, r.sortorder ASC');
+        $this->allroleassignments = get_users_roles($this->context, [], false, 'c.contextlevel DESC, r.sortorder ASC');
         $this->assignableroles = get_assignable_roles($this->context, ROLENAME_ALIAS, false);
         $this->profileroles = get_profile_roles($this->context);
         $this->viewableroles = get_viewable_roles($this->context);
