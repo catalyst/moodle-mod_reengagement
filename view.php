@@ -62,6 +62,11 @@ if ($id) {
 
 require_login($course, true, $cm);
 
+// Make sure completion and restriction is enabled.
+if (empty($CFG->enablecompletion) || empty($CFG->enableavailability)) {
+    print_error('mustenablecompletionavailability', 'mod_reengagement');
+}
+
 $context = context_module::instance($cm->id);
 
 $event = \mod_reengagement\event\course_module_viewed::create(array(

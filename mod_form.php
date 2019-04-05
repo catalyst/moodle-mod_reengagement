@@ -46,7 +46,10 @@ class mod_reengagement_mod_form extends moodleform_mod {
 
         global $COURSE, $CFG;
         $mform =& $this->_form;
-
+        // Make sure completion and restriction is enabled.
+        if (empty($CFG->enablecompletion) || empty($CFG->enableavailability)) {
+            print_error('mustenablecompletionavailability', 'mod_reengagement');
+        }
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
         if (!$COURSE->enablecompletion) {
