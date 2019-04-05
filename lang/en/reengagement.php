@@ -93,6 +93,7 @@ $string['hours'] = 'Hours';
 $string['introdefaultvalue'] = 'This is a reengagement activity.  Its purpose is to enforce a time lapse between the activities which preceed it, and the activities which follow it.';
 $string['messageprovider:mod_reengagement'] = 'Re-engagement notifications';
 $string['minutes'] = 'Minutes';
+$string['mustenablecompletionavailability'] = 'Completion tracking and restricted access settings must be enabled to use the reengagement activity.';
 $string['never'] = 'Never';
 $string['noemailattimex'] = 'Message scheduled for {$a} will not be sent because you have completed the target activity';
 $string['nosuppresstarget'] = 'No target activity selected';
