@@ -28,7 +28,13 @@ defined('MOODLE_INTERNAL') || die();
 use context;
 use context_module;
 use core_privacy\local\metadata\collection;
-use core_privacy\local\request\{writer, transform, helper, contextlist, approved_contextlist};
+use core_privacy\local\request\{approved_userlist,
+    userlist,
+    writer,
+    transform,
+    helper,
+    contextlist,
+    approved_contextlist};
 use stdClass;
 
 /**
@@ -39,6 +45,7 @@ use stdClass;
  */
 final class provider implements
     \core_privacy\local\request\plugin\provider,
+    \core_privacy\local\request\core_userlist_provider,
     \core_privacy\local\metadata\provider
 {
 
@@ -220,5 +227,70 @@ final class provider implements
             'emailsent' => $dbrow->emailsent,
             'completed' => $dbrow->completed
         ];
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param   userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+
+        if ($context->contextlevel != CONTEXT_MODULE) {
+            return;
+        }
+
+        $sql = "SELECT rip.userid
+                  FROM {reengagement_inprogress} rip
+                  JOIN {reengagement} r ON r.id = rip.reengagement
+                  JOIN {course_modules} cm ON cm.instance = r.id
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                 WHERE cm.id = :cmid";
+
+        $params = [
+            'modname' => 'reengagement',
+            'cmid' => $context->instanceid
+        ];
+
+        $userlist->add_from_sql('userid', $sql, $params);
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param   approved_userlist $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+
+        $context = $userlist->get_context();
+
+        if ($context->contextlevel != CONTEXT_MODULE) {
+            return;
+        }
+
+        $userids = $userlist->get_userids();
+
+        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+
+        $sql = "SELECT rip.id
+                  FROM {reengagement_inprogress} rip
+                  JOIN {reengagement} r ON r.id = rip.reengagement
+                  JOIN {course_modules} cm ON cm.instance = r.id
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                 WHERE rip.userid $insql
+                   AND cm.id = :cmid";
+
+        $params = [
+            'modname' => 'simplequiz',
+            'cmid' => $context->instanceid
+        ];
+
+        $params = array_merge($params, $inparams);
+
+        $reengaggment = $DB->get_fieldset_sql($sql, $params);
+
+        $DB->delete_records_list('reengagement_inprogress', 'id', array_values($reengaggment));
     }
 }
