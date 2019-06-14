@@ -816,34 +816,34 @@ function reengagement_supports($feature) {
 }
 
 /**
- * Process an arbitary number of seconds, and prepare to display it as X minutes, or Y hours or Z weeks.
+ * Process an arbitary number of seconds, and prepare to display it as 'W seconds', 'X minutes', or Y hours or Z weeks.
  *
  * @param int $duration FEATURE_xx constant for requested feature
  * @param boolean $periodstring - return period as string.
  * @return array
  */
 function reengagement_get_readable_duration($duration, $periodstring = false) {
-    if ($duration < 300) {
-        $period = 60;
-        $periodcount = 5;
-    } else {
-        $periods = array(604800, 86400, 3600, 60);
-        foreach ($periods as $period) {
-            if ((($duration % $period) == 0) || ($period == 60)) {
-                // Duration divides exactly into periods, or have reached the min. sensible period.
-                $periodcount = floor((int)$duration / (int)$period);
-                break;
-            }
+    $period = 1; // Default to dealing in seconds.
+    $periodcount = $duration; // Default to dealing in seconds.
+    $periods = array(WEEKSECS, DAYSECS, HOURSECS, MINSECS);
+    foreach ($periods as $period) {
+        if (($duration % $period) == 0) {
+            // Duration divides exactly into periods.
+            $periodcount = floor((int)$duration / (int)$period);
+            break;
         }
     }
     if ($periodstring) {
-        if ($period == 60) {
+        // Caller wants function to return in the format (30, 'minutes'), not (30, 60).
+        if ($period == MINSECS) {
             $period = get_string('minutes', 'reengagement');
-        } else if ($period == 3600) {
+        } else if ($period == HOURSECS) {
             $period = get_string('hours', 'reengagement');
-        } else if ($period == 86400) {
+        } else if ($period == DAYSECS) {
             $period = get_string('days', 'reengagement');
-        } else if ($period == 604800) {
+        } else if ($period == WEEKSECS) {
+            $period = get_string('weeks', 'reengagement');
+        } else
             $period = get_string('weeks', 'reengagement');
         }
     }
