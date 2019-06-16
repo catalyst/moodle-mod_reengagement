@@ -813,7 +813,7 @@ function reengagement_get_readable_duration($duration, $periodstring = false) {
         } else if ($period == WEEKSECS) {
             $period = get_string('weeks', 'reengagement');
         } else
-            $period = get_string('weeks', 'reengagement');
+            $period = get_string('seconds', 'reengagement');
         }
     }
     return array($periodcount, $period); // Example 5, 60 is 5 minutes.
