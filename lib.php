@@ -48,7 +48,7 @@ function reengagement_add_instance($reengagement) {
     global $DB;
 
     $reengagement->timecreated = time();
-    if (!$reengagement->suppressemail) {
+    if (empty($reengagement->suppressemail)) {
         // User didn't tick the box indicating they wanted to suppress email if a certain activity was complete.
         // Force the 'target activity' field to be 0 (ie no target).
         $reengagement->suppresstarget = 0;
