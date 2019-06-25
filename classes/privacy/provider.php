@@ -28,7 +28,12 @@ defined('MOODLE_INTERNAL') || die();
 use context;
 use context_module;
 use core_privacy\local\metadata\collection;
-use core_privacy\local\request\{writer, transform, helper, contextlist, approved_contextlist, approved_userlist, userlist};
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\transform;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\writer;
 use stdClass;
 
 /**
@@ -37,10 +42,10 @@ use stdClass;
  * @copyright 2018 Catalyst IT
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class provider implements
-    \core_privacy\local\request\plugin\provider,
+class provider implements
+    \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,
-    \core_privacy\local\metadata\provider
+    \core_privacy\local\request\plugin\provider
 {
 
     /**
