@@ -296,7 +296,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
                 if (empty($fromform->duration)) {
                     $fromform->duration = 300;
                 }
-                if ($fromform->duration < 0)) {
+                if ($fromform->duration < 0) {
                     $fromform->duration = 0;
                 }
                 unset($fromform->period);
