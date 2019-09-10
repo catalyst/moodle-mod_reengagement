@@ -615,7 +615,6 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
             }
         }
     }
-    print_object($templatevars);
     $patterns = array_keys($templatevars); // The placeholders which are to be replaced.
     $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
 
