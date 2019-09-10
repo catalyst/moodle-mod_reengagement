@@ -574,6 +574,10 @@ function reengagement_send_notification($userto, $subject, $messageplain, $messa
  * @return array - the content of the fields after templating.
  */
 function reengagement_template_variables($reengagement, $inprogress, $user) {
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot.'/user/profile/lib.php');
+
     $templatevars = array(
         '/%courseshortname%/' => $reengagement->courseshortname,
         '/%coursefullname%/' => $reengagement->coursefullname,
@@ -585,6 +589,19 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
         '/%userinstitution%/' => $user->institution,
         '/%userdepartment%/' => $user->department,
     );
+
+    // Now do custom user fields;
+    $fields = profile_get_custom_fields();
+    if (!empty($fields)) {
+        $userfielddata = $DB->get_records('user_info_data', array('userid' => $user->id), '', 'fieldid, data, dataformat');
+        foreach ($fields as $field) {
+            if (!empty($userfielddata[$field->id])) {
+                $templatevars['/%profilefield_'.$field->shortname.'%/'] = format_text($userfielddata[$field->id]->data, $userfielddata[$field->id]->dataformat);
+            } else {
+                $templatevars['/%profilefield_'.$field->shortname.'%/'] = '';
+            }
+        }
+    }
     $patterns = array_keys($templatevars); // The placeholders which are to be replaced.
     $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
 
