@@ -571,6 +571,19 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
         '/%userinstitution%/' => $user->institution,
         '/%userdepartment%/' => $user->department,
     );
+    // Add the users course groups as a template item.
+    $groups = $DB->get_records_sql_menu("SELECT g.id, g.name
+                                   FROM {groups_members} gm
+                                   JOIN {groups} g
+                                    ON g.id = gm.groupid
+                                  WHERE gm.userid = ? AND g.courseid = ?
+                                   ORDER BY name ASC", array($user->id, $reengagement->courseid));
+
+    if (!empty($groups)) {
+        $templatevars['/%usergroups%/'] = implode(', ', $groups);
+    } else {
+        $templatevars['/%usergroups%/'] = '';
+    }
 
     // Now do custom user fields;
     $fields = profile_get_custom_fields();
@@ -584,6 +597,7 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
             }
         }
     }
+    print_object($templatevars);
     $patterns = array_keys($templatevars); // The placeholders which are to be replaced.
     $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
 
