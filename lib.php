@@ -843,7 +843,7 @@ function reengagement_get_readable_duration($duration, $periodstring = false) {
             $period = get_string('days', 'reengagement');
         } else if ($period == WEEKSECS) {
             $period = get_string('weeks', 'reengagement');
-        } else
+        } else {
             $period = get_string('weeks', 'reengagement');
         }
     }
