@@ -591,7 +591,18 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
         $userfielddata = $DB->get_records('user_info_data', array('userid' => $user->id), '', 'fieldid, data, dataformat');
         foreach ($fields as $field) {
             if (!empty($userfielddata[$field->id])) {
-                $templatevars['/%profilefield_'.$field->shortname.'%/'] = format_text($userfielddata[$field->id]->data, $userfielddata[$field->id]->dataformat);
+                if ($field->datatype == 'datetime') {
+                    if (!empty($field->param3)) {
+                        $format = get_string('strftimedaydatetime', 'langconfig');
+                    } else {
+                        $format = get_string('strftimedate', 'langconfig');
+                    }
+
+                    $templatevars['/%profilefield_'.$field->shortname.'%/'] = userdate($userfielddata[$field->id]->data, $format);
+                } else {
+                    $templatevars['/%profilefield_'.$field->shortname.'%/'] = format_text($userfielddata[$field->id]->data, $userfielddata[$field->id]->dataformat);
+                }
+
             } else {
                 $templatevars['/%profilefield_'.$field->shortname.'%/'] = '';
             }
