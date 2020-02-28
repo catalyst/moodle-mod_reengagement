@@ -35,6 +35,9 @@ define('REENGAGEMENT_RECIPIENT_USER', 0);
 define('REENGAGEMENT_RECIPIENT_MANAGER', 1);
 define('REENGAGEMENT_RECIPIENT_BOTH', 2);
 
+define('REENGAGEMENT_EMAILFROM_SUPPORT', 0);
+define('REENGAGEMENT_EMAILFROM_TEACHER', 1);
+
 /**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function

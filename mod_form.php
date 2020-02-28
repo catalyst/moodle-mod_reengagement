@@ -44,7 +44,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
      */
     public function definition() {
 
-        global $COURSE, $CFG;
+        global $COURSE, $CFG, $DB;
         $mform =& $this->_form;
         // Make sure completion and restriction is enabled.
         if (empty($CFG->enablecompletion) || empty($CFG->enableavailability)) {
@@ -126,6 +126,19 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->addRule('remindercount', get_string('err_numeric', 'form'), 'numeric', '', 'client');
         $mform->addHelpButton('remindercount', 'remindercount', 'reengagement');
         $mform->hideif('remindercount', 'emailuser', 'neq', REENGAGEMENT_EMAILUSER_TIME);
+        
+        // tk Add email from selector
+        $emailfromoptions = array();
+        $emailfromoptions[REENGAGEMENT_EMAILFROM_SUPPORT] = get_string('emailfromsupport', 'reengagement');
+        $emailfromoptions[REENGAGEMENT_EMAILFROM_TEACHER] = get_string('emailfromteacher', 'reengagement');
+        $coursecontext = context_course::instance($COURSE->id);
+        $emailfromusers = get_enrolled_users($coursecontext, $withcapability='mod/reengagement:addinstance');
+        foreach($emailfromusers as $emailfromuser) {
+            $emailfromoptions[$emailfromuser->id] = get_string('fullnamedisplay', '', $emailfromuser);
+        }
+        $mform->addElement('select', 'emailfrom', get_string('emailfrom', 'reengagement'), $emailfromoptions);
+        $mform->hideif('emailfrom', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
+        $mform->addHelpButton('emailfrom', 'emailfrom', 'reengagement');
 
         $mform->addElement('text', 'emailsubject', get_string('emailsubject', 'reengagement'), array('size' => '64'));
         $mform->setType('emailsubject', PARAM_TEXT);
