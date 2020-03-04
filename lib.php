@@ -583,6 +583,8 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
 
     require_once($CFG->dirroot.'/user/profile/lib.php');
 
+    $emailfrom = reengagement_get_emailfrom($reengagement);
+
     $templatevars = array(
         '/%courseshortname%/' => $reengagement->courseshortname,
         '/%coursefullname%/' => $reengagement->coursefullname,
@@ -593,6 +595,10 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
         '/%usercity%/' => $user->city,
         '/%userinstitution%/' => $user->institution,
         '/%userdepartment%/' => $user->department,
+        '/%fromfirstname%/' => $emailfrom->firstname,
+        '/%fromlastname%/' => $emailfrom->lastname,
+        '/%fromid%/' => $emailfrom->id,
+        '/%fromemail%/' => $emailfrom->email,
     );
     // Add the users course groups as a template item.
     $groups = $DB->get_records_sql_menu("SELECT g.id, g.name
