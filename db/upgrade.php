@@ -190,6 +190,4 @@ function xmldb_reengagement_upgrade($oldversion=0) {
     }
 
     return true;
-
-    return true;
 }
