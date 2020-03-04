@@ -549,16 +549,18 @@ function reengagement_email_user($reengagement, $inprogress) {
  * @param object $reengagement database record
  */
 function reengagement_send_notification($userto, $subject, $messageplain, $messagehtml, $reengagement) {
+    $emailfrom = reengagement_get_emailfrom($reengagement);
     $eventdata = new \core\message\message();
     $eventdata->courseid = $reengagement->courseid;
     $eventdata->modulename = 'reengagement';
-    $eventdata->userfrom = core_user::get_support_user();
+    $eventdata->userfrom = $emailfrom;
     $eventdata->userto = $userto;
     $eventdata->subject = $subject;
     $eventdata->fullmessage = $messageplain;
     $eventdata->fullmessageformat = FORMAT_HTML;
     $eventdata->fullmessagehtml = $messagehtml;
     $eventdata->smallmessage = $subject;
+    $eventdata->replyto = $emailfrom->email;
 
     // Required for messaging framework
     $eventdata->name = 'mod_reengagement';
@@ -982,4 +984,32 @@ function reengagement_checkstart($course, $cm, $reengagement) {
         $output .= $OUTPUT->box($completionmessage);
     }
     return $output;
+}
+
+/**
+ * Check that emailfrom user has capability to add reengagments,
+ *  otherwise return support user
+ *
+ * @param object $reengagement
+ * @return object $user
+ */
+function reengagement_get_emailfrom($reengagement) {
+    $userid = $reengagement->emailfrom;
+    if($userid > 0){
+        $context = context_course::instance($reengagement->course);
+        if($userid == 1){ //default teacher, get first teacher in course
+            global $DB;
+            $params = array('roleid'=>3,'contextid'=>$context->id);
+            $userid = $DB->get_field('role_assignments', 'userid', $params);
+        }
+        $user = $userid ? core_user::get_user($userid) : null;
+        
+        //check selected teacher still has capability
+        if($user && has_capability('mod/reengagement:addinstance', $context, $user) ){
+            return $user;
+        }
+    }
+    
+    //if no default teacher, or selected teacher now lacks capability, return support user
+    return core_user::get_support_user();
 }
