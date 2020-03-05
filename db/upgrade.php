@@ -178,15 +178,19 @@ function xmldb_reengagement_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2017102001, 'reengagement');
     }
 
-    // Add emailfrom fields.
-    if ($oldversion < 2020022200) {
+    // Add emailfrom and instantmessage fields.
+    if ($oldversion < 2020022202) {
 
         $table = new xmldb_table('reengagement');
         $field = new xmldb_field('emailfrom', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        upgrade_mod_savepoint(true, 2020022200, 'reengagement');
+        $field = new xmldb_field('instantmessage', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2020022202, 'reengagement');
     }
 
     return true;
