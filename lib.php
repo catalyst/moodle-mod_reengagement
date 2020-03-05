@@ -553,7 +553,7 @@ function reengagement_email_user($reengagement, $inprogress) {
  */
 function reengagement_send_notification($userto, $subject, $messageplain, $messagehtml, $reengagement) {
     $emailfrom = reengagement_get_emailfrom($reengagement);
-    //check instant message setting and verify we're sending to a real user, not third party
+    // Check instant message setting and verify we're sending to a real user, not third party.
     if ($reengagement->instantmessage == REENGAGEMENT_NOTIFICATION_IM && $userto->id > 0) {
         return message_post_message($emailfrom, $userto, $messagehtml, FORMAT_HTML);
     } else {

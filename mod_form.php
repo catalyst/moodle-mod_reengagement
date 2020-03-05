@@ -139,8 +139,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->addElement('select', 'emailfrom', get_string('emailfrom', 'reengagement'), $emailfromoptions);
         $mform->hideif('emailfrom', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
         $mform->addHelpButton('emailfrom', 'emailfrom', 'reengagement');
-        
-        // Add notification type selector
+
+        // Add notification type selector.
         $instantmessageoptions = array();
         $instantmessageoptions[REENGAGEMENT_NOTIFICATION_EMAIL] = get_string('notificationemail', 'reengagement');
         $instantmessageoptions[REENGAGEMENT_NOTIFICATION_IM] = get_string('notificationim', 'reengagement');
