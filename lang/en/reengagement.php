@@ -95,6 +95,7 @@ $string['nosuppresstarget'] = 'No target activity selected';
 $string['notificationemail'] = 'Email';
 $string['notificationim'] = 'Instant message';
 $string['notificationtype'] = 'Notification type';
+$string['notificationtype_help'] = 'Send notifications as an email or as a Moodle instant message. Third party notifications always send as emails.';
 $string['oncompletion'] = 'On reengagement completion';
 $string['receiveemailattimex'] = 'Message will be sent on {$a}.';
 $string['receiveemailattimexunless'] = 'Message will be sent on {$a} unless you complete target activity.';
