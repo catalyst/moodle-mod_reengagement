@@ -1005,7 +1005,7 @@ function reengagement_get_emailfrom($reengagement) {
         $context = context_course::instance($reengagement->course);
         if ($userid == 1) { // Default teacher, get first teacher in course.
             global $DB;
-            $params = array('roleid' => 3,'contextid' => $context->id);
+            $params = array('roleid' => 3, 'contextid' => $context->id);
             $userid = $DB->get_field('role_assignments', 'userid', $params);
         }
         $user = $userid ? core_user::get_user($userid) : null;
