@@ -35,6 +35,12 @@ define('REENGAGEMENT_RECIPIENT_USER', 0);
 define('REENGAGEMENT_RECIPIENT_MANAGER', 1);
 define('REENGAGEMENT_RECIPIENT_BOTH', 2);
 
+define('REENGAGEMENT_EMAILFROM_SUPPORT', 0);
+define('REENGAGEMENT_EMAILFROM_TEACHER', 1);
+
+define('REENGAGEMENT_NOTIFICATION_EMAIL', 0);
+define('REENGAGEMENT_NOTIFICATION_IM', 1);
+
 /**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
@@ -546,22 +552,29 @@ function reengagement_email_user($reengagement, $inprogress) {
  * @param object $reengagement database record
  */
 function reengagement_send_notification($userto, $subject, $messageplain, $messagehtml, $reengagement) {
-    $eventdata = new \core\message\message();
-    $eventdata->courseid = $reengagement->courseid;
-    $eventdata->modulename = 'reengagement';
-    $eventdata->userfrom = core_user::get_support_user();
-    $eventdata->userto = $userto;
-    $eventdata->subject = $subject;
-    $eventdata->fullmessage = $messageplain;
-    $eventdata->fullmessageformat = FORMAT_HTML;
-    $eventdata->fullmessagehtml = $messagehtml;
-    $eventdata->smallmessage = $subject;
+    $emailfrom = reengagement_get_emailfrom($reengagement);
+    // Check instant message setting and verify we're sending to a real user, not third party.
+    if ($reengagement->instantmessage == REENGAGEMENT_NOTIFICATION_IM && $userto->id > 0) {
+        return message_post_message($emailfrom, $userto, $messagehtml, FORMAT_HTML);
+    } else {
+        $eventdata = new \core\message\message();
+        $eventdata->courseid = $reengagement->courseid;
+        $eventdata->modulename = 'reengagement';
+        $eventdata->userfrom = $emailfrom;
+        $eventdata->userto = $userto;
+        $eventdata->subject = $subject;
+        $eventdata->fullmessage = $messageplain;
+        $eventdata->fullmessageformat = FORMAT_HTML;
+        $eventdata->fullmessagehtml = $messagehtml;
+        $eventdata->smallmessage = $subject;
+        $eventdata->replyto = $emailfrom->email;
 
-    // Required for messaging framework
-    $eventdata->name = 'mod_reengagement';
-    $eventdata->component = 'mod_reengagement';
+        // Required for messaging framework
+        $eventdata->name = 'mod_reengagement';
+        $eventdata->component = 'mod_reengagement';
 
-    return message_send($eventdata);
+        return message_send($eventdata);
+    }
 }
 
 
@@ -578,6 +591,8 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
 
     require_once($CFG->dirroot.'/user/profile/lib.php');
 
+    $emailfrom = reengagement_get_emailfrom($reengagement);
+
     $templatevars = array(
         '/%courseshortname%/' => $reengagement->courseshortname,
         '/%coursefullname%/' => $reengagement->coursefullname,
@@ -588,6 +603,10 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
         '/%usercity%/' => $user->city,
         '/%userinstitution%/' => $user->institution,
         '/%userdepartment%/' => $user->department,
+        '/%fromfirstname%/' => $emailfrom->firstname,
+        '/%fromlastname%/' => $emailfrom->lastname,
+        '/%fromid%/' => $emailfrom->id,
+        '/%fromemail%/' => $emailfrom->email,
     );
     // Add the users course groups as a template item.
     $groups = $DB->get_records_sql_menu("SELECT g.id, g.name
@@ -979,4 +998,32 @@ function reengagement_checkstart($course, $cm, $reengagement) {
         $output .= $OUTPUT->box($completionmessage);
     }
     return $output;
+}
+
+/**
+ * Check that emailfrom user has capability to add reengagments,
+ *  otherwise return support user
+ *
+ * @param object $reengagement
+ * @return object $user
+ */
+function reengagement_get_emailfrom($reengagement) {
+    $userid = $reengagement->emailfrom;
+    if ($userid > 0) {
+        $context = context_course::instance($reengagement->course);
+        if ($userid == 1) { // Default teacher, get first teacher in course.
+            global $DB;
+            $params = array('roleid' => 3, 'contextid' => $context->id);
+            $userid = $DB->get_field('role_assignments', 'userid', $params);
+        }
+        $user = $userid ? core_user::get_user($userid) : null;
+
+        // Check selected teacher still has capability.
+        if ($user && has_capability('mod/reengagement:addinstance', $context, $user) ) {
+            return $user;
+        }
+    }
+
+    // If no default teacher, or selected teacher now lacks capability, return support user.
+    return core_user::get_support_user();
 }

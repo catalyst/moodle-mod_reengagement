@@ -44,7 +44,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
      */
     public function definition() {
 
-        global $COURSE, $CFG;
+        global $COURSE, $CFG, $DB;
         $mform =& $this->_form;
         // Make sure completion and restriction is enabled.
         if (empty($CFG->enablecompletion) || empty($CFG->enableavailability)) {
@@ -127,10 +127,32 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->addHelpButton('remindercount', 'remindercount', 'reengagement');
         $mform->hideif('remindercount', 'emailuser', 'neq', REENGAGEMENT_EMAILUSER_TIME);
 
+        // Add emailfrom selector.
+        $emailfromoptions = array();
+        $emailfromoptions[REENGAGEMENT_EMAILFROM_SUPPORT] = get_string('emailfromsupport', 'reengagement');
+        $emailfromoptions[REENGAGEMENT_EMAILFROM_TEACHER] = get_string('emailfromteacher', 'reengagement');
+        $coursecontext = context_course::instance($COURSE->id);
+        $emailfromusers = get_enrolled_users($coursecontext, 'mod/reengagement:addinstance');
+        foreach ($emailfromusers as $emailfromuser) {
+            $emailfromoptions[$emailfromuser->id] = get_string('fullnamedisplay', '', $emailfromuser);
+        }
+        $mform->addElement('select', 'emailfrom', get_string('emailfrom', 'reengagement'), $emailfromoptions);
+        $mform->hideif('emailfrom', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
+        $mform->addHelpButton('emailfrom', 'emailfrom', 'reengagement');
+
+        // Add notification type selector.
+        $instantmessageoptions = array();
+        $instantmessageoptions[REENGAGEMENT_NOTIFICATION_EMAIL] = get_string('notificationemail', 'reengagement');
+        $instantmessageoptions[REENGAGEMENT_NOTIFICATION_IM] = get_string('notificationim', 'reengagement');
+        $mform->addElement('select', 'instantmessage', get_string('notificationtype', 'reengagement'), $instantmessageoptions);
+        $mform->hideif('instantmessage', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
+        $mform->addHelpButton('instantmessage', 'notificationtype', 'reengagement');
+
         $mform->addElement('text', 'emailsubject', get_string('emailsubject', 'reengagement'), array('size' => '64'));
         $mform->setType('emailsubject', PARAM_TEXT);
         $mform->addRule('emailsubject', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->hideif('emailsubject', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
+        $mform->hideif('emailsubject', 'instantmessage', 'eq', REENGAGEMENT_NOTIFICATION_IM);
         $mform->addHelpButton('emailsubject', 'emailsubject', 'reengagement');
         $mform->addElement('editor', 'emailcontent', get_string('emailcontent', 'reengagement'), null, null);
         $mform->setDefault('emailcontent', get_string('emailcontentdefaultvalue', 'reengagement'));
@@ -143,6 +165,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setType('emailsubjectmanager', PARAM_TEXT);
             $mform->addRule('emailsubjectmanager', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
             $mform->hideif('emailsubjectmanager', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
+            $mform->hideif('emailsubjectmanager', 'instantmessage', 'eq', REENGAGEMENT_NOTIFICATION_IM);
             $mform->addHelpButton('emailsubjectmanager', 'emailsubjectmanager', 'reengagement');
             $mform->addElement('editor', 'emailcontentmanager', get_string('emailcontentmanager', 'reengagement'), null, null);
             $mform->setDefault('emailcontentmanager', get_string('emailcontentmanagerdefaultvalue', 'reengagement'));
