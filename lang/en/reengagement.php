@@ -136,3 +136,4 @@ $string['weeks'] = 'Weeks';
 $string['withselectedusers'] = 'With selected users...';
 $string['withselectedusers_help'] = '* Send message - For sending a message to one or more participants
 * Reset completion date by course access - For adjusting the reengagement completion date based on the first access to this course.';
+$string['seconds'] = 'Seconds';
