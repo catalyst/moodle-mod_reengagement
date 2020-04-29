@@ -122,3 +122,4 @@ $string['suppresstarget'] = 'Target activity.';
 $string['suppresstarget_help'] = 'Use this dropdown to choose which activity should be checked for completion before sending the reminder notification.';
 $string['userandmanager'] = 'User and Manager(s)';
 $string['weeks'] = 'Weeks';
+$string['seconds'] = 'Seconds';
