@@ -208,7 +208,7 @@ if ($canedit) {
         }
     }
 
-    if ($groupid && ($course->groupmode != SEPARATEGROUPS || $canaccessallgroups)) {
+    if ($groupid && ($course->groupmode != SEPARATEGROUPS || $canaccessallgroups) && $groupid !== -1) {
         $grouprenderer = $PAGE->get_renderer('core_group');
         $groupdetailpage = new \core_group\output\group_details($groupid);
         echo $grouprenderer->group_details($groupdetailpage);
