@@ -217,7 +217,7 @@ if ($canedit) {
 
     // Render the unified filter.
     $renderer = $PAGE->get_renderer('core_user');
-    echo $renderer->unified_filter($course, $context, $filtersapplied);
+    echo $renderer->participants_filter(context_course::instance($course->id), "user-index-participants-{$course->id}");
 
     echo '<div class="userlist">';
 
@@ -227,9 +227,10 @@ if ($canedit) {
         'id' => $cm->id,
         'perpage' => $perpage));
 
-    $participanttable = new \mod_reengagement\table\participants($reengagement, $course->id, $groupid,
-        $lastaccess, $roleid, $enrolid, $status, $searchkeywords, $bulkoperations, $selectall);
-    $participanttable->define_baseurl($baseurl);
+    $filterset = new \core_user\table\participants_filterset();
+    $filterset->add_filter(new integer_filter('courseid', filter::JOINTYPE_DEFAULT, [(int)$course->id]));
+    $participanttable = new \core_user\table\participants("user-index-participants-{$course->id}");
+    $participanttable->set_filterset($filterset);
 
     // Do this so we can get the total number of rows.
     ob_start();
