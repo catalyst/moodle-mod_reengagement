@@ -3,3 +3,15 @@
 Allows timed release of content and emails users to remind them to complete course activities
 
 More documentation available here: https://docs.moodle.org/en/Reengagement_activity
+
+Branches
+--------
+The git branches here support the following versions.
+
+| Moodle version     | Branch      |
+| ----------------- | ----------- |
+| Mooodle 3.5   | MOODLE_35_STABLE |
+| Moodle 3.6 -> 3.8 | MOODLE_38_STABLE |
+| Moodle 3.9 and higher | main |
+| Totara 12 | TOTARA_12 |
+
