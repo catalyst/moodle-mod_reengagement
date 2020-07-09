@@ -28,6 +28,21 @@ $string['reengagement'] = 'reengagement';
 $string['pluginadministration'] = '';
 $string['modulename'] = 'Reengagement';
 $string['modulenameplural'] = 'Reengagements';
+$string['modulename_help'] = 'The Reengagement activity provides a way for you to send timely notifications to students and 3rd parties, which can include reminders to return to the course and complete activities.
+
+The notification trigger is a specified period of time after a starting event, which may be enrolment in the course, completing an activity, or other course variables.
+Notifications can be set to repeat for a limited run, and/or until the target activity is completed, and can have delay periods between repeats.
+If the user has already completed the target activity, no email is sent.
+
+You could use this plugin to: <ul>
+<li>Selectively release timed content in a course.</li>
+<li>Repeatedly remind students that an assignment is overdue.</li>
+<li>Advise training managers that the course is complete.</li>
+</ul>
+
+The Reengagement activity is very flexible, explore what you can do with it.
+
+<a href=https://docs.moodle.org/39/en/Reengagement_activity>More Help</a>';
 
 // Alphabetized.
 $string['activitycompleted'] = 'This activity has been marked as complete';
@@ -106,4 +121,3 @@ $string['suppresstarget'] = 'Target activity.';
 $string['suppresstarget_help'] = 'Use this dropdown to choose which activity should be checked for completion before sending the reminder notification.';
 $string['userandmanager'] = 'User and Manager(s)';
 $string['weeks'] = 'Weeks';
-
