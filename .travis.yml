@@ -1,13 +1,11 @@
 language: php
 
-sudo: true
-
 services:
  - mysql
 
 addons:
  firefox: "47.0.1"
- postgresql: "9.5"
+ postgresql: "9.6"
  apt:
   packages:
    - openjdk-8-jre-headless
@@ -19,6 +17,7 @@ cache:
 
 php:
   - 7.2
+  - 7.4
 
 env:
  global:
@@ -28,24 +27,27 @@ env:
   - DB=mysqli
 
 before_install:
- - phpenv config-rm xdebug.ini
- - nvm install 14.5
- - nvm use 14.5
- - cd ../..
- - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
- - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+  - phpenv config-rm xdebug.ini
+  - nvm install 14.5
+  - nvm use 14.5
+  - cd ../..
+  - composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
+  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
- - moodle-plugin-ci install
+  - moodle-plugin-ci install
 
 script:
- - moodle-plugin-ci phplint
- - moodle-plugin-ci phpcpd
- - moodle-plugin-ci phpmd
- - moodle-plugin-ci codechecker
- - moodle-plugin-ci validate
- - moodle-plugin-ci savepoints
- - moodle-plugin-ci mustache
- - moodle-plugin-ci grunt
- - moodle-plugin-ci phpunit
- - moodle-plugin-ci behat
+  - moodle-plugin-ci phplint
+  - moodle-plugin-ci phpcpd
+  - moodle-plugin-ci phpmd
+  - moodle-plugin-ci codechecker
+  - moodle-plugin-ci validate
+  - moodle-plugin-ci savepoints
+  - moodle-plugin-ci mustache
+  - moodle-plugin-ci grunt
+  - moodle-plugin-ci phpunit
+  - moodle-plugin-ci behat
+  # Privacy Specific tests
+  - /home/travis/build/moodle/vendor/bin/phpunit "provider_testcase" /home/travis/build/moodle/privacy/tests/provider_test.php
+  - /home/travis/build/moodle/vendor/bin/phpunit "tool_dataprivacy_expired_contexts_testcase" /home/travis/build/moodle/admin/tool/dataprivacy/tests/expired_contexts_test.php
