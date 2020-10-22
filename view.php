@@ -58,7 +58,7 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $reengagement->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('reengagement', $reengagement->id, $course->id, false, MUST_EXIST);
 } else {
-    error('You must specify a course_module ID or an instance ID');
+    print_error('errornoid', 'mod_reengagement');
 }
 
 require_login($course, true, $cm);
@@ -95,8 +95,7 @@ $canedit = has_capability('mod/reengagement:editreengagementduration', $context)
 $bulkoperations = has_capability('mod/reengagement:bulkactions', $context);
 
 if (empty($canstart) && empty($canedit)) {
-    error("This reengagement module is not enabled for your account.
-      Please contact your administrator if you feel this is in error");
+    print_error('errorreengagementnotvalid', 'mod_reengagement');
 }
 
 if ($canstart) {

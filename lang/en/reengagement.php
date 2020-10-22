@@ -90,6 +90,9 @@ $string['emailuser_help'] = 'When the activity should notify users: <ul>
 <li>On reengagement completion: Notify the user when the reengagement activity is completed.</li>
 <li>After Delay: Notify the user a set time after they have started the module.</li>
 </ul>';
+$string['errornoid'] = 'You must specify a course_module ID or an instance ID';
+$string['errorreengagementnotvalid'] = 'This reengagement module is not enabled for your account.
+Please contact your administrator if you feel this is in error';
 $string['frequencytoohigh'] = 'The maximum reminder count with the delay period you have set is {$a}.';
 $string['periodtoolow'] = 'The delay is too low - it must be at least 5 minutes.';
 $string['hours'] = 'Hours';
