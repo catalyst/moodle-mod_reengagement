@@ -128,11 +128,6 @@ if ($canedit) {
     $participanttable = new \mod_reengagement\table\reengagement_participants("reengagement-index-participants-{$cm->id}");
     $participanttable->set_filterset($filterset);
 
-    //$filterset = new \core_user\table\participants_filterset();
-    //$filterset->add_filter(new integer_filter('courseid', filter::JOINTYPE_DEFAULT, [(int)$course->id]));
-    //$participanttable = new \core_user\table\participants("reengagement-index-participants-{$cm->id}");
-    //$participanttable->set_filterset($filterset);
-
     // Do this so we can get the total number of rows.
     ob_start();
     $participanttable->out($perpage, true);

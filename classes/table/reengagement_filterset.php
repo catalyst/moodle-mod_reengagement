@@ -29,8 +29,7 @@ use core_table\local\filter\integer_filter;
 use core_user\table\participants_filterset;
 
 /**
- * Reengagement table filterset.
- * Extends the core participants filterset to use its get_optional_filters function.
+ * Reengagement table filterset, extends the core participants filterset to use its get_optional_filters function.
  *
  * @package    mod_reengagement
  * @copyright  2020 Catalyst IT

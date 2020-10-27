@@ -51,7 +51,8 @@ class reengagement_search extends participants_search {
     protected function get_participants_sql(string $additionalwhere, array $additionalparams): array {
         $sql = parent::get_participants_sql($additionalwhere, $additionalparams);
         $sql['outerjoins'] .= 'LEFT JOIN {reengagement_inprogress} rip ON rip.userid = u.id';
-        $sql['outerselect'] .= ', rip.completiontime AS completiontime, rip.emailtime AS emailtime, rip.emailsent AS emailsent, rip.completed AS completed';
+        $sql['outerselect'] .= ', rip.completiontime AS completiontime, rip.emailtime AS emailtime, '
+            . 'rip.emailsent AS emailsent, rip.completed AS completed';
         return $sql;
     }
 }
