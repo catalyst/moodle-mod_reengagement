@@ -122,10 +122,10 @@ if ($canedit) {
         'id' => $cm->id,
         'perpage' => $perpage));
 
-    $filterset = new \mod_reengagement\table\participants_filterset();
+    $filterset = new \mod_reengagement\table\reengagement_filterset();
     $filterset->add_filter(new integer_filter('cmid', filter::JOINTYPE_DEFAULT, [(int)$cm->id]));
     $filterset->add_filter(new integer_filter('courseid', filter::JOINTYPE_DEFAULT, [(int)$course->id]));
-    $participanttable = new \mod_reengagement\table\participants("reengagement-index-participants-{$cm->id}");
+    $participanttable = new \mod_reengagement\table\reengagement_participants("reengagement-index-participants-{$cm->id}");
     $participanttable->set_filterset($filterset);
 
     //$filterset = new \core_user\table\participants_filterset();
