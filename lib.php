@@ -539,7 +539,7 @@ function reengagement_email_user($reengagement, $inprogress) {
 /**
  * Send reengagement notifications using the messaging system.
  *
- * @param object $user
+ * @param object $userto User we are sending the notification to
  * @param string $subject message subject
  * @param string $messageplain plain text message
  * @param string $messagehtml html message
@@ -886,7 +886,7 @@ function reengagement_check_target_completion($userid, $targetcmid) {
  * Method to check if existing user is eligble and cron hasn't run yet.
  * @param stdclass $course the course record.
  * @param stdclass $cm the coursemodule we should be checking.
- * @param stdclass $reengagment the full record.
+ * @param stdclass $reengagement the full record.
  * @return string
  */
 function reengagement_checkstart($course, $cm, $reengagement) {

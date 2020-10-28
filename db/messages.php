@@ -19,6 +19,7 @@
  *
  * @package    mod_reengagement
  * @author     Eugene Venter <eugene@catalyst.net.nz>
+ * @copyright  2018 Catalyst IT {@link http://www.catalyst.net.nz}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

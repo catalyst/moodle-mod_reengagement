@@ -138,11 +138,14 @@ class participants extends \table_sql {
     /** @var \stdClass[] $viewableroles */
     private $viewableroles;
 
-    /** \stdClass[] $reengagementdata data from reengagment table for this engagement. */
+    /**
+     * @var \stdClass[] $reengagementdata data from reengagment table for this engagement.
+     */
     protected $reengagmentdata;
     /**
      * Sets up the table.
      *
+     * @param \stdClass $reengagement The reengagement we are displaying the table for
      * @param int $courseid
      * @param int|false $currentgroup False if groups not used, int if groups used, 0 for all groups.
      * @param int $accesssince The time the user last accessed the site
