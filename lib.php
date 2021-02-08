@@ -261,6 +261,7 @@ function reengagement_crontask() {
 
     $inprogresssql = 'SELECT ri.*
                         FROM {reengagement_inprogress} ri
+                        JOIN {reengagement} r ON r.id = ri.reengagement
                         JOIN {user} u ON u.id = ri.userid
                        WHERE u.deleted = 0 AND
                        completiontime < ? AND completed = 0';
