@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020102200;   // The current module version.
-$plugin->requires  = 2020061500; // Requires 3.9
+$plugin->version   = 2021080100;   // The current module version.
+$plugin->requires  = 2021051700; // Requires 3.11
 $plugin->component = 'mod_reengagement';
 $plugin->release   = '3.6.3';
 $plugin->maturity  = MATURITY_STABLE;
