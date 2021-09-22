@@ -160,8 +160,8 @@ class reengagement_participants extends \table_sql implements dynamic_table {
         $bulkoperations = has_capability('moodle/course:bulkmessaging', $this->context);
         if ($bulkoperations) {
             $mastercheckbox = new \core\output\checkbox_toggleall('participants-table', true, [
-                'id' => 'select-all-participants',
-                'name' => 'select-all-participants',
+                'id' => 'select-all-reengagement-participants',
+                'name' => 'select-all-reengagement-participants',
                 'label' => get_string('selectall'),
                 'labelclasses' => 'sr-only',
                 'classes' => 'm-1',
@@ -236,7 +236,7 @@ class reengagement_participants extends \table_sql implements dynamic_table {
             $this->no_sorting('groups');
         }
 
-        $this->set_attribute('id', 'participants');
+        $this->set_attribute('id', "reengagement-index-participants-$this->cmid");
 
         $this->countries = get_string_manager()->get_list_of_countries(true);
         $this->extrafields = $extrafields;
@@ -301,7 +301,7 @@ class reengagement_participants extends \table_sql implements dynamic_table {
     public function col_roles($data) {
         global $OUTPUT;
 
-        $roles = isset($this->allroleassignments[$data->id]) ? $this->allroleassignments[$data->id] : [];
+        $roles = $this->allroleassignments[$data->id] ?? [];
         $editable = new \core_user\output\user_roles_editable($this->course,
             $this->context,
             $data,
@@ -504,11 +504,12 @@ class reengagement_participants extends \table_sql implements dynamic_table {
     public function set_filterset(filterset $filterset): void {
         global $DB;
         // Get the context.
-        $this->cmid = $filterset->get_filter('cmid')->current();
-        $this->courseid = $filterset->get_filter('courseid')->current();
-        $this->course = get_course($this->courseid);
+        $this->cmid = $filterset->get_filter('courseid')->current();
 
+        // Pretend the courseid is the cmid, as the core participants JS doesn't support additional filters.
         $cm = get_coursemodule_from_id('reengagement', $this->cmid, 0, false, MUST_EXIST);
+        $this->courseid = $cm->course;
+        $this->course = get_course($this->courseid);
         $this->reengagement = $DB->get_record('reengagement', array('id' => $cm->instance), '*', MUST_EXIST);
 
         $this->context = context_module::instance($this->cmid, MUST_EXIST);

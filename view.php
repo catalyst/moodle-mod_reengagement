@@ -26,17 +26,17 @@
 use core_table\local\filter\filter;
 use core_table\local\filter\integer_filter;
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/lib.php');
 
 define('DEFAULT_PAGE_SIZE', 20);
 define('SHOW_ALL_PAGE_SIZE', 5000);
 
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
-$a  = optional_param('a', 0, PARAM_INT);  // reengagement instance ID.
-$page         = optional_param('page', 0, PARAM_INT); // Which page to show.
-$perpage      = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
-$selectall    = optional_param('selectall', false, PARAM_BOOL); // When rendering checkboxes against users mark them all checked.
+$a = optional_param('a', 0, PARAM_INT);  // reengagement instance ID.
+$page = optional_param('page', 0, PARAM_INT); // Which page to show.
+$perpage = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
+$selectall = optional_param('selectall', false, PARAM_BOOL); // When rendering checkboxes against users mark them all checked.
 
 $params = array();
 
@@ -80,7 +80,7 @@ $event->trigger();
 
 // Print the page header.
 $strreengagements = get_string('modulenameplural', 'reengagement');
-$strreengagement  = get_string('modulename', 'reengagement');
+$strreengagement = get_string('modulename', 'reengagement');
 
 $PAGE->set_title(format_string($reengagement->name));
 $PAGE->set_heading(format_string($course->fullname));
@@ -110,9 +110,10 @@ if ($canedit) {
         echo $OUTPUT->notification(get_string('cronwarning', 'reengagement'));
     }
 
-    // Render the unified filter.
-    $renderer = $PAGE->get_renderer('core_user');
-    echo $renderer->participants_filter(context_course::instance($course->id), "user-index-participants-{$course->id}");
+    $filterset = new \mod_reengagement\table\reengagement_participants_filterset();
+    // We pretend the courseid is the cmid, because the core Moodle participants filter doesn't allow adding new filter types
+    $filterset->add_filter(new integer_filter('courseid', filter::JOINTYPE_DEFAULT, [(int) $cm->id]));
+    $participanttable = new \mod_reengagement\table\reengagement_participants("reengagement-index-participants-{$cm->id}");
 
     echo '<div class="userlist">';
 
@@ -122,72 +123,85 @@ if ($canedit) {
         'id' => $cm->id,
         'perpage' => $perpage));
 
-    $filterset = new \mod_reengagement\table\reengagement_filterset();
-    $filterset->add_filter(new integer_filter('cmid', filter::JOINTYPE_DEFAULT, [(int)$cm->id]));
-    $filterset->add_filter(new integer_filter('courseid', filter::JOINTYPE_DEFAULT, [(int)$course->id]));
-    $participanttable = new \mod_reengagement\table\reengagement_participants("reengagement-index-participants-{$cm->id}");
     $participanttable->set_filterset($filterset);
 
-    // Do this so we can get the total number of rows.
     ob_start();
     $participanttable->out($perpage, true);
     $participanttablehtml = ob_get_contents();
     ob_end_clean();
 
-    if ($bulkoperations) {
-        echo '<form action="bulkchange.php" method="post" id="participantsform">';
-        echo '<div>';
-        echo '<input type="hidden" name="id" value="' . $cm->id . '" />';
-        echo '<input type="hidden" name="sesskey" value="' . sesskey() . '" />';
-        echo '<input type="hidden" name="returnto" value="' . s($PAGE->url->out(false)) . '" />';
-    }
+    echo html_writer::start_tag('form', [
+        'action' => 'bulkchange.php',
+        'method' => 'post',
+        'id' => 'participantsform',
+        'data-course-id' => $cm->id,
+        'data-table-unique-id' => $participanttable->uniqueid,
+        'data-table-default-per-page' => ($perpage < DEFAULT_PAGE_SIZE) ? $perpage : DEFAULT_PAGE_SIZE,
+    ]);
+
+    echo '<div>';
+    echo '<input type="hidden" name="id" value="' . $cm->id . '" />';
+    echo '<input type="hidden" name="sesskey" value="' . sesskey() . '" />';
+    echo '<input type="hidden" name="returnto" value="' . s($PAGE->url->out(false)) . '" />';
+
+    echo html_writer::tag(
+        'p',
+        get_string('countparticipantsfound', 'core_user', $participanttable->totalrows),
+        [
+            'data-region' => 'participant-count',
+        ]
+    );
 
     echo $participanttablehtml;
-
-    $PAGE->requires->js_call_amd('core_user/name_page_filter', 'init');
 
     $perpageurl = clone($baseurl);
     $perpageurl->remove_params('perpage');
     if ($perpage == SHOW_ALL_PAGE_SIZE && $participanttable->totalrows > DEFAULT_PAGE_SIZE) {
-        $perpageurl->param('perpage', DEFAULT_PAGE_SIZE);
-        echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showperpage', '', DEFAULT_PAGE_SIZE)),
-            array(), 'showall');
-
+        $perpageurl->param('perpage', $participanttable->totalrows);
+        $perpagesize = SHOW_ALL_PAGE_SIZE;
+        $perpagevisible = true;
+        $perpagestring = get_string('showperpage', '', DEFAULT_PAGE_SIZE);
     } else if ($participanttable->get_page_size() < $participanttable->totalrows) {
         $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
-        echo $OUTPUT->container(html_writer::link($perpageurl, get_string('showall', '', $participanttable->totalrows)),
-            array(), 'showall');
+        $perpagesize = SHOW_ALL_PAGE_SIZE;
+        $perpagevisible = true;
+        $perpagestring = get_string('showall', '', $participanttable->totalrows);
     }
 
+    $perpageclasses = '';
+    if (!$perpagevisible) {
+        $perpageclasses = 'hidden';
+    }
+
+    echo $OUTPUT->container(html_writer::link(
+        $perpageurl,
+        $perpagestring,
+        [
+            'data-action' => 'showcount',
+            'data-target-page-size' => $perpagesize,
+            'class' => $perpageclasses,
+        ]
+    ), [], 'showall');
+
+    $options = new stdClass();
+    $options->uniqueid = $participanttable->uniqueid;
+    $options->courseid = $cm->id;
+    $options->stateHelpIcon = $OUTPUT->help_icon('publishstate', 'notes');
+
     if ($bulkoperations) {
-        echo '<br /><div class="buttons">';
+        echo '<br /><div class="buttons"><div class="form-inline">';
 
         if ($participanttable->get_page_size() < $participanttable->totalrows) {
-            $perpageurl = clone($baseurl);
-            $perpageurl->remove_params('perpage');
-            $perpageurl->param('perpage', SHOW_ALL_PAGE_SIZE);
-            $perpageurl->param('selectall', true);
-            $showalllink = $perpageurl;
-        } else {
-            $showalllink = false;
-        }
-
-        echo html_writer::start_tag('div', array('class' => 'btn-group'));
-        if ($participanttable->get_page_size() < $participanttable->totalrows) {
-            // Select all users, refresh page showing all users and mark them all selected.
+            // Select all users, refresh table showing all users and mark them all selected.
             $label = get_string('selectalluserswithcount', 'moodle', $participanttable->totalrows);
-            echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkall', 'class' => 'btn btn-secondary',
-                'value' => $label, 'data-showallink' => $showalllink));
-            // Select all users, mark all users on page as selected.
-            echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkallonpage', 'class' => 'btn btn-secondary',
-                'value' => get_string('selectallusersonpage')));
-        } else {
-            echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checkallonpage', 'class' => 'btn btn-secondary',
-                'value' => get_string('selectall')));
+            echo html_writer::empty_tag('input', [
+                'type' => 'button',
+                'id' => 'checkall',
+                'class' => 'btn btn-secondary',
+                'value' => $label,
+                'data-target-page-size' => $participanttable->totalrows,
+            ]);
         }
-
-        echo html_writer::tag('input', "", array('type' => 'button', 'id' => 'checknone', 'class' => 'btn btn-secondary',
-            'value' => get_string('deselectall')));
         echo html_writer::end_tag('div');
         $displaylist = array();
         $displaylist['#messageselect'] = get_string('messageselectadd');
@@ -196,7 +210,7 @@ if ($canedit) {
         $params = ['operation' => 'resetbyfirstcourseaccess'];
         $url = new moodle_url('bulkchange.php', $params);
         list ($periodcount, $period) = reengagement_get_readable_duration($reengagement->duration, true);
-        $duration = $periodcount ." " .$period;
+        $duration = $periodcount . " " . $period;
         $pluginoptions['resetbyfirstaccess'] = get_string('resetbyfirstaccess', 'mod_reengagement', $duration);
         $pluginoptions['resetbyenrolment'] = get_string('resetbyenrolment', 'mod_reengagement', $duration);
         $pluginoptions['resetbyspecificdate'] = get_string('resetbyspecificdate', 'mod_reengagement');
@@ -209,21 +223,17 @@ if ($canedit) {
         echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
 
         echo '<noscript style="display:inline">';
-        echo '<div><input type="submit" value="'.get_string('ok').'" /></div>';
+        echo '<div><input type="submit" value="' . get_string('ok') . '" /></div>';
         echo '</noscript>';
         echo '</div></div>';
-        echo '</form>';
-
-        $options = new stdClass();
-        $options->courseid = $course->id;
-        $options->stateHelpIcon = $OUTPUT->help_icon('publishstate', 'notes');
-        $PAGE->requires->js_call_amd('core_user/participants', 'init', [$options]);
+        $options->noteStateNames = note_get_state_names();
     }
+    echo '</form>';
+    $PAGE->requires->js_call_amd('core_user/participants', 'init', [$options]);
 
     echo '</div>';  // Userlist.
 
 }
-
 
 // Finish the page.
 echo $OUTPUT->footer($course);
