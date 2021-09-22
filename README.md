@@ -12,6 +12,7 @@ The git branches here support the following versions.
 | ----------------- | ----------- |
 | Mooodle 3.5   | MOODLE_35_STABLE |
 | Moodle 3.6 -> 3.8 | MOODLE_38_STABLE |
-| Moodle 3.9 and higher | main |
+| Moodle 3.9 -> 3.10 | MOODLE_39_STABLE |
+| Moodle 3.11 and higher | MOODLE_311_STABLE |
 | Totara 12 | TOTARA_12 |
 
