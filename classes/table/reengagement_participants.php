@@ -174,9 +174,10 @@ class reengagement_participants extends \table_sql implements dynamic_table {
         $headers[] = get_string('fullname');
         $columns[] = 'fullname';
 
-        $extrafields = get_extra_user_fields($this->context);
+        $extrafields = \core_user\fields::for_identity($this->context)->get_required_fields();
+
         foreach ($extrafields as $field) {
-            $headers[] = get_user_field_name($field);
+            $headers[] = \core_user\fields::get_display_name($field); 
             $columns[] = $field;
         }
 
