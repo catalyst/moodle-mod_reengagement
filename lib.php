@@ -148,24 +148,6 @@ function reengagement_user_complete($course, $user, $mod, $reengagement) {
     return true;
 }
 
-/**
- * Obtains the automatic completion state for this forum based on any conditions
- * in forum settings.
- *
- * @param object $course Course
- * @param object $cm Course-module
- * @param int $userid User ID
- * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
- * @return bool True if completed, false if not. (If no conditions, then return
- *   value depends on comparison type)
- */
-function reengagement_get_completion_state($course, $cm, $userid, $type) {
-    global $DB;
-    if ($completion = $DB->get_record('course_modules_completion', array('coursemoduleid' => $cm->id, 'userid' => $userid))) {
-        return $completion->completionstate == COMPLETION_COMPLETE_PASS;
-    }
-    return false;
-}
 
 /**
  * Prints the recent activity.
