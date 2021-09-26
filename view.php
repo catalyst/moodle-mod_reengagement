@@ -153,7 +153,9 @@ if ($canedit) {
     );
 
     echo $participanttablehtml;
-
+    $perpagevisible = '';
+    $perpagestring = '';
+    $perpagesize = '';
     $perpageurl = clone($baseurl);
     $perpageurl->remove_params('perpage');
     if ($perpage == SHOW_ALL_PAGE_SIZE && $participanttable->totalrows > DEFAULT_PAGE_SIZE) {
