@@ -26,6 +26,8 @@
 $string['pluginname'] = 'Reengagement';
 $string['reengagement'] = 'reengagement';
 $string['pluginadministration'] = '';
+$string['report'] = 'Reengagement Report - Testing Report Builder';
+$string['report_sample'] = 'Sample Table';
 $string['modulename'] = 'Reengagement';
 $string['modulenameplural'] = 'Reengagements';
 $string['modulename_help'] = 'The Reengagement activity provides a way for you to send timely notifications to students and 3rd parties, which can include reminders to return to the course and complete activities.
@@ -45,6 +47,8 @@ The Reengagement activity is very flexible, explore what you can do with it.
 <a href=https://docs.moodle.org/39/en/Reengagement_activity>More Help</a>';
 
 // Alphabetized.
+
+
 $string['activitycompleted'] = 'This activity has been marked as complete';
 $string['afterdelay'] = 'After delay';
 $string['areyousure'] = 'Are you sure you want to make this change?';
@@ -147,3 +151,13 @@ $string['privacy:metadata:completiontime'] = 'When this module will be complete'
 $string['privacy:metadata:emailtime'] = 'When this user should be emailed';
 $string['privacy:metadata:emailsent'] = 'Email has been sent';
 $string['privacy:metadata:reengagement_inprogress'] = 'Reengagement activities in progress';
+
+$string['course'] = 'Course ID';
+$string['timecreated'] = 'Time Created';
+$string['timemodified'] = 'Time Modified';
+$string['userid'] = 'User ID';
+$string['completiontime'] = 'Completion Time';
+$string['emailtime'] = 'Emailtime';
+$string['emailsent'] = 'Email Sent';
+$string['completed'] = 'Completed';
+
