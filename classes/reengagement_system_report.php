@@ -62,7 +62,7 @@ class reengagement_system_report extends system_report {
             $filters[] = $filter->get_unique_identifier();
         }
         $this->add_filters_from_entities($filters);
-
+        $this->set_downloadable(true, 'reengagement_report');
     }
 
     /**
