@@ -153,7 +153,6 @@ $string['privacy:metadata:reengagement_inprogress'] = 'Reengagement activities i
 $string['course'] = 'Course name';
 $string['timecreated'] = 'Time created';
 $string['timemodified'] = 'Time modified';
-$string['userid'] = 'User ID';
 $string['completiontime'] = 'Completion time';
 $string['emailtime'] = 'Email time';
 $string['emailsent'] = 'Email sent';
