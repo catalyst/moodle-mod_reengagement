@@ -153,11 +153,11 @@ $string['privacy:metadata:emailsent'] = 'Email has been sent';
 $string['privacy:metadata:reengagement_inprogress'] = 'Reengagement activities in progress';
 
 $string['course'] = 'Course ID';
-$string['timecreated'] = 'Time Created';
-$string['timemodified'] = 'Time Modified';
+$string['timecreated'] = 'Time created';
+$string['timemodified'] = 'Time modified';
 $string['userid'] = 'User ID';
-$string['completiontime'] = 'Completion Time';
-$string['emailtime'] = 'Emailtime';
-$string['emailsent'] = 'Email Sent';
+$string['completiontime'] = 'Completion time';
+$string['emailtime'] = 'Email time';
+$string['emailsent'] = 'Email sent';
 $string['completed'] = 'Completed';
 
