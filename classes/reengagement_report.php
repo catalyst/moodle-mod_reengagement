@@ -53,12 +53,12 @@ class reengagement_report extends base {
      */
     protected function get_default_table_aliases(): array {
         return [
-            'reengagement' => 'r',
-            'reengagement_inprogress' => 'ri',
-            'course_modules' => 'cm',
-            'modules' => 'mm',
-            'user' => 'u',
-            'course' => 'c',
+            'reengagement' => 'r', //plugin table
+            'reengagement_inprogress' => 'ri', //plugin table
+            'course_modules' => 'cm', //core table
+            'modules' => 'mm', //core table
+            'user' => 'u', //core table
+            'course' => 'c', //core table
         ];
     }
 
@@ -77,8 +77,6 @@ class reengagement_report extends base {
      * @return base
      */
     public function initialise(): base {
-        
-
         $columns = $this->get_all_columns();
         foreach ($columns as $column) {
             $this->add_column($column);
@@ -97,12 +95,8 @@ class reengagement_report extends base {
      *
      * @return array
      */
-
-
     protected function get_reengagement_fields(): array {
         return [
-
-          //  'id' => new lang_string('reengagement', 'reengagement'),
             'timecreated' => new lang_string('timecreated', 'reengagement'),
             'timemodified' => new lang_string('timemodified', 'reengagement'),
             'emailuser' => new lang_string('emailuser', 'reengagement'),
@@ -121,15 +115,11 @@ class reengagement_report extends base {
         ];
     }
 
-
-
-
     /**
      * reengagement_inprogress table fields.
      *
      * @return array
      */
-
     protected function get_reengagement_inprogress_fields(): array {
         return [
             'completiontime' => new lang_string('completiontime', 'reengagement'),
@@ -147,7 +137,6 @@ class reengagement_report extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
-
         $columns = [];
 
         $tablealias = $this->get_table_alias('reengagement');
@@ -212,16 +201,13 @@ class reengagement_report extends base {
                 ->add_joins($this->get_joins())
                 ->set_type($this->get_reengagement_field_type($reengagementfield))
                 ->add_field("$tablealias.$reengagementfield") 
-                ->add_callback(static function ($value, stdClass $row): string {                    
-
-                    if((isset($row->timecreated) && $row->timecreated > 0) ||  (isset($row->timemodified) && $row->timemodified > 0)) { 
+                ->add_callback(static function ($value, stdClass $row): string { 
+                         if((isset($row->timecreated) && $row->timecreated > 0) ||  (isset($row->timemodified) && $row->timemodified > 0)) { 
                         return userdate($value);
-                    }  
-                
-                    return strval($value);
+                    }                  
+                return strval($value);
                 })               
                 ->set_is_sortable($this->is_sortable($reengagementfield));
-
             $columns[] = $column;
         }
 
@@ -237,15 +223,13 @@ class reengagement_report extends base {
                             ON {$tablealias}.id = {$tablealiasinprogress}.reengagement")
                 ->set_type($this->get_reengagement_field_type($reengagementinprogressfield))
                 ->add_field("$tablealiasinprogress.$reengagementinprogressfield")   
-                ->add_callback(static function ($value, stdClass $row): string {          
-
+                ->add_callback(static function ($value, stdClass $row): string { 
                     if((isset($row->emailtime) && $row->emailtime > 0) ||  (isset($row->completiontime) && $row->completiontime > 0)) { 
                         return userdate($value);
                     } 
-                    return strval($value);
+                return strval($value);
                 })              
                 ->set_is_sortable(true);
-
             $columns[] = $column;
         }
 
@@ -264,18 +248,15 @@ class reengagement_report extends base {
                 if ($value === null) {
                     return '';
                 }
-
                 else {
                     return html_writer::link(new moodle_url('/user/profile.php', ['id' => $row->id]),
                     $row->username);
                 }
-            });
-      
+            });      
         return $columns;
     }
-
    
-  /**
+    /**
      * Returns list of all available filters
      *
      * @return array
@@ -334,14 +315,12 @@ class reengagement_report extends base {
         return $filters;
     }
 
-
     /**
      * Return appropriate column type for given fields for both of the plugin tables; reengagement and reengagement_inprogress
      *
      * @param string $reengagementfield
      * @return int
      */
-
     protected function get_reengagement_field_type(string $reengagementfield): int {
         switch ($reengagementfield) {
             case 'timecreated':
@@ -352,7 +331,6 @@ class reengagement_report extends base {
             case 'emailcontent':
                 $fieldtype = column::TYPE_LONGTEXT;
                 break;    
-
             case 'emailuser':
             case 'emailrecipient':     
             case 'duration':
@@ -360,10 +338,8 @@ class reengagement_report extends base {
             case 'emaildelay': 
             case 'suppresstarget':  
             case 'emaildelay': 
-            case 'userid': 
                 $fieldtype = column::TYPE_INTEGER;
                 break;
-            case 'reengagementname':
             case 'emailsubject':
             default:
                 $fieldtype = column::TYPE_TEXT;
@@ -372,8 +348,6 @@ class reengagement_report extends base {
 
         return $fieldtype;
     }
-
-
 
     /**
      * Check if this field is sortable
