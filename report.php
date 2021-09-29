@@ -31,20 +31,20 @@ use mod_reengagement\reengagement_system_report;
 require_once('../../config.php');
 
 require_login();
-
+$context = context_system::instance();
+   
 $PAGE->set_url(new moodle_url('/mod/reengagement/report.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('report', 'mod_reengagement'));
 $PAGE->set_heading(get_string('report', 'mod_reengagement'));
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('report_sample', 'mod_reengagement'));
-
-// Create report instance.
-
-$report = system_report_factory::create(reengagement_system_report::class, context_system::instance());
-
-
-echo $report->output();
+if (has_capability('mod/reengagement:viewsitereport', $context)) {
+    // Create report instance.
+    $report = system_report_factory::create(reengagement_system_report::class, context_system::instance()); 
+    echo $report->output();
+} else {
+    echo "You do not have access to view this report";        
+}
 
 echo $OUTPUT->footer();
-

@@ -53,8 +53,12 @@ class reengagement_report extends base {
      */
     protected function get_default_table_aliases(): array {
         return [
-            'reengagement' => 'm',
-            'reengagement_inprogress' => 'mi',
+            'reengagement' => 'r',
+            'reengagement_inprogress' => 'ri',
+            'course_modules' => 'cm',
+            'modules' => 'mm',
+            'user' => 'u',
+            'course' => 'c',
         ];
     }
 
@@ -97,8 +101,8 @@ class reengagement_report extends base {
 
     protected function get_reengagement_fields(): array {
         return [
-            'course' => new lang_string('course', 'reengagement'),
-            'name' => new lang_string('reengagementname', 'reengagement'),
+
+          //  'id' => new lang_string('reengagement', 'reengagement'),
             'timecreated' => new lang_string('timecreated', 'reengagement'),
             'timemodified' => new lang_string('timemodified', 'reengagement'),
             'emailuser' => new lang_string('emailuser', 'reengagement'),
@@ -128,7 +132,6 @@ class reengagement_report extends base {
 
     protected function get_reengagement_inprogress_fields(): array {
         return [
-            'userid' => new lang_string('userid', 'reengagement'),
             'completiontime' => new lang_string('completiontime', 'reengagement'),
             'emailtime' => new lang_string('emailtime', 'reengagement'),
             'emailsent' => new lang_string('emailsent', 'reengagement'),
@@ -144,14 +147,62 @@ class reengagement_report extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
+
         $columns = [];
-        $reengagementfields = $this->get_reengagement_fields();
-        $reengagementinprogressfields = $this->get_reengagement_inprogress_fields();
 
         $tablealias = $this->get_table_alias('reengagement');
         $tablealiasinprogress = $this->get_table_alias('reengagement_inprogress');
+        $tablealiascoursemodules = $this->get_table_alias('course_modules');
+        $tablealiasmodules = $this->get_table_alias('modules');
+        $tablealiascourse = $this->get_table_alias('course');
+        $tablealiasusers = $this->get_table_alias('user');
 
-        //from table reengagement
+        //reengagement name from table reengagement     
+        $columns[] = (new column(
+        'name',
+        new lang_string('reengagementname', 'reengagement'),
+        $this->get_entity_name()
+        ))
+            ->add_join("LEFT JOIN {course_modules} {$tablealiascoursemodules} 
+                    ON {$tablealiascoursemodules}.instance = {$tablealias}.id AND {$tablealiascoursemodules}.course = {$tablealias}.course")
+            ->add_join("INNER JOIN {modules} {$tablealiasmodules} 
+                    ON {$tablealiasmodules}.id = {$tablealiascoursemodules}.module AND {$tablealiasmodules}.name = 'reengagement'")
+            ->set_is_sortable(true)
+            ->add_field("{$tablealiascoursemodules}.id")
+            ->add_field("{$tablealias}.name")
+            ->add_callback(static function(?string $value, stdClass $row): string {
+                if ($value === null) {
+                    return '';
+                }
+                else {
+                    return html_writer::link(new moodle_url('/mod/reengagement/view.php', ['id' => $row->id]),
+                    $row->name);
+                }
+            });
+
+        //course name from table reengagement
+        $columns[] = (new column(
+        'course',
+        new lang_string('course', 'reengagement'),
+        $this->get_entity_name()
+        ))
+            ->add_join("LEFT JOIN {course} {$tablealiascourse} 
+                    ON {$tablealiascourse}.id = {$tablealias}.course")
+            ->set_is_sortable(true)
+            ->add_field("{$tablealiascourse}.id")
+            ->add_field("{$tablealiascourse}.shortname")
+            ->add_callback(static function(?string $value, stdClass $row): string {
+                if ($value === null) {
+                    return '';
+                }
+                else {
+                    return html_writer::link(new moodle_url('/course/view.php', ['id' => $row->id]),
+                    $row->shortname);
+                }
+            });
+    
+        //remaining fields from table reengagement
+        $reengagementfields = $this->get_reengagement_fields();
         foreach ($reengagementfields as $reengagementfield => $reengagementfieldlang) {
             $column = (new column(
                 $reengagementfield,
@@ -166,19 +217,16 @@ class reengagement_report extends base {
                     if((isset($row->timecreated) && $row->timecreated > 0) ||  (isset($row->timemodified) && $row->timemodified > 0)) { 
                         return userdate($value);
                     }  
-
-                    if(isset($row->course)) { 
-                        return html_writer::link(new moodle_url('/mod/reengagement/index.php', ['id' => $row->course]), $value);
-                    }
-                   
+                
                     return strval($value);
                 })               
                 ->set_is_sortable($this->is_sortable($reengagementfield));
 
-
             $columns[] = $column;
         }
-        //from table reengagement_inprogress
+
+        //fields from table reengagement_inprogress
+        $reengagementinprogressfields = $this->get_reengagement_inprogress_fields();
         foreach ($reengagementinprogressfields as $reengagementinprogressfield => $reengagementinprogressfieldlang) {
             $column = (new column(
                 $reengagementinprogressfield,
@@ -194,11 +242,6 @@ class reengagement_report extends base {
                     if((isset($row->emailtime) && $row->emailtime > 0) ||  (isset($row->completiontime) && $row->completiontime > 0)) { 
                         return userdate($value);
                     } 
-                    
-                    if(isset($row->userid)) { 
-                        return html_writer::link(new moodle_url('/user/profile.php', ['id' => $row->userid]), $value);
-                    }
-
                     return strval($value);
                 })              
                 ->set_is_sortable(true);
@@ -206,10 +249,32 @@ class reengagement_report extends base {
             $columns[] = $column;
         }
 
+        //username from table reengagement_inprogress        
+        $columns[] = (new column(
+        'username',
+        new lang_string('username', 'reengagement'),
+        $this->get_entity_name()
+        ))
+            ->add_join("LEFT JOIN {user} {$tablealiasusers} 
+                        ON {$tablealiasusers}.id = {$tablealiasinprogress}.userid")
+            ->set_is_sortable(true)
+            ->add_field("{$tablealiasusers}.username")
+            ->add_field("{$tablealiasusers}.id")
+            ->add_callback(static function(?string $value, stdClass $row): string {
+                if ($value === null) {
+                    return '';
+                }
+
+                else {
+                    return html_writer::link(new moodle_url('/user/profile.php', ['id' => $row->id]),
+                    $row->username);
+                }
+            });
+      
         return $columns;
     }
 
-
+   
   /**
      * Returns list of all available filters
      *
@@ -223,8 +288,13 @@ class reengagement_report extends base {
 
         $fields_reengagement = $this->get_reengagement_fields();
         $fields_reengagement_inprogress = $this->get_reengagement_inprogress_fields();
-
-        $fields = array_merge($fields_reengagement,$fields_reengagement_inprogress);
+        //extra fields which were added to with extra formatting (like adding links) reengagementname and username 
+        $fields_extra = [
+            'name' => new lang_string('reengagementname', 'reengagement'),
+            'course' => new lang_string('course', 'reengagement'),
+            'username' => new lang_string('username', 'reengagement'),
+        ];
+        $fields = array_merge($fields_extra, $fields_reengagement,$fields_reengagement_inprogress );
 
         foreach ($fields as $field => $name) {
             // Filtering isn't supported for LONGTEXT fields on Oracle.
@@ -282,7 +352,7 @@ class reengagement_report extends base {
             case 'emailcontent':
                 $fieldtype = column::TYPE_LONGTEXT;
                 break;    
-            case 'course':
+
             case 'emailuser':
             case 'emailrecipient':     
             case 'duration':
