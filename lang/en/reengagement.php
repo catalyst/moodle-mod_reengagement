@@ -47,8 +47,6 @@ The Reengagement activity is very flexible, explore what you can do with it.
 <a href=https://docs.moodle.org/39/en/Reengagement_activity>More Help</a>';
 
 // Alphabetized.
-
-
 $string['activitycompleted'] = 'This activity has been marked as complete';
 $string['afterdelay'] = 'After delay';
 $string['areyousure'] = 'Are you sure you want to make this change?';
@@ -161,4 +159,3 @@ $string['emailtime'] = 'Email time';
 $string['emailsent'] = 'Email sent';
 $string['completed'] = 'Completed';
 $string['username'] = 'Email sent to user';
-
