@@ -26,6 +26,8 @@
 $string['pluginname'] = 'Reengagement';
 $string['reengagement'] = 'reengagement';
 $string['pluginadministration'] = '';
+$string['report'] = 'Reengagement Report - Testing Report Builder';
+$string['report_sample'] = 'Sample Table';
 $string['modulename'] = 'Reengagement';
 $string['modulenameplural'] = 'Reengagements';
 $string['modulename_help'] = 'The Reengagement activity provides a way for you to send timely notifications to students and 3rd parties, which can include reminders to return to the course and complete activities.
@@ -147,3 +149,12 @@ $string['privacy:metadata:completiontime'] = 'When this module will be complete'
 $string['privacy:metadata:emailtime'] = 'When this user should be emailed';
 $string['privacy:metadata:emailsent'] = 'Email has been sent';
 $string['privacy:metadata:reengagement_inprogress'] = 'Reengagement activities in progress';
+
+$string['course'] = 'Course name';
+$string['timecreated'] = 'Time created';
+$string['timemodified'] = 'Time modified';
+$string['completiontime'] = 'Completion time';
+$string['emailtime'] = 'Email time';
+$string['emailsent'] = 'Email sent';
+$string['completed'] = 'Completed';
+$string['username'] = 'Email sent to user';
