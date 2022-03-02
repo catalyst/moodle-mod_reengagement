@@ -621,6 +621,22 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
     foreach ($replacementfields as $field) {
         $results[$field] = preg_replace($patterns, $replacements, $reengagement->$field);
     }
+
+    // Apply enabled filters to email content.
+    $options = array(
+            'context' => context_course::instance($reengagement->courseid),
+            'noclean' => true,
+            'trusted' => true
+    );
+    $subjectfields = array('emailsubject', 'emailsubjectmanager', 'emailsubjectthirdparty');
+    foreach ($subjectfields as $field) {
+        $results[$field] = format_text($reengagement->$field, FORMAT_PLAIN, $options);
+    }
+    $contentfields = array('emailcontent', 'emailcontentmanager', 'emailcontentthirdparty');
+    foreach ($contentfields as $field) {
+        $results[$field] = format_text($reengagement->$field, FORMAT_MOODLE, $options);
+    }
+
     return $results;
 }
 
