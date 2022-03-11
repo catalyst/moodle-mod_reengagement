@@ -25,9 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021092300;   // The current module version.
+$plugin->version   = 2022031100;   // The current module version.
 $plugin->requires  = 2021091700; // Requires 4.0.
 $plugin->component = 'mod_reengagement';
-$plugin->release   = '3.6.3';
+$plugin->release   = '4.0';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->cron      = 0; // Now uses a scheduled task.
+$plugin->supported = [400, 400];
