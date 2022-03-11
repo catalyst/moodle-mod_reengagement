@@ -106,7 +106,7 @@ if ($canstart) {
 if ($canedit) {
     $task = \core\task\manager::get_scheduled_task('\mod_reengagement\task\cron_task');
     $lastrun = $task->get_last_run_time();
-    if ($lastrun < time() - 3600) { // Check if cron run in last 60min.
+    if ($lastrun < time() - 28800) { // Check if cron run in last 8hrs.
         echo $OUTPUT->notification(get_string('cronwarning', 'reengagement'));
     }
 
