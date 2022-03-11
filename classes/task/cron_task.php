@@ -25,8 +25,6 @@
 
 namespace mod_reengagement\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Simple task to run the Reengagement cron.
  *

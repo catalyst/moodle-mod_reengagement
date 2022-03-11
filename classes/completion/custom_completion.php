@@ -15,13 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
  /**
- * New base class for defining reengagement custom completion requirements.
- * @package    mod_reengagement
- * @copyright  2021 Catalyst IT
- * @author     Sumaiya Javed <sumaiya.javed@catalyst.net.nz>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
+  * New base class for defining reengagement custom completion requirements.
+  * @package    mod_reengagement
+  * @copyright  2021 Catalyst IT
+  * @author     Sumaiya Javed <sumaiya.javed@catalyst.net.nz>
+  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+  */
 
 namespace mod_reengagement\completion;
 
@@ -42,7 +41,7 @@ class custom_completion extends activity_custom_completion {
 
         // Survey only supports duration as a custom rule.
         $status = $DB->record_exists('course_modules_completion', ['coursemoduleid' => $this->cm->id, 'userid' => $this->userid]);
-        return $status ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;      //  return $status ? COMPLETION_COMPLETE_PASS : COMPLETION_INCOMPLETE;
+        return $status ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
     }
 
     /**
@@ -55,16 +54,15 @@ class custom_completion extends activity_custom_completion {
     }
 
     /**
-    * Returns an associative array of the descriptions of custom completion rules.
-    *
-    * @return array
-    */
-   public function get_custom_rule_descriptions(): array {
-       return [
-           'duration' => get_string('duration', 'reengagement')
-       ];
-   }
-
+     * Returns an associative array of the descriptions of custom completion rules.
+     *
+     * @return array
+     */
+    public function get_custom_rule_descriptions(): array {
+        return [
+            'duration' => get_string('duration', 'reengagement')
+        ];
+    }
 
     /**
      * Returns an array of all completion rules, in the order they should be displayed to users.
