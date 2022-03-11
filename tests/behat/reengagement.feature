@@ -1,9 +1,10 @@
-@mod @mod_reengagement
+@mod @mod_reengagement @javascript
 Feature: Teachers can create reengagment activity
   In order to trigger reengagements
   As a teacher
   I need to create a reengagement
 
+  @javascript
   Scenario: Create Reengagment activity.
     Given the following "courses" exist:
       | fullname | shortname | summary                             | category | timecreated   | timemodified  |

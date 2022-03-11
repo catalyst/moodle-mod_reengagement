@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This is called at the beginning of the uninstallation process to give the module
  * a chance to clean-up its hacks, bits etc. where possible.

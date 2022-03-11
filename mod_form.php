@@ -48,7 +48,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform =& $this->_form;
         // Make sure completion and restriction is enabled.
         if (empty($CFG->enablecompletion) || empty($CFG->enableavailability)) {
-            print_error('mustenablecompletionavailability', 'mod_reengagement');
+            throw new moodle_exception('mustenablecompletionavailability', 'mod_reengagement');
         }
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -76,7 +76,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->addElement('header', 'reengagementfieldset', get_string('reengagementfieldset', 'reengagement'));
         $mform->setExpanded('reengagementfieldset', true);
 
-        // Adding email detail fields:
+        // Adding email detail fields.
         $emailuseroptions = array(); // The sorts of emailing this module might do.
         $emailuseroptions[REENGAGEMENT_EMAILUSER_NEVER] = get_string('never', 'reengagement');
         $emailuseroptions[REENGAGEMENT_EMAILUSER_COMPLETION] = get_string('oncompletion', 'reengagement');
@@ -185,7 +185,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setDefault('completion', COMPLETION_TRACKING_AUTOMATIC);
             $mform->freeze('completion');
         }
-        // Hide some elements not relevant to this activity (student visibility)
+        // Hide some elements not relevant to this activity (student visibility).
         if ($mform->elementExists('visible')) {
             $mform->removeElement('visible');
             $mform->addElement('hidden', 'visible', 0);

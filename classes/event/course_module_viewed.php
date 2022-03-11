@@ -25,8 +25,6 @@
 
 namespace mod_reengagement\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Define all the backup steps that will be used by the backup_reengagement_activity_task
  *

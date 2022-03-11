@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Code run to upgrade the reengagment database tables.
  *
@@ -107,7 +105,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
 
         upgrade_mod_savepoint(true, 2016112400, 'reengagement');
     }
-    // Set default value
+    // Set default value.
     if ($oldversion < 2017040400) {
 
         $table = new xmldb_table('reengagement');
@@ -151,7 +149,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
             $activitycompletion->userid = $missing->userid;
             $DB->insert_record('course_modules_completion', $activitycompletion);
 
-            // flag re-enagement as complete if required - or delete record.
+            // Flag re-enagement as complete if required - or delete record.
             // logic copied from cron function.
             if (($missing->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) ||
                 ($missing->emailuser == REENGAGEMENT_EMAILUSER_NEVER) ||

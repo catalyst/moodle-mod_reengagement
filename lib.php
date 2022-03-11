@@ -188,7 +188,7 @@ function reengagement_crontask() {
 
     $reengagements = $DB->get_recordset_sql($reengagementssql);
     if (!$reengagements->valid()) {
-        // No reengagement module instances in a course
+        // No reengagement module instances in a course.
         mtrace("No reengagement instances found - nothing to do :)");
         return true;
     }
@@ -267,7 +267,7 @@ function reengagement_crontask() {
         // Update completion record to indicate completion so the user can continue with any dependant activities.
         $completionrecord = $DB->get_record('course_modules_completion', array('coursemoduleid' => $cmid, 'userid' => $userid));
         if (empty($completionrecord)) {
-            mtrace("Could not find completion record for updating to complete state - userid: $userid, cmid: $cmid - recreating record.");
+            mtrace("Could not find completion record to update complete state, userid: $userid, cmid: $cmid - recreating record.");
             // This might happen when reset_all_state has been triggered, deleting an "in-progress" record. so recreate it.
             $completionrecord = new stdClass();
             $completionrecord->coursemoduleid = $cmid;
@@ -540,7 +540,7 @@ function reengagement_send_notification($userto, $subject, $messageplain, $messa
     $eventdata->fullmessagehtml = $messagehtml;
     $eventdata->smallmessage = $subject;
 
-    // Required for messaging framework
+    // Required for messaging framework.
     $eventdata->name = 'mod_reengagement';
     $eventdata->component = 'mod_reengagement';
 
@@ -586,7 +586,7 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
         $templatevars['/%usergroups%/'] = '';
     }
 
-    // Now do custom user fields;
+    // Now do custom user fields.
     $fields = profile_get_custom_fields();
     if (!empty($fields)) {
         $userfielddata = $DB->get_records('user_info_data', array('userid' => $user->id), '', 'fieldid, data, dataformat');
@@ -601,7 +601,8 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
 
                     $templatevars['/%profilefield_'.$field->shortname.'%/'] = userdate($userfielddata[$field->id]->data, $format);
                 } else {
-                    $templatevars['/%profilefield_'.$field->shortname.'%/'] = format_text($userfielddata[$field->id]->data, $userfielddata[$field->id]->dataformat);
+                    $templatevars['/%profilefield_'.$field->shortname.'%/'] = format_text($userfielddata[$field->id]->data,
+                                                                                          $userfielddata[$field->id]->dataformat);
                 }
 
             } else {

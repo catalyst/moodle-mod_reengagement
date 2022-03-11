@@ -32,8 +32,8 @@ require_once(dirname(__FILE__) . '/lib.php');
 define('DEFAULT_PAGE_SIZE', 20);
 define('SHOW_ALL_PAGE_SIZE', 5000);
 
-$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
-$a = optional_param('a', 0, PARAM_INT);  // reengagement instance ID.
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID.
+$a = optional_param('a', 0, PARAM_INT);  // Reengagement instance ID.
 $page = optional_param('page', 0, PARAM_INT); // Which page to show.
 $perpage = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
 $selectall = optional_param('selectall', false, PARAM_BOOL); // When rendering checkboxes against users mark them all checked.
@@ -58,14 +58,14 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $reengagement->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('reengagement', $reengagement->id, $course->id, false, MUST_EXIST);
 } else {
-    print_error('errornoid', 'mod_reengagement');
+    throw new moodle_exception('errornoid', 'mod_reengagement');
 }
 
 require_login($course, true, $cm);
 
 // Make sure completion and restriction is enabled.
 if (empty($CFG->enablecompletion) || empty($CFG->enableavailability)) {
-    print_error('mustenablecompletionavailability', 'mod_reengagement');
+    throw new moodle_exception('mustenablecompletionavailability', 'mod_reengagement');
 }
 
 $context = context_module::instance($cm->id);
@@ -95,7 +95,7 @@ $canedit = has_capability('mod/reengagement:editreengagementduration', $context)
 $bulkoperations = has_capability('mod/reengagement:bulkactions', $context);
 
 if (empty($canstart) && empty($canedit)) {
-    print_error('errorreengagementnotvalid', 'mod_reengagement');
+    throw new moodle_exception('errorreengagementnotvalid', 'mod_reengagement');
 }
 
 if ($canstart) {
@@ -111,7 +111,7 @@ if ($canedit) {
     }
 
     $filterset = new \mod_reengagement\table\reengagement_participants_filterset();
-    // We pretend the courseid is the cmid, because the core Moodle participants filter doesn't allow adding new filter types
+    // We pretend the courseid is the cmid, because the core Moodle participants filter doesn't allow adding new filter types.
     $filterset->add_filter(new integer_filter('courseid', filter::JOINTYPE_DEFAULT, [(int) $cm->id]));
     $participanttable = new \mod_reengagement\table\reengagement_participants("reengagement-index-participants-{$cm->id}");
 
