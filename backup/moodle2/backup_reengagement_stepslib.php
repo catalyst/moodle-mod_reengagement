@@ -49,7 +49,8 @@ class backup_reengagement_activity_structure_step extends backup_activity_struct
             'name', 'timecreated', 'timemodified',
             'emailuser', 'emailsubject', 'emailcontent', 'emailcontentformat',
             'duration', 'suppresstarget', 'emaildelay', 'emailrecipient',
-            'emailsubjectmanager', 'emailcontentmanager', 'emailcontentmanagerformat'));
+            'emailsubjectmanager', 'emailcontentmanager', 'emailcontentmanagerformat',
+            'remindercount'));
 
         $inprogresses = new backup_nested_element('inprogresses');
 
