@@ -648,11 +648,11 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
     );
     $subjectfields = array('emailsubject', 'emailsubjectmanager', 'emailsubjectthirdparty');
     foreach ($subjectfields as $field) {
-        $results[$field] = format_text($reengagement->$field, FORMAT_PLAIN, $options);
+        $results[$field] = format_text($results[$field], FORMAT_PLAIN, $options);
     }
     $contentfields = array('emailcontent', 'emailcontentmanager', 'emailcontentthirdparty');
     foreach ($contentfields as $field) {
-        $results[$field] = format_text($reengagement->$field, FORMAT_MOODLE, $options);
+        $results[$field] = format_text($results[$field], FORMAT_MOODLE, $options);
     }
 
     return $results;
