@@ -771,11 +771,10 @@ function reengagement_get_startusers($reengagement) {
              AND u.id NOT IN ($alreadyripsql)";
 
     $startusers = $DB->get_records_sql($sql, $params);
-
-    $modinfo = get_fast_modinfo($reengagement->courseid);
-    $cm = $modinfo->get_cm($reengagement->cmid);
-    $ainfomod = new \core_availability\info_module($cm);
     foreach ($startusers as $startcandidate) {
+        $modinfo = get_fast_modinfo($reengagement->courseid, $startcandidate->id);
+        $cm = $modinfo->get_cm($reengagement->cmid);
+        $ainfomod = new \core_availability\info_module($cm);
         $information = '';
         if (empty($startcandidate->confirmed)) {
             // Exclude unconfirmed users. Typically this shouldn't happen, but if an unconfirmed user
