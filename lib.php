@@ -36,7 +36,7 @@ define('REENGAGEMENT_RECIPIENT_MANAGER', 1);
 define('REENGAGEMENT_RECIPIENT_BOTH', 2);
 
 define('REENGAGEMENT_EMAILFROM_SUPPORT', 0);
-define('REENGAGEMENT_EMAILFROM_TEACHER', 1);
+define('REENGAGEMENT_EMAILFROM_TEACHER', -1);
 
 define('REENGAGEMENT_NOTIFICATION_EMAIL', 0);
 define('REENGAGEMENT_NOTIFICATION_IM', 1);
@@ -1009,9 +1009,9 @@ function reengagement_checkstart($course, $cm, $reengagement) {
  */
 function reengagement_get_emailfrom($reengagement) {
     $userid = $reengagement->emailfrom;
-    if ($userid > 0) {
+    if ($userid != 0) {
         $context = context_course::instance($reengagement->course);
-        if ($userid == 1) { // Default teacher, get first teacher in course.
+        if ($userid == REENGAGEMENT_EMAILFROM_TEACHER) { // Default teacher, get first teacher in course.
             global $DB;
             $params = array('roleid' => 3, 'contextid' => $context->id);
             $userid = $DB->get_field('role_assignments', 'userid', $params);
