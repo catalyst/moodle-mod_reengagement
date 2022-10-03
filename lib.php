@@ -1011,17 +1011,19 @@ function reengagement_checkstart($course, $cm, $reengagement) {
 function reengagement_get_emailfrom($reengagement) {
     $userid = $reengagement->emailfrom;
     if ($userid != 0) {
-        $context = context_course::instance($reengagement->course);
+        $context = context_course::instance($reengagement->courseid);
         if ($userid == REENGAGEMENT_EMAILFROM_TEACHER) { // Default teacher, get first teacher in course.
-            global $DB;
-            $params = array('roleid' => 3, 'contextid' => $context->id);
-            $userid = $DB->get_field('role_assignments', 'userid', $params);
-        }
-        $user = $userid ? core_user::get_user($userid) : null;
+            $users = get_enrolled_users($context, 'mod/reengagement:addinstance', 0, 'u.*', '', 0, 1);
+            if ($users && $user = reset($users)) {
+                return $user;
+            }
+        } else {
+            $user = $userid ? core_user::get_user($userid) : null;
 
-        // Check selected teacher still has capability.
-        if ($user && has_capability('mod/reengagement:addinstance', $context, $user) ) {
-            return $user;
+            // Check selected teacher still has capability.
+            if ($user && has_capability('mod/reengagement:addinstance', $context, $user) ) {
+                return $user;
+            }
         }
     }
 
