@@ -179,7 +179,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
     }
 
     // Add emailfrom and instantmessage fields.
-    if ($oldversion < 2020022202) {
+    if ($oldversion < 2022092900) {
 
         $table = new xmldb_table('reengagement');
         $field = new xmldb_field('emailfrom', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');

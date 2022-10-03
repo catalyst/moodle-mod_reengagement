@@ -36,7 +36,7 @@ define('REENGAGEMENT_RECIPIENT_MANAGER', 1);
 define('REENGAGEMENT_RECIPIENT_BOTH', 2);
 
 define('REENGAGEMENT_EMAILFROM_SUPPORT', 0);
-define('REENGAGEMENT_EMAILFROM_TEACHER', 1);
+define('REENGAGEMENT_EMAILFROM_TEACHER', -1);
 
 define('REENGAGEMENT_NOTIFICATION_EMAIL', 0);
 define('REENGAGEMENT_NOTIFICATION_IM', 1);
@@ -255,7 +255,8 @@ function reengagement_crontask() {
                                 r.thirdpartyemails, r.emailcontentmanager, r.emailcontentmanagerformat, r.emailsubjectmanager,
                                 r.emailcontentthirdparty, r.emailcontentthirdpartyformat, r.emailsubjectthirdparty,
                                 r.emailuser, r.name, r.suppresstarget, r.remindercount, c.shortname as courseshortname,
-                                c.fullname as coursefullname, c.id as courseid, r.emailrecipient, r.emaildelay
+                                c.fullname as coursefullname, c.id as courseid, r.emailrecipient, r.emaildelay,
+                                r.emailfrom, r.instantmessage
                           FROM {reengagement} r
                     INNER JOIN {course_modules} cm ON cm.instance = r.id
                     INNER JOIN {course} c ON cm.course = c.id
@@ -1009,18 +1010,20 @@ function reengagement_checkstart($course, $cm, $reengagement) {
  */
 function reengagement_get_emailfrom($reengagement) {
     $userid = $reengagement->emailfrom;
-    if ($userid > 0) {
-        $context = context_course::instance($reengagement->course);
-        if ($userid == 1) { // Default teacher, get first teacher in course.
-            global $DB;
-            $params = array('roleid' => 3, 'contextid' => $context->id);
-            $userid = $DB->get_field('role_assignments', 'userid', $params);
-        }
-        $user = $userid ? core_user::get_user($userid) : null;
+    if ($userid != 0) {
+        $context = context_course::instance($reengagement->courseid);
+        if ($userid == REENGAGEMENT_EMAILFROM_TEACHER) { // Default teacher, get first teacher in course.
+            $users = get_enrolled_users($context, 'mod/reengagement:addinstance', 0, 'u.*', '', 0, 1);
+            if ($users && $user = reset($users)) {
+                return $user;
+            }
+        } else {
+            $user = $userid ? core_user::get_user($userid) : null;
 
-        // Check selected teacher still has capability.
-        if ($user && has_capability('mod/reengagement:addinstance', $context, $user) ) {
-            return $user;
+            // Check selected teacher still has capability.
+            if ($user && has_capability('mod/reengagement:addinstance', $context, $user) ) {
+                return $user;
+            }
         }
     }
 
