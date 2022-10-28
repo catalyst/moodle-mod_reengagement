@@ -55,7 +55,7 @@ if (!empty($userids)) {
     $userids = explode(',', $userids);
 }
 // First initial post from view.php - users stored in array as "userX" => "on" - get the userids.
-if (empty($userids) and $post = data_submitted()) {
+if (empty($userids) && $post = data_submitted()) {
     foreach ($post as $k => $v) {
         if (preg_match('/^user(\d+)$/', $k, $m)) {
             $userids[] = $m[1];

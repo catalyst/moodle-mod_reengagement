@@ -26,6 +26,9 @@ namespace mod_reengagement\completion;
 
 use core_completion\activity_custom_completion;
 
+/**
+ * Custom_completion class.
+ */
 class custom_completion extends activity_custom_completion {
 
     /**
