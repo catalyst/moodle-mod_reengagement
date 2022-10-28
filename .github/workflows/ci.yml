@@ -1,9 +1,11 @@
-name: Run all tests for Moodle 40+
+name: ci
 
 on: [push, pull_request]
 
 jobs:
-  workflow_group_40_plus_ci:
-    uses: catalyst/catalyst-moodle-workflows/.github/workflows/group-40-plus-ci.yml@main
+  ci:
+    uses: catalyst/catalyst-moodle-workflows/.github/workflows/ci.yml@main
+    # secrets:
+      moodle_org_token: ${{ secrets.MOODLE_ORG_TOKEN }}
     with:
       disable_phpunit: true
