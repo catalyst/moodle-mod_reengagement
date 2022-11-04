@@ -409,7 +409,7 @@ class reengagement_participants extends \table_sql implements dynamic_table {
      * @return string
      */
     public function col_emailtime($data) {
-        return userdate($data->emailtime, get_string('strftimedatetimeshort', 'langconfig'));
+        return $data->emailtime ? userdate($data->emailtime, get_string('strftimedatetimeshort', 'langconfig')) : '-';
     }
 
     /**
@@ -419,7 +419,7 @@ class reengagement_participants extends \table_sql implements dynamic_table {
      * @return string
      */
     public function col_completiontime($data) {
-        return userdate($data->completiontime, get_string('strftimedatetimeshort', 'langconfig'));
+        return $data->completiontime ? userdate($data->completiontime, get_string('strftimedatetimeshort', 'langconfig')) : '-';
     }
 
     /**
