@@ -59,6 +59,10 @@ class restore_reengagement_activity_task extends restore_activity_task {
     public static function define_decode_contents() {
         $contents = array();
 
+        $contents[] = new restore_decode_content('reengagement', 'emailcontent');
+        $contents[] = new restore_decode_content('reengagement', 'emailcontentmanager');
+        $contents[] = new restore_decode_content('reengagement', 'emailcontentthirdparty');
+
         return $contents;
     }
 
