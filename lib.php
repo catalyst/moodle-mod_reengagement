@@ -544,6 +544,7 @@ function reengagement_send_notification($userto, $subject, $messageplain, $messa
     $eventdata->name = 'mod_reengagement';
     $eventdata->component = 'mod_reengagement';
 
+    return -1; // Not false, but not a real id either.
     return message_send($eventdata);
 }
 
