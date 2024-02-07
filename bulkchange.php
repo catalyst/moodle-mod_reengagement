@@ -94,7 +94,7 @@ if ($formaction == 'resetbyspecificdate') {
     exit;
 }
 
-$usernamefields = get_all_user_name_fields(true, 'u');
+$usernamefields = \core_user\fields::for_name()->get_sql($alias = 'u', false, '', '',  false)->selects;
 list($usql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
 
 if ($formaction == 'resetbyfirstaccess') {
