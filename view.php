@@ -186,7 +186,6 @@ if ($canedit) {
     ), [], 'showall');
 
     $options = new stdClass();
-    $options->uniqueid = $participanttable->uniqueid;
     $options->courseid = $cm->id;
     $options->stateHelpIcon = $OUTPUT->help_icon('publishstate', 'notes');
 
