@@ -980,3 +980,29 @@ function reengagement_checkstart($course, $cm, $reengagement) {
     }
     return $output;
 }
+
+/**
+ * Add a get_coursemodule_info function for 'extra' information
+ *
+ * @param stdClass $coursemodule The coursemodule object (record).
+ * @return cached_cm_info An object on information that the courses will know about.
+ */
+function reengagement_get_coursemodule_info($coursemodule) {
+    global $DB;
+
+    $dbparams = ['id' => $coursemodule->instance];
+    $fields = 'id, name, duration';
+    if (!$reengagement = $DB->get_record('reengagement', $dbparams, $fields)) {
+        return false;
+    }
+
+    $result = new cached_cm_info();
+    $result->name = $reengagement->name;
+
+    // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['duration'] = $reengagement->duration;
+    }
+
+    return $result;
+}
