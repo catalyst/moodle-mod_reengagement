@@ -112,7 +112,7 @@ function reengagement_delete_instance($id) {
     $result = true;
 
     // Delete any dependent records here.
-    if (! $DB->delete_records('reengagement_inprogress', array('reengagement' => $reengagement->id))) {
+    if (!$DB->delete_records('reengagement_inprogress', array('reengagement' => $reengagement->id))) {
         $result = false;
     }
 
@@ -723,10 +723,20 @@ function reengagement_reset_userdata($data) {
  * Get array of users who can start supplied reengagement module
  *
  * @param object $reengagement - reengagement record.
+ * @param $batchsize - number of users to return in each batch.
  * @return Generator
  */
-function reengagement_get_startusers($reengagement) {
+function reengagement_get_startusers($reengagement, $batchsize = 1000) {
     global $DB;
+
+    // Define a key.
+    $configkey = 'reengagement_start_cmid_' . $reengagement->cmid;
+
+    $start = get_config('mod_reengagement', $configkey);
+    if (empty($start)) {
+        $start = 0;
+    }
+
     $context = context_module::instance($reengagement->cmid);
 
     list($esql, $params) = get_enrolled_sql($context, 'mod/reengagement:startreengagement', 0, true);
@@ -750,23 +760,18 @@ function reengagement_get_startusers($reengagement) {
     $ainfomod = new \core_availability\info_module($cm);
     $information = '';
 
-    // Get all users.
-    $start = 0;
-    while (true) {
-        $startusers = $DB->get_records_sql($sql, $params, $start, 1000);
-        if (empty($startusers)) {
-            break;
+    $startusers = $DB->get_records_sql($sql, $params, $start, $batchsize);
+    foreach ($startusers as $startcandidate) {
+        if ($ainfomod->is_available($information, false, $startcandidate->id, $modinfo)) {
+            yield $startcandidate;
         }
-        // TODO: can we get rid of this loop by adding other required conditions to the SQL itself?
-        // Can we store availability info in the reengagement_inprogress table beforehand?
-        // For e.g. on module create,update,delete, user enrolment etc.
-        foreach ($startusers as $startcandidate) {
+    }
 
-            if ($ainfomod->is_available($information, false, $startcandidate->id, $modinfo)) {
-                yield $startcandidate;
-            }
-        }
-        $start += 1000;
+    if (count($startusers) < $batchsize) {
+        set_config($configkey, 0, 'mod_reengagement'); // We have reached the end of the list.
+    } else {
+        // There are more users to process in next turn.
+        set_config($configkey, $start + $batchsize, 'mod_reengagement');
     }
 }
 
