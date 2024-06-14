@@ -112,7 +112,7 @@ function reengagement_delete_instance($id) {
     $result = true;
 
     // Delete any dependent records here.
-    if (! $DB->delete_records('reengagement_inprogress', array('reengagement' => $reengagement->id))) {
+    if (!$DB->delete_records('reengagement_inprogress', array('reengagement' => $reengagement->id))) {
         $result = false;
     }
 
@@ -178,26 +178,8 @@ function reengagement_crontask() {
     // Get a consistent 'timenow' value across this whole function.
     $timenow = time();
 
-    $reengagementssql = "SELECT cm.id as id, cm.id as cmid, cm.availability, r.id as rid, r.course as courseid,
-                                r.duration, r.emaildelay
-                          FROM {reengagement} r
-                    INNER JOIN {course_modules} cm on cm.instance = r.id
-                          JOIN {modules} m on m.id = cm.module
-                         WHERE m.name = 'reengagement' AND cm.deletioninprogress = 0
-                      ORDER BY r.id ASC";
-
-    $reengagements = $DB->get_recordset_sql($reengagementssql);
-    if (!$reengagements->valid()) {
-        // No reengagement module instances in a course.
-        mtrace("No reengagement instances found - nothing to do :)");
-        return true;
-    }
-
     // First: add 'in-progress' records for those users who are able to start.
-    foreach ($reengagements as $reengagementcm) {
-        // Get a list of users who are eligible to start this module.
-        $startusers = reengagement_get_startusers($reengagementcm);
-
+    foreach (get_reengagements_generator() as $reengagementcm) {
         // Prepare some objects for later db insertion.
         $reengagementinprogress = new stdClass();
         $reengagementinprogress->reengagement = $reengagementcm->rid;
@@ -207,20 +189,20 @@ function reengagement_crontask() {
         $activitycompletion->coursemoduleid = $reengagementcm->cmid;
         $activitycompletion->completionstate = COMPLETION_INCOMPLETE;
         $activitycompletion->timemodified = $timenow;
-        $userlist = array_keys($startusers);
-        $newripcount = count($userlist); // Count of new reengagements-in-progress.
+
+        $newripcount = 0;
+        foreach (reengagement_get_startusers($reengagementcm) as $startcandidate) {
+            $reengagementinprogress->userid = $startcandidate->id;
+            $DB->insert_record('reengagement_inprogress', $reengagementinprogress);
+            $activitycompletion->userid = $startcandidate->id;
+            $DB->insert_record('course_modules_completion', $activitycompletion);
+            $newripcount++;
+        }
+
         if (debugging('', DEBUG_DEVELOPER) || ($newripcount && debugging('', DEBUG_ALL))) {
             mtrace("Adding $newripcount reengagements-in-progress to reengagementid " . $reengagementcm->rid);
         }
-
-        foreach ($userlist as $userid) {
-            $reengagementinprogress->userid = $userid;
-            $DB->insert_record('reengagement_inprogress', $reengagementinprogress);
-            $activitycompletion->userid = $userid;
-            $DB->insert_record('course_modules_completion', $activitycompletion);
-        }
     }
-    $reengagements->close();
     // All new users have now been recorded as started.
     // See if any previous users are due to finish, &/or be emailed.
 
@@ -741,54 +723,56 @@ function reengagement_reset_userdata($data) {
  * Get array of users who can start supplied reengagement module
  *
  * @param object $reengagement - reengagement record.
- * @return array
+ * @param $batchsize - number of users to return in each batch.
+ * @return Generator
  */
-function reengagement_get_startusers($reengagement) {
+function reengagement_get_startusers($reengagement, $batchsize = 1000) {
     global $DB;
+
+    // Define a key.
+    $configkey = 'reengagement_start_cmid_' . $reengagement->cmid;
+
+    $start = get_config('mod_reengagement', $configkey);
+    if (empty($start)) {
+        $start = 0;
+    }
+
     $context = context_module::instance($reengagement->cmid);
 
     list($esql, $params) = get_enrolled_sql($context, 'mod/reengagement:startreengagement', 0, true);
 
-    // Get a list of people who already started this reengagement (finished users are included in this list)
-    // (based on activity completion records).
-    $alreadycompletionsql = "SELECT userid
-                               FROM {course_modules_completion}
-                              WHERE coursemoduleid = :alcmoduleid";
-    $params['alcmoduleid'] = $reengagement->id;
-
-    // Get a list of people who already started this reengagement
-    // (based on reengagement_inprogress records).
-    $alreadyripsql = "SELECT userid
-                        FROM {reengagement_inprogress}
-                       WHERE reengagement = :ripmoduleid";
-    $params['ripmoduleid'] = $reengagement->rid;
-
     $sql = "SELECT u.*
               FROM {user} u
               JOIN ($esql) je ON je.id = u.id
-             WHERE u.deleted = 0
-             AND u.id NOT IN ($alreadycompletionsql)
-             AND u.id NOT IN ($alreadyripsql)";
+              LEFT JOIN {course_modules_completion} cmc ON cmc.userid = u.id AND cmc.coursemoduleid = :alcmoduleid
+              LEFT JOIN {reengagement_inprogress} rip ON rip.userid = u.id AND rip.reengagement = :ripmoduleid
+              WHERE u.deleted = 0
+              AND u.confirmed = 1
+              AND cmc.id IS NULL
+              AND rip.id IS NULL";
 
-    $startusers = $DB->get_records_sql($sql, $params);
+    $params['alcmoduleid'] = $reengagement->cmid;
+    $params['ripmoduleid'] = $reengagement->rid;
+
+    // Load modinfo once per course and cache it to avoid multiple calls to get_fast_modinfo.
+    $modinfo = get_fast_modinfo($reengagement->courseid);
+    $cm = $modinfo->get_cm($reengagement->cmid);
+    $ainfomod = new \core_availability\info_module($cm);
+    $information = '';
+
+    $startusers = $DB->get_records_sql($sql, $params, $start, $batchsize);
     foreach ($startusers as $startcandidate) {
-        $modinfo = get_fast_modinfo($reengagement->courseid, $startcandidate->id);
-        $cm = $modinfo->get_cm($reengagement->cmid);
-        $ainfomod = new \core_availability\info_module($cm);
-        $information = '';
-        if (empty($startcandidate->confirmed)) {
-            // Exclude unconfirmed users. Typically this shouldn't happen, but if an unconfirmed user
-            // has been enrolled to a course we shouldn't e-mail them about activities they can't access yet.
-            unset($startusers[$startcandidate->id]);
-            continue;
-        }
-        // Exclude users who can't see this activity.
-        if (!$ainfomod->is_available($information, false, $startcandidate->id, $modinfo)) {
-            unset($startusers[$startcandidate->id]);
+        if ($ainfomod->is_available($information, false, $startcandidate->id, $modinfo)) {
+            yield $startcandidate;
         }
     }
 
-    return $startusers;
+    if (count($startusers) < $batchsize) {
+        set_config($configkey, 0, 'mod_reengagement'); // We have reached the end of the list.
+    } else {
+        // There are more users to process in next turn.
+        set_config($configkey, $start + $batchsize, 'mod_reengagement');
+    }
 }
 
 
@@ -1005,4 +989,33 @@ function reengagement_get_coursemodule_info($coursemodule) {
     }
 
     return $result;
+}
+
+/**
+ * Generator function to yeild reengagement module instances.
+ *
+ * @global $DB
+ * @return Generator
+ */
+function get_reengagements_generator() {
+    global $DB;
+    $reengagementssql = "SELECT cm.id as id, cm.id as cmid, cm.availability, r.id as rid, r.course as courseid,
+                                r.duration, r.emaildelay
+                          FROM {reengagement} r
+                    INNER JOIN {course_modules} cm on cm.instance = r.id
+                          JOIN {modules} m on m.id = cm.module
+                         WHERE m.name = 'reengagement' AND cm.deletioninprogress = 0
+                      ORDER BY r.id ASC";
+
+    $reengagements = $DB->get_recordset_sql($reengagementssql);
+    if (!$reengagements->valid()) {
+        // No reengagement module instances in a course.
+        mtrace("No reengagement instances found - nothing to do :)");
+        return true;
+    }
+
+    foreach ($reengagements as $reengagementcm) {
+        yield $reengagementcm;
+    }
+    $reengagements->close();
 }
