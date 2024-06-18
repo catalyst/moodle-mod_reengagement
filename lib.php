@@ -771,12 +771,14 @@ function reengagement_get_startusers($reengagement) {
              AND u.id NOT IN ($alreadycompletionsql)
              AND u.id NOT IN ($alreadyripsql)";
 
+    // Load modinfo once per course and cache it to avoid multiple calls to get_fast_modinfo.
+    $modinfo = get_fast_modinfo($reengagement->courseid);
+    $cm = $modinfo->get_cm($reengagement->cmid);
+    $ainfomod = new \core_availability\info_module($cm);
+    $information = '';
+
     $startusers = $DB->get_records_sql($sql, $params);
     foreach ($startusers as $startcandidate) {
-        $modinfo = get_fast_modinfo($reengagement->courseid, $startcandidate->id);
-        $cm = $modinfo->get_cm($reengagement->cmid);
-        $ainfomod = new \core_availability\info_module($cm);
-        $information = '';
         // Exclude users who can't see this activity.
         if (!$ainfomod->is_available($information, false, $startcandidate->id, $modinfo)) {
             unset($startusers[$startcandidate->id]);
