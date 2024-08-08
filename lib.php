@@ -161,8 +161,11 @@ function reengagement_user_complete($course, $user, $mod, $reengagement) {
  */
 function reengagement_get_completion_state($course, $cm, $userid, $type) {
     global $DB;
+    if ($isinprogress = $DB->get_record('reengagement_inprogress', ['reengagement' => $cm->instance, 'userid' => $userid])) {
+        return $isinprogress->completiontime < time();
+    }
     if ($completion = $DB->get_record('course_modules_completion', array('coursemoduleid' => $cm->id, 'userid' => $userid))) {
-        return $completion->completionstate == COMPLETION_COMPLETE_PASS;
+        return $completion->completionstate == COMPLETION_COMPLETE;
     }
     return false;
 }
@@ -281,41 +284,13 @@ function reengagement_crontask() {
             continue;
         }
 
-        // Update completion record to indicate completion so the user can continue with any dependant activities.
-        $completionrecord = $DB->get_record('course_modules_completion', array('coursemoduleid' => $cmid, 'userid' => $userid));
-        if (empty($completionrecord)) {
-            mtrace("Could not find completion record for updating to complete state - userid: $userid, cmid: $cmid - recreating record.");
-            // This might happen when reset_all_state has been triggered, deleting an "in-progress" record. so recreate it.
-            $completionrecord = new stdClass();
-            $completionrecord->coursemoduleid = $cmid;
-            $completionrecord->completionstate = COMPLETION_COMPLETE_PASS;
-            $completionrecord->viewed = COMPLETION_VIEWED;
-            $completionrecord->overrideby = null;
-            $completionrecord->timemodified = $timenow;
-            $completionrecord->userid = $userid;
-            $completionrecord->id = $DB->insert_record('course_modules_completion', $completionrecord);
-        } else {
-            $updaterecord = new stdClass();
-            $updaterecord->id = $completionrecord->id;
-            $updaterecord->completionstate = COMPLETION_COMPLETE_PASS;
-            $updaterecord->timemodified = $timenow;
-            $DB->update_record('course_modules_completion', $updaterecord) . " \n";
+        // Trigger completion so the user can continue with any dependant activities.
+        $course = $DB->get_record('course', array('id' => $reengagement->courseid), '*', MUST_EXIST);
+        $cm = get_coursemodule_from_id('reengagement', $cmid, $reengagement->courseid, false, MUST_EXIST);
+        $ccompletion = new completion_info($course);
+        if ($ccompletion->is_enabled($cm)) {
+            $ccompletion->update_state($cm, COMPLETION_COMPLETE, $userid);
         }
-        $completioncache = cache::make('core', 'completion');
-        $completioncache->delete($userid . '_' . $reengagement->courseid);
-
-        $cmcontext = context_module::instance($cmid, MUST_EXIST);
-        // Trigger an event for course module completion changed.
-        $event = \core\event\course_module_completion_updated::create(array(
-            'objectid' => $completionrecord->id,
-            'context' => $cmcontext,
-            'relateduserid' => $userid,
-            'other' => array(
-                'relateduserid' => $userid
-            )
-        ));
-        $event->add_record_snapshot('course_modules_completion', $completionrecord);
-        $event->trigger();
 
         $result = false;
         if (($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) ||
