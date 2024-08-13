@@ -27,7 +27,7 @@ namespace mod_reengagement\table;
 
 use context;
 use context_module;
-use core_table\dynamic as dynamic_table;
+
 use core_table\local\filter\filterset;
 use core_user\output\status_field;
 use DateTime;
@@ -48,7 +48,7 @@ require_once($CFG->dirroot . '/user/lib.php');
  * @author     Dan Marsden <Dan@danmarsden.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class reengagement_participants extends \table_sql implements dynamic_table {
+class reengagement_participants extends \core_user\table\participants {
 
     /**
      * @var \stdclass $reengagement The reengagement record
@@ -261,149 +261,6 @@ class reengagement_participants extends \table_sql implements dynamic_table {
     }
 
     /**
-     * Generate the select column.
-     *
-     * @param \stdClass $data
-     * @return string
-     */
-    public function col_select($data) {
-        global $OUTPUT;
-
-        $checkbox = new \core\output\checkbox_toggleall('participants-table', false, [
-            'classes' => 'usercheckbox m-1',
-            'id' => 'user' . $data->id,
-            'name' => 'user' . $data->id,
-            'checked' => false,
-            'label' => get_string('selectitem', 'moodle', fullname($data)),
-            'labelclasses' => 'accesshide',
-        ]);
-
-        return $OUTPUT->render($checkbox);
-    }
-
-    /**
-     * Generate the fullname column.
-     *
-     * @param \stdClass $data
-     * @return string
-     */
-    public function col_fullname($data) {
-        global $OUTPUT;
-
-        return $OUTPUT->user_picture($data, array('size' => 35, 'courseid' => $this->course->id, 'includefullname' => true));
-    }
-
-    /**
-     * User roles column.
-     *
-     * @param \stdClass $data
-     * @return string
-     */
-    public function col_roles($data) {
-        global $OUTPUT;
-
-        $roles = $this->allroleassignments[$data->id] ?? [];
-        $editable = new \core_user\output\user_roles_editable($this->course,
-            $this->context,
-            $data,
-            $this->allroles,
-            $this->assignableroles,
-            $this->profileroles,
-            $roles,
-            $this->viewableroles);
-
-        return $OUTPUT->render_from_template('core/inplace_editable', $editable->export_for_template($OUTPUT));
-    }
-
-    /**
-     * Generate the groups column.
-     *
-     * @param \stdClass $data
-     * @return string
-     */
-    public function col_groups($data) {
-        global $OUTPUT;
-
-        $usergroups = [];
-        foreach ($this->groups as $coursegroup) {
-            if (isset($coursegroup->members[$data->id])) {
-                $usergroups[] = $coursegroup->id;
-            }
-        }
-        $editable = new \core_group\output\user_groups_editable($this->course, $this->context, $data, $this->groups, $usergroups);
-        return $OUTPUT->render_from_template('core/inplace_editable', $editable->export_for_template($OUTPUT));
-    }
-
-    /**
-     * Generate the last access column.
-     *
-     * @param \stdClass $data
-     * @return string
-     */
-    public function col_lastaccess($data) {
-        if ($data->lastaccess) {
-            return format_time(time() - $data->lastaccess);
-        }
-
-        return get_string('never');
-    }
-
-    /**
-     * Generate the status column.
-     *
-     * @param \stdClass $data The data object.
-     * @return string
-     */
-    public function col_status($data) {
-        global $CFG, $OUTPUT, $PAGE;
-
-        $enrolstatusoutput = '';
-        $canreviewenrol = has_capability('moodle/course:enrolreview', $this->context);
-        if ($canreviewenrol) {
-            $canviewfullnames = has_capability('moodle/site:viewfullnames', $this->context);
-            $fullname = fullname($data, $canviewfullnames);
-            $coursename = format_string($this->course->fullname, true, array('context' => $this->context));
-            require_once($CFG->dirroot . '/enrol/locallib.php');
-            $manager = new \course_enrolment_manager($PAGE, $this->course);
-            $userenrolments = $manager->get_user_enrolments($data->id);
-            foreach ($userenrolments as $ue) {
-                $timestart = $ue->timestart;
-                $timeend = $ue->timeend;
-                $timeenrolled = $ue->timecreated;
-                $actions = $ue->enrolmentplugin->get_user_enrolment_actions($manager, $ue);
-                $instancename = $ue->enrolmentinstancename;
-
-                // Default status field label and value.
-                $status = get_string('participationactive', 'enrol');
-                $statusval = status_field::STATUS_ACTIVE;
-                switch ($ue->status) {
-                    case ENROL_USER_ACTIVE:
-                        $currentdate = new DateTime();
-                        $now = $currentdate->getTimestamp();
-                        $isexpired = $timestart > $now || ($timeend > 0 && $timeend < $now);
-                        $enrolmentdisabled = $ue->enrolmentinstance->status == ENROL_INSTANCE_DISABLED;
-                        // If user enrolment status has not yet started/already ended or the enrolment instance is disabled.
-                        if ($isexpired || $enrolmentdisabled) {
-                            $status = get_string('participationnotcurrent', 'enrol');
-                            $statusval = status_field::STATUS_NOT_CURRENT;
-                        }
-                        break;
-                    case ENROL_USER_SUSPENDED:
-                        $status = get_string('participationsuspended', 'enrol');
-                        $statusval = status_field::STATUS_SUSPENDED;
-                        break;
-                }
-
-                $statusfield = new status_field($instancename, $coursename, $fullname, $status, $timestart, $timeend,
-                    $actions, $timeenrolled);
-                $statusfielddata = $statusfield->set_status($statusval)->export_for_template($OUTPUT);
-                $enrolstatusoutput .= $OUTPUT->render_from_template('core_user/status_field', $statusfielddata);
-            }
-        }
-        return $enrolstatusoutput;
-    }
-
-    /**
      * Generate the notify time column.
      *
      * @param \stdClass $data The data object.
@@ -424,26 +281,6 @@ class reengagement_participants extends \table_sql implements dynamic_table {
     }
 
     /**
-     * This function is used for the extra user fields.
-     *
-     * These are being dynamically added to the table so there are no functions 'col_<userfieldname>' as
-     * the list has the potential to increase in the future and we don't want to have to remember to add
-     * a new method to this class. We also don't want to pollute this class with unnecessary methods.
-     *
-     * @param string $colname The column name
-     * @param \stdClass $data
-     * @return string
-     */
-    public function other_cols($colname, $data) {
-        // Do not process if it is not a part of the extra fields.
-        if (!in_array($colname, $this->extrafields)) {
-            return '';
-        }
-
-        return s($data->{$colname});
-    }
-
-    /**
      * Query the database for results to display in the table.
      *
      * @param int $pagesize size of page for paginated displayed table.
@@ -458,9 +295,6 @@ class reengagement_participants extends \table_sql implements dynamic_table {
         $this->pagesize($pagesize, $total);
 
         $sort = $this->get_sql_sort();
-        if ($sort) {
-            $sort = 'ORDER BY ' . $sort;
-        }
 
         $rawdata = $psearch->get_participants($twhere, $tparams, $sort, $this->get_page_start(), $this->get_page_size());
 
@@ -484,20 +318,6 @@ class reengagement_participants extends \table_sql implements dynamic_table {
     }
 
     /**
-     * Override the table show_hide_link to not show for select column.
-     *
-     * @param string $column the column name, index into various names.
-     * @param int $index numerical index of the column.
-     * @return string HTML fragment.
-     */
-    protected function show_hide_link($column, $index) {
-        if ($index > 0) {
-            return parent::show_hide_link($column, $index);
-        }
-        return '';
-    }
-
-    /**
      * Set filters and build table structure.
      *
      * @param filterset $filterset The filterset object to get the filters from.
@@ -516,7 +336,7 @@ class reengagement_participants extends \table_sql implements dynamic_table {
         $this->context = context_module::instance($this->cmid, MUST_EXIST);
 
         // Process the filterset.
-        parent::set_filterset($filterset);
+        \table_sql::set_filterset($filterset);
     }
 
     /**
@@ -524,16 +344,5 @@ class reengagement_participants extends \table_sql implements dynamic_table {
      */
     public function guess_base_url(): void {
         $this->baseurl = new moodle_url('/mod/reengagement/view.php', ['id' => $this->cmid]);
-    }
-
-    /**
-     * Get the context of the current table.
-     *
-     * Note: This function should not be called until after the filterset has been provided.
-     *
-     * @return context
-     */
-    public function get_context(): context {
-        return $this->context;
     }
 }
