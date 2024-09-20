@@ -248,9 +248,11 @@ function reengagement_crontask() {
                         FROM {reengagement_inprogress} ri
                         JOIN {reengagement} r ON r.id = ri.reengagement
                         JOIN {user} u ON u.id = ri.userid
+                        LEFT JOIN {course_modules_completion} cmc ON cmc.userid = u.id AND cmc.coursemoduleid = r.suppresstarget
                        WHERE u.deleted = 0 AND
-                       completiontime < ? AND completed = 0';
-    $inprogresses = $DB->get_recordset_sql($inprogresssql, array($timenow));
+                       ri.completed = 0 AND
+                       (completiontime < ? OR cmc.completionstate IN (?,?,?))';
+    $inprogresses = $DB->get_recordset_sql($inprogresssql, array($timenow, COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL));
     $completeripcount = 0;
     foreach ($inprogresses as $inprogress) {
         $completeripcount++;
