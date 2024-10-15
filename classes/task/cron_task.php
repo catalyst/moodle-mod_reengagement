@@ -49,7 +49,32 @@ class cron_task extends \core\task\scheduled_task {
     public function execute() {
         global $CFG;
         require_once($CFG->dirroot . '/mod/reengagement/lib.php');
+
+        if ($this->has_pending_adhoc_tasks()) {
+            mtrace('Pending reengagement adhoc task already exists, skipping execution.');
+            return;
+        }
+
         reengagement_crontask();
     }
 
+    /**
+     * Check if pending adhoc tasks created by this task already exist.
+     *
+     * @return bool
+     */
+    protected function has_pending_adhoc_tasks() {
+        global $DB;
+        $pendingtasks = $DB->get_records_sql(
+            "SELECT * FROM {task_adhoc}
+             WHERE classname = :classname
+             AND faildelay = 0
+             AND nextruntime <= :time",
+            [
+                'classname' => '\\mod_reengagement\\task\\reengagement_adhoc_task',
+                'time' => time()
+            ]
+        );
+        return !empty($pendingtasks);
+    }
 }
