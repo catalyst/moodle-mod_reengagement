@@ -305,7 +305,7 @@ function reengagement_email_user($reengagement, $inprogress) {
         $emails = array_map('trim', explode(',', $reengagement->thirdpartyemails));
         foreach ($emails as $emailaddress) {
             if (!validate_email($emailaddress)) {
-                debugging('', DEBUG_ALL) && mtrace("invalid third-party email: $email - skipping send");
+                debugging('', DEBUG_ALL) && mtrace("invalid third-party email: $emailaddress - skipping send");
                 continue;
             }
             if ($istotara) {
