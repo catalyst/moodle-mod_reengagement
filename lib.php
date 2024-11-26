@@ -201,10 +201,14 @@ function reengagement_crontask() {
 
     // First: add 'in-progress' records for those users who are able to start.
     foreach ($reengagements as $reengagementcm) {
-        if (debugging('', DEBUG_DEVELOPER) || ($reengagementcm->cmid && debugging('', DEBUG_ALL))) {
-            mtrace("Adding adhoc task for course module id " . $reengagementcm->cmid);
+        $isqueued = reengagement_queue_adhoc_task($reengagementcm);
+        if (!$isqueued) {
+            debugging('', DEBUG_DEVELOPER) &&
+              mtrace("Skipped queueing re-engagement module: (rid: $reengagementcm->rid, cmid: $reengagementcm->cmid)");
+            continue;
         }
-        reengagement_queue_adhoc_task($reengagementcm);
+        debugging('', DEBUG_DEVELOPER) &&
+          mtrace("Queued re-engagement module: (rid: $reengagementcm->rid, cmid: $reengagementcm->cmid)");
     }
     $reengagements->close();
 
@@ -840,5 +844,5 @@ function reengagement_queue_adhoc_task($reengagementcm) {
     $task->set_custom_data($customdata);
 
     // Queue the task.
-    manager::queue_adhoc_task($task, true);
+    return manager::queue_adhoc_task($task, true);
 }
