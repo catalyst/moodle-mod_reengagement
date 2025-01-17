@@ -1,4 +1,6 @@
-# Re-engagement plugin developed by Catalyst IT [![Build Status](https://travis-ci.org/catalyst/moodle-mod_reengagement.png?branch=master)](https://travis-ci.org/catalyst/moodle-mod_reengagement)
+[![ci](https://github.com/catalyst/moodle-mod_reengagement/actions/workflows/ci.yml/badge.svg?branch=MOODLE_400_STABLE)](https://github.com/catalyst/moodle-mod_reengagement/actions/workflows/ci.yml?branch=MOODLE_400_STABLE)
+
+# Re-engagement plugin developed by Catalyst IT
 
 Allows timed release of content and emails users to remind them to complete course activities
 
