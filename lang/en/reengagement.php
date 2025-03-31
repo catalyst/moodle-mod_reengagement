@@ -109,7 +109,6 @@ $string['receiveemailattimexunless'] = 'Message will be sent on {$a} unless you 
 $string['reengagement:addinstance'] = 'reengagement:addinstance';
 $string['reengagement:startreengagement'] = 'Start Reengagement';
 $string['reengagement:editreengagementduration'] = 'Edit Reengagement Duration';
-$string['reengagement:bulkactions'] = 'Perform bulk actions on reengagment';
 $string['reengagementduration'] = 'Reengagement duration';
 $string['reengagementfieldset'] = 'Reengagement details';
 $string['reengagementintro'] = 'Reengagement intro';
