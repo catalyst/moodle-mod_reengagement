@@ -50,6 +50,11 @@ class reengagement_adhoc_task extends adhoc_task {
             return;
         }
 
+        // Ensure the coursemodule still exists, otherwise exit early.
+        if (empty($data->cmid) || !$DB->record_exists('course_modules', ['id' => $data->cmid])) {
+            return;
+        }
+
         // Get a list of users who are eligible to start this module.
         $startusers = reengagement_get_startusers($data);
 
