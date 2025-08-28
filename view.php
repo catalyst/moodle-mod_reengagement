@@ -228,10 +228,15 @@ if ($canedit) {
         echo '<div><input type="submit" value="' . get_string('ok') . '" /></div>';
         echo '</noscript>';
         echo '</div></div>';
-        $options->noteStateNames = note_get_state_names();
     }
     echo '</form>';
-    $PAGE->requires->js_call_amd('core_user/participants', 'init', [$options]);
+
+    $jsoptions = (object)[
+        'courseid' => $course->id,
+        'context' => $context->id
+    ];
+
+    $PAGE->requires->js_call_amd('core_user/participants', 'init', [$jsoptions]);
 
     echo '</div>';  // Userlist.
 

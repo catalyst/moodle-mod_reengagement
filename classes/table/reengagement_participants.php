@@ -290,28 +290,33 @@ class reengagement_participants extends \core_user\table\participants {
         list($twhere, $tparams) = $this->get_sql_where();
         $psearch = new \mod_reengagement\table\reengagement_search($this->course, $this->context, $this->filterset);
 
-        $total = $psearch->get_total_participants_count($twhere, $tparams);
+        $sort = $this->get_sql_sort();
+
+        $rs = $psearch->get_participants(
+            $twhere,
+            $tparams,
+            $sort,
+            (int)$this->get_page_start(),
+            (int)$this->get_page_size()
+        );
+
+        $this->rawdata = [];
+        $total = 0;
+
+        foreach ($rs as $user) {
+            if ($total === 0) {
+                $total = (int)$user->fullcount;
+            }
+            $this->rawdata[$user->id] = $user;
+        }
+        $rs->close();
 
         $this->pagesize($pagesize, $total);
 
-        $sort = $this->get_sql_sort();
+        $this->allroleassignments = $this->rawdata
+            ? get_users_roles($this->context, array_keys($this->rawdata), true, 'c.contextlevel DESC, r.sortorder ASC')
+            : [];
 
-        $rawdata = $psearch->get_participants($twhere, $tparams, $sort, $this->get_page_start(), $this->get_page_size());
-
-        $this->rawdata = [];
-        foreach ($rawdata as $user) {
-            $this->rawdata[$user->id] = $user;
-        }
-        $rawdata->close();
-
-        if ($this->rawdata) {
-            $this->allroleassignments = get_users_roles($this->context, array_keys($this->rawdata),
-                true, 'c.contextlevel DESC, r.sortorder ASC');
-        } else {
-            $this->allroleassignments = [];
-        }
-
-        // Set initial bars.
         if ($useinitialsbar) {
             $this->initialbars(true);
         }
