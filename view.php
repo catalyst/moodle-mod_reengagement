@@ -231,7 +231,13 @@ if ($canedit) {
         $options->noteStateNames = note_get_state_names();
     }
     echo '</form>';
-    $PAGE->requires->js_call_amd('core_user/participants', 'init', [$options]);
+
+    $jsoptions = (object)[
+        'courseid' => $course->id,
+        'context' => $context->id
+    ];
+
+    $PAGE->requires->js_call_amd('core_user/participants', 'init', [$jsoptions]);
 
     echo '</div>';  // Userlist.
 
