@@ -228,7 +228,6 @@ if ($canedit) {
         echo '<div><input type="submit" value="' . get_string('ok') . '" /></div>';
         echo '</noscript>';
         echo '</div></div>';
-        $options->noteStateNames = note_get_state_names();
     }
     echo '</form>';
 
