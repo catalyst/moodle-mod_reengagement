@@ -321,8 +321,6 @@ class reengagement_participants extends \core_user\table\participants {
             $this->initialbars(true);
         }
     }
-
-
     /**
      * Set filters and build table structure.
      *
