@@ -305,7 +305,7 @@ class reengagement_participants extends \core_user\table\participants {
 
         foreach ($rs as $user) {
             if ($total === 0) {
-                $total = (int)$user->fullcount; // <- confirmed by your dump
+                $total = (int)$user->fullcount;
             }
             $this->rawdata[$user->id] = $user;
         }
