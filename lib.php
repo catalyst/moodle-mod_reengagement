@@ -352,10 +352,14 @@ function reengagement_email_user($reengagement, $inprogress) {
  * @param object $reengagement database record
  */
 function reengagement_send_notification($userto, $subject, $messageplain, $messagehtml, $reengagement) {
+    global $CFG;
+    
     $eventdata = new \core\message\message();
     $eventdata->courseid = $reengagement->courseid;
     $eventdata->modulename = 'reengagement';
-    $eventdata->userfrom = core_user::get_support_user();
+    //$eventdata->userfrom = core_user::get_support_user();
+    //Ei update - user noreply instead of support 
+    $eventdata->userfrom = core_user::get_noreply_user();
     $eventdata->userto = $userto;
     $eventdata->subject = $subject;
     $eventdata->fullmessage = $messageplain;
