@@ -355,7 +355,7 @@ function reengagement_send_notification($userto, $subject, $messageplain, $messa
     $eventdata = new \core\message\message();
     $eventdata->courseid = $reengagement->courseid;
     $eventdata->modulename = 'reengagement';
-    $eventdata->userfrom = core_user::get_support_user();
+    $eventdata->userfrom = core_user::get_noreply_user();
     $eventdata->userto = $userto;
     $eventdata->subject = $subject;
     $eventdata->fullmessage = $messageplain;
