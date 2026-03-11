@@ -186,7 +186,7 @@ if ($canedit) {
     ), [], 'showall');
 
     if ($bulkoperations) {
-        echo '<br /><div class="buttons"><div class="form-inline">';
+        echo '<br /><div class="buttons"><div class="d-flex flex-wrap gap-2 align-items-center">';
 
         if ($participanttable->get_page_size() < $participanttable->totalrows) {
             // Select all users, refresh table showing all users and mark them all selected.
