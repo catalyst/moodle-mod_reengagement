@@ -30,7 +30,6 @@ use core_completion\activity_custom_completion;
  * Custom_completion class.
  */
 class custom_completion extends activity_custom_completion {
-
     /**
      * Fetches the completion state for a given completion rule.
      *
@@ -63,7 +62,7 @@ class custom_completion extends activity_custom_completion {
      */
     public function get_custom_rule_descriptions(): array {
         return [
-            'duration' => get_string('duration', 'reengagement')
+            'duration' => get_string('duration', 'reengagement'),
         ];
     }
 

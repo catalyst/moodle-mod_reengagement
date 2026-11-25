@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 /**
  * Moodleform class.
@@ -36,7 +36,6 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_reengagement_mod_form extends moodleform_mod {
-
     /**
      * Called to define this moodle form
      *
@@ -55,18 +54,22 @@ class mod_reengagement_mod_form extends moodleform_mod {
         if (!$COURSE->enablecompletion) {
             $coursecontext = context_course::instance($COURSE->id);
             if (has_capability('moodle/course:update', $coursecontext)) {
-                $mform->addElement('static', 'completionwillturnon', get_string('completion', 'reengagement'),
-                                   get_string('completionwillturnon', 'reengagement'));
+                $mform->addElement(
+                    'static',
+                    'completionwillturnon',
+                    get_string('completion', 'reengagement'),
+                    get_string('completionwillturnon', 'reengagement')
+                );
             }
         }
 
         $istotara = false;
-        if (file_exists($CFG->dirroot.'/totara')) {
+        if (file_exists($CFG->dirroot . '/totara')) {
             $istotara = true;
         }
 
         // Adding the standard "name" field.
-        $mform->addElement('text', 'name', get_string('reengagementname', 'reengagement'), array('size' => '64'));
+        $mform->addElement('text', 'name', get_string('reengagementname', 'reengagement'), ['size' => '64']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
@@ -77,7 +80,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->setExpanded('reengagementfieldset', true);
 
         // Adding email detail fields.
-        $emailuseroptions = array(); // The sorts of emailing this module might do.
+        $emailuseroptions = []; // The sorts of emailing this module might do.
         $emailuseroptions[REENGAGEMENT_EMAILUSER_NEVER] = get_string('never', 'reengagement');
         $emailuseroptions[REENGAGEMENT_EMAILUSER_COMPLETION] = get_string('oncompletion', 'reengagement');
         $emailuseroptions[REENGAGEMENT_EMAILUSER_TIME] = get_string('afterdelay', 'reengagement');
@@ -87,7 +90,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
 
         if ($istotara) {
             // Add options to control who any notifications should go to.
-            $emailrecipientoptions = array(); // The message recipient options.
+            $emailrecipientoptions = []; // The message recipient options.
             $emailrecipientoptions[REENGAGEMENT_RECIPIENT_USER] = get_string('user');
             $emailrecipientoptions[REENGAGEMENT_RECIPIENT_MANAGER] = get_string('manager', 'role');
             $emailrecipientoptions[REENGAGEMENT_RECIPIENT_BOTH] = get_string('userandmanager', 'reengagement');
@@ -99,20 +102,20 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setType('emailrecipient', PARAM_INT);
         }
 
-        $mform->addElement('text', 'thirdpartyemails', get_string('thirdpartyemails', 'reengagement'), array('size' => '80'));
+        $mform->addElement('text', 'thirdpartyemails', get_string('thirdpartyemails', 'reengagement'), ['size' => '80']);
         $mform->addHelpButton('thirdpartyemails', 'thirdpartyemails', 'reengagement');
         $mform->setType('thirdpartyemails', PARAM_TEXT);
 
         // Add a group of controls to specify after how long an email should be sent.
-        $emaildelay = array();
-        $periods = array();
+        $emaildelay = [];
+        $periods = [];
         $periods[60] = get_string('minutes', 'reengagement');
         $periods[3600] = get_string('hours', 'reengagement');
         $periods[86400] = get_string('days', 'reengagement');
         $periods[604800] = get_string('weeks', 'reengagement');
-        $emaildelay[] = $mform->createElement('text', 'emailperiodcount', '', array('class="emailperiodcount"'));
+        $emaildelay[] = $mform->createElement('text', 'emailperiodcount', '', ['class="emailperiodcount"']);
         $emaildelay[] = $mform->createElement('select', 'emailperiod', '', $periods);
-        $mform->addGroup($emaildelay, 'emaildelay', get_string('emaildelay', 'reengagement'), array(' '), false);
+        $mform->addGroup($emaildelay, 'emaildelay', get_string('emaildelay', 'reengagement'), [' '], false);
         $mform->addHelpButton('emaildelay', 'emaildelay', 'reengagement');
         $mform->setType('emailperiodcount', PARAM_INT);
         $mform->setDefault('emailperiodcount', '1');
@@ -120,14 +123,14 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->hideif('emaildelay', 'emailuser', 'neq', REENGAGEMENT_EMAILUSER_TIME);
 
         // Add frequency of e-mails.
-        $mform->addElement('text', 'remindercount', get_string('remindercount', 'reengagement'), array('maxlength' => '2'));
+        $mform->addElement('text', 'remindercount', get_string('remindercount', 'reengagement'), ['maxlength' => '2']);
         $mform->setType('remindercount', PARAM_INT);
         $mform->setDefault('remindercount', '1');
         $mform->addRule('remindercount', get_string('err_numeric', 'form'), 'numeric', '', 'client');
         $mform->addHelpButton('remindercount', 'remindercount', 'reengagement');
         $mform->hideif('remindercount', 'emailuser', 'neq', REENGAGEMENT_EMAILUSER_TIME);
 
-        $mform->addElement('text', 'emailsubject', get_string('emailsubject', 'reengagement'), array('size' => '64'));
+        $mform->addElement('text', 'emailsubject', get_string('emailsubject', 'reengagement'), ['size' => '64']);
         $mform->setType('emailsubject', PARAM_TEXT);
         $mform->addRule('emailsubject', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->hideif('emailsubject', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
@@ -138,8 +141,12 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->hideif('emailcontent', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
 
         if ($istotara) {
-            $mform->addElement('text', 'emailsubjectmanager', get_string('emailsubjectmanager', 'reengagement'),
-                               array('size' => '64'));
+            $mform->addElement(
+                'text',
+                'emailsubjectmanager',
+                get_string('emailsubjectmanager', 'reengagement'),
+                ['size' => '64']
+            );
             $mform->setType('emailsubjectmanager', PARAM_TEXT);
             $mform->addRule('emailsubjectmanager', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
             $mform->hideif('emailsubjectmanager', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
@@ -155,8 +162,12 @@ class mod_reengagement_mod_form extends moodleform_mod {
             $mform->setType('emailcontentmanager', PARAM_ALPHA);
         }
 
-        $mform->addElement('text', 'emailsubjectthirdparty',
-            get_string('emailsubjectthirdparty', 'reengagement'), array('size' => '64'));
+        $mform->addElement(
+            'text',
+            'emailsubjectthirdparty',
+            get_string('emailsubjectthirdparty', 'reengagement'),
+            ['size' => '64']
+        );
         $mform->setType('emailsubjectthirdparty', PARAM_TEXT);
         $mform->addRule('emailsubjectthirdparty', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('emailsubjectthirdparty', 'emailsubjectthirdparty', 'reengagement');
@@ -169,7 +180,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         $mform->hideif('suppressemail', 'emailuser', 'eq', REENGAGEMENT_EMAILUSER_NEVER);
         $mform->addHelpbutton('suppressemail', 'suppressemail', 'reengagement');
         $truemods = get_fast_modinfo($COURSE->id);
-        $mods = array();
+        $mods = [];
         $mods[0] = get_string('nosuppresstarget', 'reengagement');
         foreach ($truemods->cms as $mod) {
             $mods[$mod->id] = $mod->name;
@@ -199,7 +210,6 @@ class mod_reengagement_mod_form extends moodleform_mod {
 
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
-
     }
 
     /**
@@ -210,19 +220,19 @@ class mod_reengagement_mod_form extends moodleform_mod {
     public function set_data($toform) {
         global $CFG;
         $istotara = false;
-        if (file_exists($CFG->dirroot.'/totara')) {
+        if (file_exists($CFG->dirroot . '/totara')) {
             $istotara = true;
         }
         // Form expects durations as a number of periods eg 5 minutes.
         // Process dbtime (seconds) into form-appropraite times.
         if (!empty($toform->duration)) {
-            list ($periodcount, $period) = reengagement_get_readable_duration($toform->duration);
+             [$periodcount, $period] = reengagement_get_readable_duration($toform->duration);
             $toform->period = $period;
             $toform->periodcount = $periodcount;
             unset($toform->duration);
         }
         if (!empty($toform->emaildelay)) {
-            list ($periodcount, $period) = reengagement_get_readable_duration($toform->emaildelay);
+             [$periodcount, $period] = reengagement_get_readable_duration($toform->emaildelay);
             $toform->emailperiod = $period;
             $toform->emailperiodcount = $periodcount;
             unset($toform->emaildelay);
@@ -233,7 +243,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
         if (!isset($toform->emailcontentformat)) {
             $toform->emailcontentformat = 1;
         }
-        $toform->emailcontent = array('text' => $toform->emailcontent, 'format' => $toform->emailcontentformat);
+        $toform->emailcontent = ['text' => $toform->emailcontent, 'format' => $toform->emailcontentformat];
         if ($istotara) {
             if (!isset($toform->emailcontentmanager)) {
                 $toform->emailcontentmanager = get_string('emailcontentmanagerdefaultvalue', 'reengagement');
@@ -241,8 +251,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
             if (!isset($toform->emailcontentmanagerformat)) {
                 $toform->emailcontentmanagerformat = 1;
             }
-            $toform->emailcontentmanager = array('text' => $toform->emailcontentmanager,
-                'format' => $toform->emailcontentmanagerformat);
+            $toform->emailcontentmanager = ['text' => $toform->emailcontentmanager,
+                'format' => $toform->emailcontentmanagerformat];
         }
 
         if (!isset($toform->emailcontentthirdparty)) {
@@ -251,8 +261,8 @@ class mod_reengagement_mod_form extends moodleform_mod {
         if (!isset($toform->emailcontentthirdpartyformat)) {
             $toform->emailcontentthirdpartyformat = 1;
         }
-        $toform->emailcontentthirdparty = array('text' => $toform->emailcontentthirdparty,
-                                                'format' => $toform->emailcontentthirdpartyformat);
+        $toform->emailcontentthirdparty = ['text' => $toform->emailcontentthirdparty,
+                                                'format' => $toform->emailcontentthirdpartyformat];
 
         if (empty($toform->suppresstarget)) {
             // There is no target activity specified.
@@ -279,7 +289,7 @@ class mod_reengagement_mod_form extends moodleform_mod {
     public function get_data() {
         global $CFG;
         $istotara = false;
-        if (file_exists($CFG->dirroot.'/totara')) {
+        if (file_exists($CFG->dirroot . '/totara')) {
             $istotara = true;
         }
         $fromform = parent::get_data();
@@ -333,20 +343,20 @@ class mod_reengagement_mod_form extends moodleform_mod {
      */
     public function add_completion_rules() {
         $mform =& $this->_form;
-        $periods = array();
+        $periods = [];
         $periods[1] = get_string('seconds', 'reengagement');
         $periods[MINSECS] = get_string('minutes', 'reengagement');
         $periods[HOURSECS] = get_string('hours', 'reengagement');
         $periods[DAYSECS] = get_string('days', 'reengagement');
         $periods[WEEKSECS] = get_string('weeks', 'reengagement');
-        $duration[] = &$mform->createElement('text', 'periodcount', '', array('class="periodcount"'));
+        $duration[] = &$mform->createElement('text', 'periodcount', '', ['class="periodcount"']);
         $mform->setType('periodcount', PARAM_INT);
         $duration[] = &$mform->createElement('select', 'period', '', $periods);
-        $mform->addGroup($duration, 'duration', get_string('reengagementduration', 'reengagement'), array(' '), false);
+        $mform->addGroup($duration, 'duration', get_string('reengagementduration', 'reengagement'), [' '], false);
         $mform->addHelpButton('duration', 'duration', 'reengagement');
         $mform->setDefault('periodcount', '1');
         $mform->setDefault('period', '604800');
-        return array('duration');
+        return ['duration'];
     }
 
     /**

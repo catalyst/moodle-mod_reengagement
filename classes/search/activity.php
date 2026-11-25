@@ -25,7 +25,6 @@
 
 namespace mod_reengagement\search;
 
-
 /**
  * Search area for mod_reengagement activities.
  *

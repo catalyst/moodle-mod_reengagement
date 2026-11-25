@@ -129,7 +129,7 @@ class reengagement_adhoc_task extends adhoc_task {
                         JOIN {user} u ON u.id = ri.userid
                        WHERE u.deleted = 0 AND
                        completiontime < ? AND completed = 0 AND ri.reengagement = ?';
-        $inprogresses = $DB->get_recordset_sql($inprogresssql, array($timenow, $reengagementid));
+        $inprogresses = $DB->get_recordset_sql($inprogresssql, [$timenow, $reengagementid]);
         $completeripcount = 0;
         foreach ($inprogresses as $inprogress) {
             $completeripcount++;
@@ -142,12 +142,12 @@ class reengagement_adhoc_task extends adhoc_task {
             // Check if user is still enrolled in the course.
             $context = context_module::instance($reengagement->cmid);
             if (!is_enrolled($context, $userid, 'mod/reengagement:startreengagement', true)) {
-                $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
+                $DB->delete_records('reengagement_inprogress', ['id' => $inprogress->id]);
                 continue;
             }
 
             // Update completion record to indicate completion so the user can continue with any dependant activities.
-            $completionrecord = $DB->get_record('course_modules_completion', array('coursemoduleid' => $cmid, 'userid' => $userid));
+            $completionrecord = $DB->get_record('course_modules_completion', ['coursemoduleid' => $cmid, 'userid' => $userid]);
             if (empty($completionrecord)) {
                 mtrace("Could not find completion record to update complete state, userid: $userid, cmid: $cmid - recreating record.");
                 // This might happen when reset_all_state has been triggered, deleting an "in-progress" record. so recreate it.
@@ -171,19 +171,20 @@ class reengagement_adhoc_task extends adhoc_task {
 
             $cmcontext = context_module::instance($cmid, MUST_EXIST);
             // Trigger an event for course module completion changed.
-            $event = \core\event\course_module_completion_updated::create(array(
+            $event = \core\event\course_module_completion_updated::create([
                 'objectid' => $completionrecord->id,
                 'context' => $cmcontext,
                 'relateduserid' => $userid,
-                'other' => array(
-                    'relateduserid' => $userid
-                )
-            ));
+                'other' => [
+                    'relateduserid' => $userid,
+                ],
+            ]);
             $event->add_record_snapshot('course_modules_completion', $completionrecord);
             $event->trigger();
 
             $result = false;
-            if (($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) ||
+            if (
+                ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) ||
                 ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_NEVER) ||
                 ($reengagement->emailuser == REENGAGEMENT_EMAILUSER_TIME && !empty($inprogress->emailsent))
             ) {
@@ -191,7 +192,7 @@ class reengagement_adhoc_task extends adhoc_task {
                 // Delete inprogress record.
                 debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id.
                       User marked complete, deleting inprogress record for user $userid");
-                $result = $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
+                $result = $DB->delete_records('reengagement_inprogress', ['id' => $inprogress->id]);
             } else {
                 // Update inprogress record to indicate completion done.
                 debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id
@@ -230,7 +231,7 @@ class reengagement_adhoc_task extends adhoc_task {
                              AND u.deleted = 0
                              AND ip.reengagement = :reengagementid
                     ORDER BY r.id ASC';
-        $params = array('emailtime' => $timenow, 'reengagementid' => $reengagementid);
+        $params = ['emailtime' => $timenow, 'reengagementid' => $reengagementid];
 
         $inprogresses = $DB->get_recordset_sql($inprogresssql, $params);
         $emailduecount = 0;
@@ -242,14 +243,14 @@ class reengagement_adhoc_task extends adhoc_task {
             // Check if user is still enrolled in the course.
             $context = context_module::instance($reengagement->cmid);
             if (!is_enrolled($context, $userid, 'mod/reengagement:startreengagement', true)) {
-                $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
+                $DB->delete_records('reengagement_inprogress', ['id' => $inprogress->id]);
                 continue;
             }
 
             if ($inprogress->completed == COMPLETION_COMPLETE) {
                 debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id.
                       User already marked complete. Deleting inprogress record for user $userid");
-                $result = $DB->delete_records('reengagement_inprogress', array('id' => $inprogress->id));
+                $result = $DB->delete_records('reengagement_inprogress', ['id' => $inprogress->id]);
             } else {
                 debugging('', DEBUG_DEVELOPER) && mtrace("mode $reengagement->emailuser reengagementid $reengagement->id.
                       Updating inprogress record to indicate email sent for user $userid");

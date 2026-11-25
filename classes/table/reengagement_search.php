@@ -40,7 +40,6 @@ require_once($CFG->dirroot . '/user/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class reengagement_search extends participants_search {
-
     /**
      * Generate the SQL used to fetch filtered data for the reengagement table.
      *

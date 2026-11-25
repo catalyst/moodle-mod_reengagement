@@ -27,7 +27,7 @@ use core\task\manager;
 use mod_reengagement\task\reengagement_adhoc_task;
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->libdir."/completionlib.php");
+require_once($CFG->libdir . "/completionlib.php");
 
 define('REENGAGEMENT_EMAILUSER_NEVER', 0);
 define('REENGAGEMENT_EMAILUSER_COMPLETION', 1);
@@ -62,11 +62,11 @@ function reengagement_add_instance($reengagement) {
     }
 
     // Check course has completion enabled, and enable it if not, and user has permission to do so.
-    $course = $DB->get_record('course', array('id' => $reengagement->course));
+    $course = $DB->get_record('course', ['id' => $reengagement->course]);
     if (empty($course->enablecompletion)) {
         $coursecontext = context_course::instance($course->id);
         if (has_capability('moodle/course:update', $coursecontext)) {
-            $data = array('id' => $course->id, 'enablecompletion' => '1');
+            $data = ['id' => $course->id, 'enablecompletion' => '1'];
             $DB->update_record('course', $data);
             rebuild_course_cache($course->id);
         }
@@ -111,18 +111,18 @@ function reengagement_update_instance($reengagement) {
 function reengagement_delete_instance($id) {
     global $DB;
 
-    if (! $reengagement = $DB->get_record('reengagement', array('id' => $id))) {
+    if (! $reengagement = $DB->get_record('reengagement', ['id' => $id])) {
         return false;
     }
 
     $result = true;
 
     // Delete any dependent records here.
-    if (! $DB->delete_records('reengagement_inprogress', array('reengagement' => $reengagement->id))) {
+    if (! $DB->delete_records('reengagement_inprogress', ['reengagement' => $reengagement->id])) {
         $result = false;
     }
 
-    if (! $DB->delete_records('reengagement', array('id' => $reengagement->id))) {
+    if (! $DB->delete_records('reengagement', ['id' => $reengagement->id])) {
         $result = false;
     }
 
@@ -179,7 +179,7 @@ function reengagement_print_recent_activity($course, $isteacher, $timestart) {
 function reengagement_crontask() {
     global $CFG, $DB;
 
-    require_once($CFG->libdir."/completionlib.php");
+    require_once($CFG->libdir . "/completionlib.php");
 
     // Get a consistent 'timenow' value across this whole function.
     $timenow = time();
@@ -226,10 +226,10 @@ function reengagement_crontask() {
 function reengagement_email_user($reengagement, $inprogress) {
     global $DB, $SITE, $CFG;
     $istotara = false;
-    if (file_exists($CFG->dirroot.'/totara')) {
+    if (file_exists($CFG->dirroot . '/totara')) {
         $istotara = true;
     }
-    $user = $DB->get_record('user', array('id' => $inprogress->userid));
+    $user = $DB->get_record('user', ['id' => $inprogress->userid]);
     if (!empty($user->deleted)) {
         // User has been deleted - don't send an e-mail.
         return true;
@@ -237,8 +237,8 @@ function reengagement_email_user($reengagement, $inprogress) {
     if (!empty($reengagement->suppresstarget)) {
         $targetcomplete = reengagement_check_target_completion($user->id, $reengagement->suppresstarget);
         if ($targetcomplete) {
-            debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:'.$user->id.
-                      ' has completed target activity:'.$reengagement->suppresstarget.' suppressing email.');
+            debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:' . $user->id .
+                      ' has completed target activity:' . $reengagement->suppresstarget . ' suppressing email.');
             return true;
         }
     }
@@ -246,27 +246,29 @@ function reengagement_email_user($reengagement, $inprogress) {
     if (!empty($inprogress->timedue) && (($inprogress->timedue + 2 * DAYSECS) < time())) {
         // We should have sent this email more than two days ago.
         // Don't send.
-        debugging('', DEBUG_ALL) && mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.
+        debugging('', DEBUG_ALL) && mtrace('Reengagement: ip id ' . $inprogress->id . 'User:' . $user->id .
                   ' Email not sent - was due more than 2 days ago.');
         return true;
     }
     if (!empty($inprogress->timeoverdue) && ($inprogress->timeoverdue < time())) {
         // There's a deadline hint provided, and we're past it.
         // Don't send.
-        debugging('', DEBUG_ALL) && mtrace('Reengagement: ip id ' . $inprogress->id . 'User:'.$user->id.
+        debugging('', DEBUG_ALL) && mtrace('Reengagement: ip id ' . $inprogress->id . 'User:' . $user->id .
                   ' Email not sent - past usefulness deadline.');
         return true;
     }
 
-    debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:'.$user->id.' Sending email.');
+    debugging('', DEBUG_DEVELOPER) && mtrace('Reengagement modules: User:' . $user->id . ' Sending email.');
 
     $templateddetails = reengagement_template_variables($reengagement, $inprogress, $user);
     $plaintext = html_to_text($templateddetails['emailcontent']);
 
     $emailresult = true;
-    if ($istotara &&
+    if (
+        $istotara &&
         ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_MANAGER) ||
-        ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
+        ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)
+    ) {
         // We're supposed to email the user's manager(s).
         $managerids = \totara_job\job_assignment::get_all_manager_userids($user->id);
         if (empty($managerids)) {
@@ -275,8 +277,9 @@ function reengagement_email_user($reengagement, $inprogress) {
         } else {
             // User has manager(s).
             foreach ($managerids as $managerid) {
-                $manager = $DB->get_record('user', array('id' => $managerid));
-                $managersendresult = reengagement_send_notification($manager,
+                $manager = $DB->get_record('user', ['id' => $managerid]);
+                $managersendresult = reengagement_send_notification(
+                    $manager,
                     $templateddetails['emailsubjectmanager'],
                     html_to_text($templateddetails['emailcontentmanager']),
                     $templateddetails['emailcontentmanager'],
@@ -289,10 +292,13 @@ function reengagement_email_user($reengagement, $inprogress) {
             }
         }
     }
-    if (($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_USER) ||
-        ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)) {
+    if (
+        ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_USER) ||
+        ($reengagement->emailrecipient == REENGAGEMENT_RECIPIENT_BOTH)
+    ) {
         // We are supposed to send email to the user.
-        $usersendresult = reengagement_send_notification($user,
+        $usersendresult = reengagement_send_notification(
+            $user,
             $templateddetails['emailsubject'],
             $plaintext,
             $templateddetails['emailcontent'],
@@ -324,17 +330,17 @@ function reengagement_email_user($reengagement, $inprogress) {
 
             debugging('', DEBUG_ALL) && mtrace("sending third-party email to: $emailaddress");
 
-            $usersendresult = reengagement_send_notification($thirdpartyuser,
-                    $templateddetails['emailsubjectthirdparty'],
-                    html_to_text($templateddetails['emailcontentthirdparty']),
-                    $templateddetails['emailcontentthirdparty'],
-                    $reengagement
-                );
+            $usersendresult = reengagement_send_notification(
+                $thirdpartyuser,
+                $templateddetails['emailsubjectthirdparty'],
+                html_to_text($templateddetails['emailcontentthirdparty']),
+                $templateddetails['emailcontentthirdparty'],
+                $reengagement
+            );
             if (!$usersendresult) {
                 mtrace("failed to send user $user->id email for reengagement $reengagement->id");
             }
             $emailresult = $emailresult && $usersendresult;
-
         }
     }
 
@@ -382,9 +388,9 @@ function reengagement_send_notification($userto, $subject, $messageplain, $messa
 function reengagement_template_variables($reengagement, $inprogress, $user) {
     global $CFG, $DB;
 
-    require_once($CFG->dirroot.'/user/profile/lib.php');
+    require_once($CFG->dirroot . '/user/profile/lib.php');
 
-    $templatevars = array(
+    $templatevars = [
         '/%courseshortname%/' => $reengagement->courseshortname,
         '/%coursefullname%/' => $reengagement->coursefullname,
         '/%courseid%/' => $reengagement->courseid,
@@ -394,14 +400,14 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
         '/%usercity%/' => $user->city,
         '/%userinstitution%/' => $user->institution,
         '/%userdepartment%/' => $user->department,
-    );
+    ];
     // Add the users course groups as a template item.
     $groups = $DB->get_records_sql_menu("SELECT g.id, g.name
                                    FROM {groups_members} gm
                                    JOIN {groups} g
                                     ON g.id = gm.groupid
                                   WHERE gm.userid = ? AND g.courseid = ?
-                                   ORDER BY name ASC", array($user->id, $reengagement->courseid));
+                                   ORDER BY name ASC", [$user->id, $reengagement->courseid]);
 
     if (!empty($groups)) {
         $templatevars['/%usergroups%/'] = implode(', ', $groups);
@@ -412,7 +418,7 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
     // Now do custom user fields.
     $fields = profile_get_custom_fields();
     if (!empty($fields)) {
-        $userfielddata = $DB->get_records('user_info_data', array('userid' => $user->id), '', 'fieldid, data, dataformat');
+        $userfielddata = $DB->get_records('user_info_data', ['userid' => $user->id], '', 'fieldid, data, dataformat');
         foreach ($fields as $field) {
             if (!empty($userfielddata[$field->id])) {
                 if ($field->datatype == 'datetime') {
@@ -422,14 +428,15 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
                         $format = get_string('strftimedate', 'langconfig');
                     }
 
-                    $templatevars['/%profilefield_'.$field->shortname.'%/'] = userdate($userfielddata[$field->id]->data, $format);
+                    $templatevars['/%profilefield_' . $field->shortname . '%/'] = userdate($userfielddata[$field->id]->data, $format);
                 } else {
-                    $templatevars['/%profilefield_'.$field->shortname.'%/'] = format_text($userfielddata[$field->id]->data,
-                                                                                          $userfielddata[$field->id]->dataformat);
+                    $templatevars['/%profilefield_' . $field->shortname . '%/'] = format_text(
+                        $userfielddata[$field->id]->data,
+                        $userfielddata[$field->id]->dataformat
+                    );
                 }
-
             } else {
-                $templatevars['/%profilefield_'.$field->shortname.'%/'] = '';
+                $templatevars['/%profilefield_' . $field->shortname . '%/'] = '';
             }
         }
     }
@@ -437,26 +444,26 @@ function reengagement_template_variables($reengagement, $inprogress, $user) {
     $replacements = array_values($templatevars); // The values which are to be templated in for the placeholders.
 
     // Array to describe which fields in reengagement object should have a template replacement.
-    $replacementfields = array('emailsubject', 'emailcontent', 'emailsubjectmanager', 'emailcontentmanager',
-                               'emailsubjectthirdparty', 'emailcontentthirdparty', 'thirdpartyemails');
+    $replacementfields = ['emailsubject', 'emailcontent', 'emailsubjectmanager', 'emailcontentmanager',
+                               'emailsubjectthirdparty', 'emailcontentthirdparty', 'thirdpartyemails'];
 
-    $results = array();
+    $results = [];
     // Replace %variable% with relevant value everywhere it occurs in reengagement->field.
     foreach ($replacementfields as $field) {
         $results[$field] = preg_replace($patterns, $replacements, $reengagement->$field);
     }
 
     // Apply enabled filters to email content.
-    $options = array(
+    $options = [
             'context' => context_course::instance($reengagement->courseid),
             'noclean' => true,
-            'trusted' => true
-    );
-    $subjectfields = array('emailsubject', 'emailsubjectmanager', 'emailsubjectthirdparty');
+            'trusted' => true,
+    ];
+    $subjectfields = ['emailsubject', 'emailsubjectmanager', 'emailsubjectthirdparty'];
     foreach ($subjectfields as $field) {
         $results[$field] = format_text($results[$field], FORMAT_PLAIN, $options);
     }
-    $contentfields = array('emailcontent', 'emailcontentmanager', 'emailcontentthirdparty');
+    $contentfields = ['emailcontent', 'emailcontentmanager', 'emailcontentthirdparty'];
     foreach ($contentfields as $field) {
         $results[$field] = format_text($results[$field], FORMAT_MOODLE, $options);
     }
@@ -532,7 +539,7 @@ function reengagement_reset_course_form_definition(&$mform) {
  * @return array
  */
 function reengagement_reset_course_form_defaults($course) {
-    return array('reset_reengagement' => 1);
+    return ['reset_reengagement' => 1];
 }
 
 /**
@@ -546,15 +553,15 @@ function reengagement_reset_userdata($data) {
     global $DB;
 
     $componentstr = get_string('modulenameplural', 'reengagement');
-    $status = array();
+    $status = [];
 
     if (!empty($data->reset_reengagement)) {
         $reengagementsql = "SELECT ch.id
                        FROM {reengagement} ch
                        WHERE ch.course=?";
 
-        $DB->delete_records_select('reengagement_inprogress', "reengagement IN ($reengagementsql)", array($data->courseid));
-        $status[] = array('component' => $componentstr, 'item' => get_string('removeresponses', 'reengagement'), 'error' => false);
+        $DB->delete_records_select('reengagement_inprogress', "reengagement IN ($reengagementsql)", [$data->courseid]);
+        $status[] = ['component' => $componentstr, 'item' => get_string('removeresponses', 'reengagement'), 'error' => false];
     }
 
     return $status;
@@ -570,7 +577,7 @@ function reengagement_get_startusers($reengagement) {
     global $DB;
     $context = context_module::instance($reengagement->cmid);
 
-    list($esql, $params) = get_enrolled_sql($context, 'mod/reengagement:startreengagement', 0, true);
+    [$esql, $params] = get_enrolled_sql($context, 'mod/reengagement:startreengagement', 0, true);
 
     // Get a list of people who already started this reengagement (finished users are included in this list)
     // (based on activity completion records).
@@ -616,7 +623,7 @@ function reengagement_get_startusers($reengagement) {
  * @return mixed True if module supports feature, null if doesn't know
  */
 function reengagement_supports($feature) {
-    switch($feature) {
+    switch ($feature) {
         case FEATURE_GROUPS:
             return false;
         case FEATURE_GROUPINGS:
@@ -652,7 +659,7 @@ function reengagement_supports($feature) {
 function reengagement_get_readable_duration($duration, $periodstring = false) {
     $period = 1; // Default to dealing in seconds.
     $periodcount = $duration; // Default to dealing in seconds.
-    $periods = array(WEEKSECS, DAYSECS, HOURSECS, MINSECS);
+    $periods = [WEEKSECS, DAYSECS, HOURSECS, MINSECS];
     foreach ($periods as $period) {
         if (($duration % $period) == 0) {
             // Duration divides exactly into periods.
@@ -674,7 +681,7 @@ function reengagement_get_readable_duration($duration, $periodstring = false) {
             $period = get_string('weeks', 'reengagement');
         }
     }
-    return array($periodcount, $period); // Example 5, 60 is 5 minutes.
+    return [$periodcount, $period]; // Example 5, 60 is 5 minutes.
 }
 
 /**
@@ -687,12 +694,12 @@ function reengagement_check_target_completion($userid, $targetcmid) {
     global $DB;
     // This reengagement is focused on getting people to do a particular (ie targeted) activity.
     // Behaviour of the module changes depending on whether the target activity is already complete.
-    $conditions = array('userid' => $userid, 'coursemoduleid' => $targetcmid);
+    $conditions = ['userid' => $userid, 'coursemoduleid' => $targetcmid];
     $activitycompletion = $DB->get_record('course_modules_completion', $conditions);
     if ($activitycompletion) {
         // There is a target activity, and completion is enabled in that activity.
         $userstate = $activitycompletion->completionstate;
-        if (in_array($userstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL))) {
+        if (in_array($userstate, [COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL])) {
             return true;
         }
     }
@@ -716,7 +723,7 @@ function reengagement_checkstart($course, $cm, $reengagement) {
 
     // User could have arrived here eligible to start, but before cron had a chance to start them in the activity.
     // Check for that scenario.
-    $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
+    $completion = $DB->get_record('course_modules_completion', ['userid' => $USER->id, 'coursemoduleid' => $cm->id]);
     if (empty($completion)) {
         // User hasn't yet started this activity.
         $availabilityinfo = '';
@@ -738,8 +745,7 @@ function reengagement_checkstart($course, $cm, $reengagement) {
             $activitycompletion->userid = $USER->id;
             $DB->insert_record('course_modules_completion', $activitycompletion);
             // Re-load that same info.
-            $completion = $DB->get_record('course_modules_completion', array('userid' => $USER->id, 'coursemoduleid' => $cm->id));
-
+            $completion = $DB->get_record('course_modules_completion', ['userid' => $USER->id, 'coursemoduleid' => $cm->id]);
         } else {
             // The user has permission to start a reengagement, but not this one (likely due to incomplete prerequiste activities).
             $report = "This reengagement is not available";
@@ -750,7 +756,7 @@ function reengagement_checkstart($course, $cm, $reengagement) {
         }
     }
     if (!empty($completion)) {
-        $rip = $DB->get_record('reengagement_inprogress', array('userid' => $USER->id, 'reengagement' => $reengagement->id));
+        $rip = $DB->get_record('reengagement_inprogress', ['userid' => $USER->id, 'reengagement' => $reengagement->id]);
     }
     $dateformat = get_string('strftimedatetime', 'langconfig'); // Description of how to format times in user's language.
     if (!empty($completion) && !empty($rip)) {

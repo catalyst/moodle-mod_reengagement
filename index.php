@@ -23,12 +23,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/lib.php');
 
 $id = required_param('id', PARAM_INT);
 
-$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
 
 require_login($course);
 
@@ -36,7 +36,7 @@ require_login($course);
 $strreengagements = get_string('modulenameplural', 'reengagement');
 $strreengagement  = get_string('modulename', 'reengagement');
 
-$params = array();
+$params = [];
 
 $params['id'] = $id;
 
@@ -48,9 +48,9 @@ $PAGE->set_title(format_string($strreengagements));
 $PAGE->set_heading(format_string($course->fullname));
 
 // Add the page view to the Moodle log.
-$event = \mod_reengagement\event\course_module_instance_list_viewed::create(array(
-    'context' => context_course::instance($course->id)
-));
+$event = \mod_reengagement\event\course_module_instance_list_viewed::create([
+    'context' => context_course::instance($course->id),
+]);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
@@ -69,7 +69,7 @@ $timenow  = time();
 $strname  = get_string('name');
 $strweek  = get_string('week');
 $strtopic = get_string('topic');
-$strsectionname  = get_string('sectionname', 'format_'.$course->format);
+$strsectionname  = get_string('sectionname', 'format_' . $course->format);
 
 $usesections = course_format_uses_sections($course->format);
 
@@ -77,11 +77,11 @@ $table = new html_table();
 $table->attributes['class'] = 'generaltable mod_index';
 
 if ($usesections) {
-    $table->head  = array ($strsectionname, $strname);
-    $table->align = array ('center', 'left', 'left');
+    $table->head  = [$strsectionname, $strname];
+    $table->align = ['center', 'left', 'left'];
 } else {
-    $table->head  = array ($strlastmodified, $strname);
-    $table->align = array ('left', 'left', 'left');
+    $table->head  = [$strlastmodified, $strname];
+    $table->align = ['left', 'left', 'left'];
 }
 
 
@@ -101,17 +101,16 @@ foreach ($reengagements as $reengagement) {
             $currentsection = $reengagement->section;
         }
     } else {
-        $printsection = '<span class="smallinfo">'.userdate($reengagement->timemodified)."</span>";
+        $printsection = '<span class="smallinfo">' . userdate($reengagement->timemodified) . "</span>";
     }
 
     $class = $reengagement->visible ? '' : 'class="dimmed"'; // Hidden modules are dimmed.
 
-    $table->data[] = array (
+    $table->data[] = [
         $printsection,
-        "<a $class href=\"view.php?id=$cm->id\">".format_string($reengagement->name)."</a>");
+        "<a $class href=\"view.php?id=$cm->id\">" . format_string($reengagement->name) . "</a>"];
 }
 
 echo html_writer::table($table);
 
 echo $OUTPUT->footer();
-
