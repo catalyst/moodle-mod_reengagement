@@ -8,4 +8,4 @@ jobs:
     uses: catalyst/catalyst-moodle-workflows/.github/workflows/ci.yml@main
     # Required if you plan to publish (uncomment the below)
     secrets:
-      moodle_org_token: ${{ secrets.MOODLE_ORG_TOKEN }}
+      MOODLE_MARKETPLACE_TOKEN: ${{ secrets.MOODLE_MARKETPLACE_TOKEN }}
