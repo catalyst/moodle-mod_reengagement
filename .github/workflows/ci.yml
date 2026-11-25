@@ -6,6 +6,9 @@ on: [push, pull_request]
 jobs:
   ci:
     uses: catalyst/catalyst-moodle-workflows/.github/workflows/ci.yml@main
+    # The shared workflow's release job tags releases, which needs write access.
+    permissions:
+      contents: write
     # Required if you plan to publish (uncomment the below)
     secrets:
       MOODLE_MARKETPLACE_TOKEN: ${{ secrets.MOODLE_MARKETPLACE_TOKEN }}
