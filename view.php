@@ -38,7 +38,7 @@ $page = optional_param('page', 0, PARAM_INT); // Which page to show.
 $perpage = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
 $selectall = optional_param('selectall', false, PARAM_BOOL); // When rendering checkboxes against users mark them all checked.
 
-$params = array();
+$params = [];
 
 if ($id) {
     $params['id'] = $id;
@@ -50,12 +50,11 @@ $PAGE->set_url('/mod/reengagement/view.php', $params);
 
 if ($id) {
     $cm = get_coursemodule_from_id('reengagement', $id, 0, false, MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $reengagement = $DB->get_record('reengagement', array('id' => $cm->instance), '*', MUST_EXIST);
-
+    $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+    $reengagement = $DB->get_record('reengagement', ['id' => $cm->instance], '*', MUST_EXIST);
 } else if ($a) {
-    $reengagement = $DB->get_record('reengagement', array('id' => $a), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $reengagement->course), '*', MUST_EXIST);
+    $reengagement = $DB->get_record('reengagement', ['id' => $a], '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $reengagement->course], '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('reengagement', $reengagement->id, $course->id, false, MUST_EXIST);
 } else {
     throw new moodle_exception('errornoid', 'mod_reengagement');
@@ -70,10 +69,10 @@ if (empty($CFG->enablecompletion) || empty($CFG->enableavailability)) {
 
 $context = context_module::instance($cm->id);
 
-$event = \mod_reengagement\event\course_module_viewed::create(array(
+$event = \mod_reengagement\event\course_module_viewed::create([
     'objectid' => $reengagement->id,
     'context' => $context,
-));
+]);
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('reengagement', $reengagement);
 $event->trigger();
@@ -106,7 +105,8 @@ if ($canstart) {
 if ($canedit) {
     $task = \core\task\manager::get_scheduled_task('\mod_reengagement\task\cron_task');
     $lastrun = $task->get_last_run_time();
-    if ($lastrun < time() - 28800) { // Check if cron run in last 8hrs.
+    // Check if cron run in last 8hrs.
+    if ($lastrun < time() - 28800) {
         echo $OUTPUT->notification(get_string('cronwarning', 'reengagement'));
     }
 
@@ -118,10 +118,10 @@ if ($canedit) {
     echo '<div class="userlist">';
 
     // Should use this variable so that we don't break stuff every time a variable is added or changed.
-    $baseurl = new moodle_url('/mod/reengagement/view.php', array(
+    $baseurl = new moodle_url('/mod/reengagement/view.php', [
         'contextid' => $context->id,
         'id' => $cm->id,
-        'perpage' => $perpage));
+        'perpage' => $perpage]);
 
     $participanttable->set_filterset($filterset);
 
@@ -200,13 +200,13 @@ if ($canedit) {
             ]);
         }
         echo html_writer::end_tag('div');
-        $displaylist = array();
+        $displaylist = [];
         $displaylist['#messageselect'] = get_string('messageselectadd');
 
         $pluginoptions = [];
         $params = ['operation' => 'resetbyfirstcourseaccess'];
         $url = new moodle_url('bulkchange.php', $params);
-        list ($periodcount, $period) = reengagement_get_readable_duration($reengagement->duration, true);
+         [$periodcount, $period] = reengagement_get_readable_duration($reengagement->duration, true);
         $duration = $periodcount . " " . $period;
         $pluginoptions['resetbyfirstaccess'] = get_string('resetbyfirstaccess', 'mod_reengagement', $duration);
         $pluginoptions['resetbyenrolment'] = get_string('resetbyenrolment', 'mod_reengagement', $duration);
@@ -216,8 +216,8 @@ if ($canedit) {
         $displaylist[] = [$name => $pluginoptions];
 
         echo $OUTPUT->help_icon('withselectedusers', 'mod_reengagement');
-        echo html_writer::tag('label', get_string("withselectedusers"), array('for' => 'formactionid'));
-        echo html_writer::select($displaylist, 'formaction', '', array('' => 'choosedots'), array('id' => 'formactionid'));
+        echo html_writer::tag('label', get_string("withselectedusers"), ['for' => 'formactionid']);
+        echo html_writer::select($displaylist, 'formaction', '', ['' => 'choosedots'], ['id' => 'formactionid']);
 
         echo '<noscript style="display:inline">';
         echo '<div><input type="submit" value="' . get_string('ok') . '" /></div>';
@@ -228,13 +228,12 @@ if ($canedit) {
 
     $jsoptions = (object)[
         'courseid' => $course->id,
-        'context' => $context->id
+        'context' => $context->id,
     ];
 
     $PAGE->requires->js_call_amd('core_user/participants', 'init', [$jsoptions]);
 
     echo '</div>';  // Userlist.
-
 }
 
 // Finish the page.

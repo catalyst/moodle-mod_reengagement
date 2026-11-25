@@ -27,7 +27,6 @@ namespace mod_reengagement\table;
 
 use context;
 use context_module;
-
 use core_table\local\filter\filterset;
 use core_user\output\status_field;
 use DateTime;
@@ -49,7 +48,6 @@ require_once($CFG->dirroot . '/user/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class reengagement_participants extends \core_user\table\participants {
-
     /**
      * @var \stdclass $reengagement The reengagement record
      */
@@ -185,7 +183,7 @@ class reengagement_participants extends \core_user\table\participants {
         $columns[] = 'roles';
 
         // Get the list of fields we have to hide.
-        $hiddenfields = array();
+        $hiddenfields = [];
         if (!has_capability('moodle/course:viewhiddenuserfields', $this->context)) {
             $hiddenfields = array_flip(explode(',', $CFG->hiddenuserfields));
         }
@@ -208,7 +206,7 @@ class reengagement_participants extends \core_user\table\participants {
         }
 
         // Show notify time and Completion time columns.
-        if (!in_array($this->reengagement->emailuser, array(REENGAGEMENT_EMAILUSER_NEVER, REENGAGEMENT_EMAILUSER_COMPLETION))) {
+        if (!in_array($this->reengagement->emailuser, [REENGAGEMENT_EMAILUSER_NEVER, REENGAGEMENT_EMAILUSER_COMPLETION])) {
             $headers[] = get_string('emailtime', 'mod_reengagement');
             $columns[] = 'emailtime';
         }
@@ -287,7 +285,7 @@ class reengagement_participants extends \core_user\table\participants {
      * @param bool $useinitialsbar do you want to use the initials bar.
      */
     public function query_db($pagesize, $useinitialsbar = true) {
-        list($twhere, $tparams) = $this->get_sql_where();
+        [$twhere, $tparams] = $this->get_sql_where();
         $psearch = new \mod_reengagement\table\reengagement_search($this->course, $this->context, $this->filterset);
 
         $sort = $this->get_sql_sort();
@@ -336,7 +334,7 @@ class reengagement_participants extends \core_user\table\participants {
         $cm = get_coursemodule_from_id('reengagement', $this->cmid, 0, false, MUST_EXIST);
         $this->courseid = $cm->course;
         $this->course = get_course($this->courseid);
-        $this->reengagement = $DB->get_record('reengagement', array('id' => $cm->instance), '*', MUST_EXIST);
+        $this->reengagement = $DB->get_record('reengagement', ['id' => $cm->instance], '*', MUST_EXIST);
 
         $this->context = context_module::instance($this->cmid, MUST_EXIST);
 

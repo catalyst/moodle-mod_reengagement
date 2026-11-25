@@ -23,24 +23,24 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/lib.php');
 
 $id = required_param('id', PARAM_INT); // Course_module ID.
 $formaction = required_param('formaction', PARAM_LOCALURL);
-$userids = optional_param('userids', array(), PARAM_TEXT);
+$userids = optional_param('userids', [], PARAM_TEXT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 
 $cm = get_coursemodule_from_id('reengagement', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$reengagement = $DB->get_record('reengagement', array('id' => $cm->instance), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+$reengagement = $DB->get_record('reengagement', ['id' => $cm->instance], '*', MUST_EXIST);
 
 $default = new moodle_url('/mod/reengagement/view.php', ['id' => $cm->id]);
 $returnurl = new moodle_url(optional_param('returnto', $default, PARAM_URL));
 
 require_sesskey(); // This is an action script.
 
-$PAGE->set_url('/mod/reengagement/view.php', array('id' => $id, 'formaction' => $formaction));
+$PAGE->set_url('/mod/reengagement/view.php', ['id' => $id, 'formaction' => $formaction]);
 
 require_login($course, true, $cm);
 
@@ -78,15 +78,15 @@ if ($formaction == 'resetbyspecificdate') {
         $years[$i] = $i;
     }
     echo '<div align="center">';
-    echo '<h4>'.get_string('specifydate', 'mod_reengagement').'</h4>';
-    echo '<form action="'.$CFG->wwwroot.'/mod/reengagement/bulkchange.php" method="POST"
+    echo '<h4>' . get_string('specifydate', 'mod_reengagement') . '</h4>';
+    echo '<form action="' . $CFG->wwwroot . '/mod/reengagement/bulkchange.php" method="POST"
            id="reengagementbulkchange" class="popupform">';
     echo html_writer::select($days, 'day', date('n'));
     echo html_writer::select($months, 'month', date('n'));
-    echo html_writer::select($years,  'year',  date('Y'));
-    echo '<input name="userids" value="'. implode(',', $userids).'" type="hidden" />';
-    echo '<input name="id" value="'.$id.'" type="hidden" />';
-    echo '<input name="sesskey" value="'.sesskey().'" type="hidden" />';
+    echo html_writer::select($years, 'year', date('Y'));
+    echo '<input name="userids" value="' . implode(',', $userids) . '" type="hidden" />';
+    echo '<input name="id" value="' . $id . '" type="hidden" />';
+    echo '<input name="sesskey" value="' . sesskey() . '" type="hidden" />';
     echo '<input name="formaction" value="resetbyspecificdate2" type="hidden" />';
     echo '<input name="submit" value="Go" type="submit" id="id_submit" />';
     echo '</form></div>';
@@ -94,8 +94,8 @@ if ($formaction == 'resetbyspecificdate') {
     exit;
 }
 
-$usernamefields = \core_user\fields::for_name()->get_sql($alias = 'u', false, '', '',  false)->selects;
-list($usql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+$usernamefields = \core_user\fields::for_name()->get_sql($alias = 'u', false, '', '', false)->selects;
+[$usql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
 
 if ($formaction == 'resetbyfirstaccess') {
     $sql = "SELECT u.id, $usernamefields, rip.id as ripid,
@@ -104,7 +104,7 @@ if ($formaction == 'resetbyfirstaccess') {
         FROM {reengagement_inprogress} rip
         JOIN {user} u on u.id = rip.userid
         LEFT JOIN {logstore_standard_log} l ON l.userid = u.id AND l.courseid = :courseid
-        WHERE rip.reengagement = :re AND u.id ".$usql ."
+        WHERE rip.reengagement = :re AND u.id " . $usql . "
         GROUP BY u.id, u.firstname, u.lastname, rip.id,
                  rip.completiontime, rip.emailtime, rip.completiontime, rip.completed";
     $params['courseid'] = $course->id;
@@ -119,7 +119,7 @@ if ($formaction == 'resetbyfirstaccess') {
         JOIN {user} u on u.id = rip.userid
         JOIN {user_enrolments} ue ON ue.userid = u.id
         JOIN {enrol} e ON (e.id = ue.enrolid) AND e.courseid = :courseid
-        WHERE rip.reengagement = :re AND u.id ".$usql ."
+        WHERE rip.reengagement = :re AND u.id " . $usql . "
         GROUP BY u.id, u.firstname, u.lastname, rip.id,
                  rip.completiontime, rip.emailtime, rip.completiontime, rip.completed";
     $params['courseid'] = $course->id;
@@ -137,10 +137,10 @@ if ($formaction == 'resetbyfirstaccess') {
 
     $sql = "SELECT u.id, $usernamefields, rip.id as ripid,
                    rip.completiontime, rip.emailtime, rip.completiontime, rip.completed,
-                   '".$timestamp."' as firstaccess
+                   '" . $timestamp . "' as firstaccess
         FROM {reengagement_inprogress} rip
         JOIN {user} u on u.id = rip.userid
-        WHERE rip.reengagement = :re AND u.id ".$usql ."
+        WHERE rip.reengagement = :re AND u.id " . $usql . "
         GROUP BY u.id, u.firstname, u.lastname, rip.id,
                  rip.completiontime, rip.emailtime, rip.completiontime, rip.completed";
     $params['courseid'] = $course->id;
@@ -167,20 +167,19 @@ if (!empty($formaction) && !empty($users)) {
                 } else {
                     $newdate = userdate($newdate, get_string('strftimedatetimeshort', 'langconfig'));
                 }
-
             } else {
                 $newdate = get_string('nochangenoaccess', 'mod_reengagement');
             }
 
             print '<tr><td>' . fullname($user) . '</td>';
-            print '<td>' . userdate($user->completiontime, get_string('strftimedatetimeshort', 'langconfig'))."</td>";
-            print '<td>'. $newdate."</td></tr>";
+            print '<td>' . userdate($user->completiontime, get_string('strftimedatetimeshort', 'langconfig')) . "</td>";
+            print '<td>' . $newdate . "</td></tr>";
         }
         print '</table>';
 
         $yesurl = new moodle_url('/mod/reengagement/bulkchange.php');
-        $yesparams = array('id' => $cm->id, 'formaction' => $formaction,
-            'userids' => implode(',', $userids), 'confirm' => 1);
+        $yesparams = ['id' => $cm->id, 'formaction' => $formaction,
+            'userids' => implode(',', $userids), 'confirm' => 1];
         if ($formaction == 'resetbyspecificdate2') {
             // Add timestamp to form.
             $yesparams['timestamp'] = $timestamp;
@@ -208,4 +207,3 @@ if (!empty($formaction) && !empty($users)) {
 }
 
 redirect($returnurl);
-

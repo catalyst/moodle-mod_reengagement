@@ -25,6 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$messageproviders = array(
-    'mod_reengagement' => array(),
-);
+$messageproviders = [
+    'mod_reengagement' => [],
+];

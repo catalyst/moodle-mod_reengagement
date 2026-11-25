@@ -32,7 +32,6 @@ namespace mod_reengagement\task;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cron_task extends \core\task\scheduled_task {
-
     /**
      * Get a descriptive name for this task (shown to admins).
      *
@@ -51,5 +50,4 @@ class cron_task extends \core\task\scheduled_task {
         require_once($CFG->dirroot . '/mod/reengagement/lib.php');
         reengagement_crontask();
     }
-
 }

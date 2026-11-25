@@ -29,7 +29,7 @@
  * @param int $oldversion
  * @return bool always true
  */
-function xmldb_reengagement_upgrade($oldversion=0) {
+function xmldb_reengagement_upgrade($oldversion = 0) {
     global $DB;
     $dbman = $DB->get_manager();
     if ($oldversion < 2014071701) {
@@ -66,7 +66,6 @@ function xmldb_reengagement_upgrade($oldversion=0) {
 
     // Add remindercount fields.
     if ($oldversion < 2016080301) {
-
         $table = new xmldb_table('reengagement');
         $field = new xmldb_field('remindercount', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '1');
         if (!$dbman->field_exists($table, $field)) {
@@ -107,7 +106,6 @@ function xmldb_reengagement_upgrade($oldversion=0) {
     }
     // Set default value.
     if ($oldversion < 2017040400) {
-
         $table = new xmldb_table('reengagement');
         $field = new xmldb_field('thirdpartyemails', XMLDB_TYPE_TEXT, null, null, false, null, null);
         $dbman->change_field_notnull($table, $field);
@@ -126,7 +124,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
 
     if ($oldversion < 2017102001) {
         global $CFG;
-        require_once($CFG->dirroot.'/mod/reengagement/lib.php');
+        require_once($CFG->dirroot . '/mod/reengagement/lib.php');
         // A bug in previous versions prevented some e-mails from being sent.
         // Flag these old broken reengagment e-mails as sent as they may no longer be relevant.
         $timenow = time();
@@ -138,7 +136,7 @@ function xmldb_reengagement_upgrade($oldversion=0) {
              LEFT JOIN {course_modules_completion} cmc ON cmc.coursemoduleid = cm.id AND cmc.userid = rin.userid
                  WHERE m.name = 'reengagement' AND cmc.id is null
                        AND rin.completiontime < ? AND rin.completed = 0";
-        $missingprogress = $DB->get_recordset_sql($sql, array($timenow));
+        $missingprogress = $DB->get_recordset_sql($sql, [$timenow]);
 
         foreach ($missingprogress as $missing) {
             // Add course completion record.
@@ -151,14 +149,16 @@ function xmldb_reengagement_upgrade($oldversion=0) {
 
             // Flag re-enagement as complete if required - or delete record.
             // logic copied from cron function.
-            if (($missing->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) ||
+            if (
+                ($missing->emailuser == REENGAGEMENT_EMAILUSER_COMPLETION) ||
                 ($missing->emailuser == REENGAGEMENT_EMAILUSER_NEVER) ||
-                ($missing->emailuser == REENGAGEMENT_EMAILUSER_TIME && !empty($missing->emailsent))) {
+                ($missing->emailuser == REENGAGEMENT_EMAILUSER_TIME && !empty($missing->emailsent))
+            ) {
                 // No need to keep 'inprogress' record for later emailing
                 // Delete inprogress record.
                 debugging('', DEBUG_DEVELOPER) && mtrace("mode $missing->emailuser reengagementid $missing->id.
                       User marked complete, deleting inprogress record for user $missing->userid");
-                $DB->delete_records('reengagement_inprogress', array('id' => $missing->id));
+                $DB->delete_records('reengagement_inprogress', ['id' => $missing->id]);
             } else {
                 // Update inprogress record to indicate completion done.
                 debugging('', DEBUG_DEVELOPER) && mtrace("mode $missing->emailuser reengagementid $missing->id

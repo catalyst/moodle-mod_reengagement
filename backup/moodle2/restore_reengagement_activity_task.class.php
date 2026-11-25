@@ -36,7 +36,6 @@ require_once($CFG->dirroot . '/mod/reengagement/backup/moodle2/restore_reengagem
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_reengagement_activity_task extends restore_activity_task {
-
     /**
      * Define (add) particular settings this activity can have
      */
@@ -57,7 +56,7 @@ class restore_reengagement_activity_task extends restore_activity_task {
      * processed by the link decoder
      */
     public static function define_decode_contents() {
-        $contents = array();
+        $contents = [];
 
         $contents[] = new restore_decode_content('reengagement', 'emailcontent');
         $contents[] = new restore_decode_content('reengagement', 'emailcontentmanager');
@@ -71,13 +70,12 @@ class restore_reengagement_activity_task extends restore_activity_task {
      * to the activity to be executed by the link decoder
      */
     public static function define_decode_rules() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_decode_rule('STANDDOWNVIEWBYID', '/mod/reengagement/view.php?id=$1', 'course_module');
         $rules[] = new restore_decode_rule('STANDDOWNINDEX', '/mod/reengagement/index.php?id=$1', 'course');
 
         return $rules;
-
     }
 
     /**
@@ -87,7 +85,7 @@ class restore_reengagement_activity_task extends restore_activity_task {
      * of {@see restore_log_rule} objects
      */
     public static function define_restore_log_rules() {
-        $rules = array();
+        $rules = [];
 
         return $rules;
     }
@@ -103,11 +101,18 @@ class restore_reengagement_activity_task extends restore_activity_task {
      * activity level. All them are rules not linked to any module instance (cmid = 0)
      */
     public static function define_restore_log_rules_for_course() {
-        $rules = array();
+        $rules = [];
 
         // Fix old wrong uses (missing extension).
-        $rules[] = new restore_log_rule('reengagement', 'view all', 'index?id={course}', null,
-                                        null, null, 'index.php?id={course}');
+        $rules[] = new restore_log_rule(
+            'reengagement',
+            'view all',
+            'index?id={course}',
+            null,
+            null,
+            null,
+            'index.php?id={course}'
+        );
         $rules[] = new restore_log_rule('reengagement', 'view all', 'index.php?id={course}', null);
 
         return $rules;
@@ -122,7 +127,7 @@ class restore_reengagement_activity_task extends restore_activity_task {
         global $DB;
         $id = $this->get_activityid();
         $course = $this->get_courseid();
-        $reengagement = $DB->get_record('reengagement', array('id' => $id));
+        $reengagement = $DB->get_record('reengagement', ['id' => $id]);
         if (empty($reengagement)) {
             // Unexpected, but nothing needs doing.
             return;
@@ -143,7 +148,7 @@ class restore_reengagement_activity_task extends restore_activity_task {
             // put out a log warning and set a target of 0. not much else we can do here
             // nb: according to wiki doc these logs go nowhere!
             $this->get_logger()->process("Failed to restore the suppressed email target in reengagement: '$id'. " .
-                "Backup and restore of this item will not work correctly unless you include the required activity ".
+                "Backup and restore of this item will not work correctly unless you include the required activity " .
                 "in the restore to course:$course.", backup::LOG_ERROR);
             $reengagement->suppresstarget = 0;
             $DB->update_record('reengagement', $reengagement);

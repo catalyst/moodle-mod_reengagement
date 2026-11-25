@@ -45,14 +45,13 @@ class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,
     \core_privacy\local\request\plugin\provider {
-
     /**
      * Returns meta data about this system.
      *
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
             'reengagement_inprogress',
             [
@@ -60,7 +59,7 @@ class provider implements
                 'userid' => 'privacy:metadata:userid',
                 'completiontime' => 'privacy:metadata:completiontime',
                 'emailtime' => 'privacy:metadata:emailtime',
-                'emailsent' => 'privacy:metadata:emailsent'
+                'emailsent' => 'privacy:metadata:emailsent',
             ],
             'privacy:metadata:reengagement_inprogress'
         );
@@ -74,8 +73,8 @@ class provider implements
      * @param int $userid The user to search.
      * @return contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
-        return (new contextlist)->add_from_sql(
+    public static function get_contexts_for_userid(int $userid): contextlist {
+        return (new contextlist())->add_from_sql(
             "SELECT ctx.id
                  FROM {course_modules} cm
                  JOIN {modules} m ON cm.module = m.id AND m.name = :modulename
@@ -86,7 +85,7 @@ class provider implements
             [
                 'modulename' => 'reengagement',
                 'contextlevel' => CONTEXT_MODULE,
-                'userid' => $userid
+                'userid' => $userid,
             ]
         );
     }
@@ -112,7 +111,7 @@ class provider implements
             'reengagement_inprogress',
             "reengagement = :reengagementid",
             [
-                'reengagementid' => $cm->instance
+                'reengagementid' => $cm->instance,
             ]
         );
     }
@@ -140,7 +139,7 @@ class provider implements
                 "reengagement = :reengagementid AND userid = :userid",
                 [
                     'reengagementid' => $cm->instance,
-                    'userid' => $userid
+                    'userid' => $userid,
                 ]
             );
         }
@@ -157,10 +156,10 @@ class provider implements
         $params = [
             'modulename' => 'reengagement',
             'contextlevel' => CONTEXT_MODULE,
-            'userid' => $contextlist->get_user()->id
+            'userid' => $contextlist->get_user()->id,
         ];
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT
                     rip.*,
@@ -195,10 +194,10 @@ class provider implements
      * @param array $classes An array of classes to group.
      * @param string $property A common property to group the classes by.
      */
-    private static function group_by_property(array $classes, string $property) : array {
+    private static function group_by_property(array $classes, string $property): array {
         return array_reduce(
             $classes,
-            function (array $classes, stdClass $class) use ($property) : array {
+            function (array $classes, stdClass $class) use ($property): array {
                 $classes[$class->{$property}][] = $class;
                 return $classes;
             },
@@ -215,14 +214,14 @@ class provider implements
      * @param stdClass $dbrow A row from the database containing session information.
      * @return stdClass The transformed row.
      */
-    private static function transform_db_row_to_data(stdClass $dbrow) : stdClass {
+    private static function transform_db_row_to_data(stdClass $dbrow): stdClass {
         return (object) [
             'name' => $dbrow->reengagementname,
             'userid' => $dbrow->userid,
             'completiontime' => transform::datetime($dbrow->completiontime),
             'emailtime' => transform::datetime($dbrow->emailtime),
             'emailsent' => $dbrow->emailsent,
-            'completed' => $dbrow->completed
+            'completed' => $dbrow->completed,
         ];
     }
 
@@ -269,7 +268,7 @@ class provider implements
         }
         // Prepare SQL to gather all completed IDs.
         $userids = $userlist->get_userids();
-        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
 
         $sql = "(SELECT r.id
                   FROM {reengagement_inprogress} r
